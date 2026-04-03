@@ -1,0 +1,15 @@
+---
+description: Antes de deploy ou publicação, ler deploy.md e seguir o destino definido
+alwaysApply: true
+---
+
+# Deploy (Agenda Católica)
+
+Quando o usuário pedir **deploy**, **publicar**, **subir para o GitHub**, **release**, **EAS build** ou equivalente neste repositório:
+
+1. **Abrir e ler integralmente** o arquivo `deploy.md` na raiz do projeto (mesmo nível que `package.json`, pasta `agenda-catolica`).
+2. Tratar o **destino padrão de código** como: repositório **https://github.com/gfmcosta08/diario_catolico**, branch **`main`**, trabalhando a partir da pasta **`agenda-catolica`** (ou o clone atual).
+3. **Não** sobrescrever `.env` sem confirmação explícita do usuário.
+4. Para lojas (Play/App Store) ou hospedagem web estática, seguir a secção “Outros tipos de deploy” em `deploy.md` e confirmar o alvo se não estiver definido.
+
+Sem ler `deploy.md`, não executar fluxo de deploy assumindo outro remoto ou branch.
