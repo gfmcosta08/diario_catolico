@@ -12,11 +12,8 @@ export default function RegisterScreen() {
   const [password, setPassword] = useState('');
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
-  const [info, setInfo] = useState<string | null>(null);
-
   async function onSubmit() {
     setError(null);
-    setInfo(null);
     if (password.length < 6) {
       setError('A senha deve ter pelo menos 6 caracteres.');
       return;
@@ -28,9 +25,9 @@ export default function RegisterScreen() {
         setError(err.message);
         return;
       }
-      setInfo('Conta criada! Faça login para continuar.');
-    } catch (e: any) {
-      setError(e.message || 'Erro ao criar conta');
+      router.replace('/(app)');
+    } catch (e: unknown) {
+      setError(e instanceof Error ? e.message : 'Erro ao criar conta');
     } finally {
       setLoading(false);
     }
@@ -65,7 +62,6 @@ export default function RegisterScreen() {
         />
         
         {error ? <Text style={styles.error}>{error}</Text> : null}
-        {info ? <Text style={styles.info}>{info}</Text> : null}
         
         <AppButton title="Cadastrar" onPress={onSubmit} loading={loading} />
         
@@ -103,11 +99,6 @@ const styles = StyleSheet.create({
   },
   error: {
     color: palette.error,
-    marginBottom: spacing.md,
-    fontSize: 14,
-  },
-  info: {
-    color: palette.success,
     marginBottom: spacing.md,
     fontSize: 14,
   },

@@ -60,7 +60,13 @@ async function request<T>(path: string, init: RequestInit = {}, auth = true): Pr
   }
 
   if (!res.ok) {
-    throw new Error(data?.error || 'Erro na API');
+    const o = data && typeof data === 'object' ? (data as { error?: string; message?: string }) : null;
+    const fromBody = o?.error ?? o?.message;
+    throw new Error(
+      fromBody?.trim()
+        ? String(fromBody)
+        : `Erro na API (${res.status}${res.statusText ? ` ${res.statusText}` : ''})`
+    );
   }
 
   return data as T;
