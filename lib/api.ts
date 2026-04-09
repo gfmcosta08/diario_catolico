@@ -5,7 +5,11 @@ const extra = Constants.expoConfig?.extra as { apiUrl?: string } | undefined;
 const configuredApiUrl = process.env.EXPO_PUBLIC_API_URL ?? extra?.apiUrl ?? '';
 const API_URL = configuredApiUrl.replace(/\/$/, '');
 
-export const isApiConfigured = Boolean(API_URL);
+function hasBaseUrl() {
+  return Boolean(API_URL) || (typeof window !== 'undefined' && typeof window.location?.origin === 'string');
+}
+
+export const isApiConfigured = hasBaseUrl();
 const TOKEN_KEY = 'auth_token';
 
 export type AuthUser = { id: string; email: string };
