@@ -6,6 +6,7 @@ services:
     plan: free
     buildCommand: npm install && cd backend && npm install && npm run prisma:generate && cd backend && npx tsc && cd .. && npm run build:web
     startCommand: cd backend && npm run prisma:push && node dist/server.js
+    
     envVars:
       - key: DATABASE_URL
         fromDatabase:
