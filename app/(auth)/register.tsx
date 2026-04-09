@@ -85,7 +85,7 @@ export default function RegisterScreen() {
             {info}
           </Text>
         ) : null}
-        <AppButton title="Cadastrar" onPress={onSubmit} loading={loading} />
+        <AppButton title="Cadastrar" onPress={onSubmit} loading={loading} disabled={!configured} />
         <Link href="/(auth)/login" asChild>
           <AppButton title="JÃ¡ tenho conta" variant="outline" style={styles.mt} />
         </Link>

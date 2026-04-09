@@ -80,7 +80,7 @@ export default function ForgotPasswordScreen() {
         </View>
       ) : null}
 
-      <AppButton title="Enviar link" onPress={onSubmit} loading={loading} />
+      <AppButton title="Enviar link" onPress={onSubmit} loading={loading} disabled={!configured} />
 
       <Link href="/(auth)/reset-password" asChild>
         <AppButton title="Já tenho token" variant="ghost" style={styles.mtSm} />

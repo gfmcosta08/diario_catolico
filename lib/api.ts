@@ -3,9 +3,7 @@ import Constants from 'expo-constants';
 
 const extra = Constants.expoConfig?.extra as { apiUrl?: string } | undefined;
 const configuredApiUrl = process.env.EXPO_PUBLIC_API_URL ?? extra?.apiUrl ?? '';
-const fallbackWebOrigin = typeof window !== 'undefined' ? window.location.origin : '';
-const isBrowser = typeof window !== 'undefined' && typeof window.location !== 'undefined';
-const API_URL = (configuredApiUrl || (isBrowser ? fallbackWebOrigin : '')).replace(/\/$/, '');
+const API_URL = configuredApiUrl.replace(/\/$/, '');
 
 export const isApiConfigured = Boolean(API_URL);
 const TOKEN_KEY = 'auth_token';
@@ -24,8 +22,17 @@ export async function clearToken() {
   await AsyncStorage.removeItem(TOKEN_KEY);
 }
 
+function getBaseUrl() {
+  if (API_URL) return API_URL;
+  if (typeof window !== 'undefined' && window.location?.origin) {
+    return window.location.origin;
+  }
+  return '';
+}
+
 async function request<T>(path: string, init: RequestInit = {}, auth = true): Promise<T> {
-  if (!API_URL) {
+  const baseUrl = getBaseUrl();
+  if (!baseUrl) {
     throw new Error('Configure EXPO_PUBLIC_API_URL');
   }
 
@@ -39,7 +46,7 @@ async function request<T>(path: string, init: RequestInit = {}, auth = true): Pr
     if (token) headers.Authorization = `Bearer ${token}`;
   }
 
-  const res = await fetch(`${API_URL}${path}`, { ...init, headers });
+  const res = await fetch(`${baseUrl}${path}`, { ...init, headers });
 
   let data: any = null;
   try {

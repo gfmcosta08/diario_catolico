@@ -77,7 +77,7 @@ export default function LoginScreen() {
             {error}
           </Text>
         ) : null}
-        <AppButton title="Entrar" onPress={onSubmit} loading={loading} />
+        <AppButton title="Entrar" onPress={onSubmit} loading={loading} disabled={!configured} />
         <Link href="/(auth)/register" asChild>
           <AppButton title="Criar nova conta" variant="outline" style={styles.mt} />
         </Link>
