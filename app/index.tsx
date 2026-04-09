@@ -13,7 +13,7 @@ export default function Index() {
     );
   }
 
-  if (configured && !session) {
+  if (!session) {
     return <Redirect href="/(auth)/login" />;
   }
 

@@ -5,6 +5,7 @@ import React, {
   useCallback,
   useContext,
   useEffect,
+  useLayoutEffect,
   useMemo,
   useState,
 } from 'react';
@@ -27,9 +28,15 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const queryClient = useQueryClient();
   const [session, setSession] = useState<Session | null>(null);
   const [loading, setLoading] = useState(true);
-  const configured = checkApiConfigured();
+  /** Só avaliar window/origin depois do mount — evita falso “não configurado” no 1º frame (export estático / RN Web). */
+  const [hydrated, setHydrated] = useState(false);
+  useLayoutEffect(() => {
+    setHydrated(true);
+  }, []);
+  const configured = hydrated && checkApiConfigured();
 
   useEffect(() => {
+    if (!hydrated) return;
     let active = true;
     const bootstrap = async () => {
       if (!checkApiConfigured()) {
@@ -55,7 +62,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     return () => {
       active = false;
     };
-  }, [configured]);
+  }, [hydrated]);
 
   const signIn = useCallback(async (email: string, password: string) => {
     if (!checkApiConfigured()) {
