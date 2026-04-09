@@ -30,6 +30,17 @@
 - `agenda-catolica` (web service)
 - `agenda-catolica-db` (postgres)
 
+## Push no Git mas o deploy nao aparece no Render
+
+1. **Dashboard do serviço web** → secção **Settings** → **Build & Deploy**:
+   - **Branch** tem de ser `main` (ou a branch que você usa).
+   - **Auto-Deploy** tem de estar **On** (ou “On commit”).
+2. **Repositório ligado:** o serviço precisa mostrar `gfmcosta08/diario_catolico` (ou o repo certo). Se o serviço foi criado só com Docker/manual sem Git, pushes **não** disparam build.
+3. **Blueprint:** se usou “Blueprint” pela primeira vez, alterações no código exigem que o serviço web esteja ligado ao mesmo repo. O `render.yaml` inclui `repo`, `branch: main` e `autoDeployTrigger: commit` para deixar isso explícito; após alterar o YAML, no Render abra o **Blueprint** e use **Manual sync** se pedido.
+4. **GitHub:** em **Settings → Webhooks** do repositório, deve existir um webhook `api.render.com` com entregas recentes em verde. Se falhar, reinstale a integração GitHub em **Render → Account Settings → GitHub**.
+5. **Deploy Hook (à prova de falhas):** no serviço → **Deploy Hook** → crie um URL; em GitHub → **Secrets** → `RENDER_DEPLOY_HOOK_URL`. Pode criar em `.github/workflows/` um YAML que em cada `push` em `main` execute `curl -fsS -X POST "$RENDER_DEPLOY_HOOK_URL"` (o token Git usado no `git push` precisa do scope **`workflow`** no GitHub para alterar ficheiros em `.github/workflows/`; sem isso, crie o workflow pela UI do GitHub ou use um PAT com esse scope).
+6. **Deploy manual:** no serviço Render, botão **Manual Deploy** → **Deploy latest commit**.
+
 ## Build (render.yaml)
 
 O comando de build compila o servidor dentro de `backend/` (`prisma generate` + `tsc`), volta a raiz e roda `npm run build:web`. Nao use um segundo `cd backend` apos ja estar em `backend/` (isso quebrava o build no Linux).

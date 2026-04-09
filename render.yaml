@@ -2,6 +2,10 @@ services:
   - type: web
     name: agenda-catolica
     runtime: node
+    # Garante que o Render associa o serviço a este repositório e dispara deploy a cada push em main.
+    repo: https://github.com/gfmcosta08/diario_catolico
+    branch: main
+    autoDeployTrigger: commit
     rootDir: .
     plan: free
     buildCommand: npm install && cd backend && npm install && npm run prisma:generate && npx tsc && cd .. && npm run build:web
