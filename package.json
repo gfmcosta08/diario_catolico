@@ -8,6 +8,7 @@
     "ios": "expo start --ios",
     "web": "expo start --web",
     "build:web": "node ./scripts/build-web-entry.js",
+    "postinstall": "npm --prefix backend install --include=dev",
     "check:reading-plan": "node ./scripts/check-reading-plan.js",
     "import:licensed-bible": "node ./scripts/import-licensed-bible.js",
     "generate:public-domain": "python ./scripts/generate-public-domain-bible.py"

@@ -19,7 +19,9 @@ if (runningOnRender) {
     });
 
   try {
-    await runStep('npm', ['--prefix', 'backend', 'install', '--include=dev']);
+    // Deps já instalados no build step (postinstall do root package.json)
+    // Aplica migrations e inicia o servidor
+    await runStep('npm', ['--prefix', 'backend', 'run', 'prisma:migrate']);
     const child = spawn('npm', ['--prefix', 'backend', 'run', 'start'], {
       stdio: 'inherit',
       shell: true,
