@@ -1,4 +1,4 @@
-import { palette } from '@/constants/theme';
+﻿import { palette } from '@/constants/theme';
 import { Stack } from 'expo-router';
 
 export default function AuthLayout() {
@@ -16,6 +16,7 @@ export default function AuthLayout() {
       <Stack.Screen name="login" options={{ title: 'Entrar' }} />
       <Stack.Screen name="register" options={{ title: 'Criar conta' }} />
       <Stack.Screen name="forgot-password" options={{ title: 'Recuperar senha' }} />
+      <Stack.Screen name="reset-password" options={{ title: 'Redefinir senha' }} />
     </Stack>
   );
 }

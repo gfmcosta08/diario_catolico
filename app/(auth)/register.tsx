@@ -1,4 +1,4 @@
-import { AppButton } from '@/components/ui/AppButton';
+﻿import { AppButton } from '@/components/ui/AppButton';
 import { AppTextField } from '@/components/ui/AppTextField';
 import { useAuth } from '@/context/AuthContext';
 import { palette, spacing } from '@/constants/theme';
@@ -36,25 +36,27 @@ export default function RegisterScreen() {
       return;
     }
     setInfo(
-      'Conta criada. Verifique seu e-mail para confirmar, se a confirmação estiver ativa no projeto Supabase.'
+      'Conta criada. Verifique seu e-mail para confirmar, se a confirmaÃ§Ã£o estiver ativa no servidor de autenticação.'
     );
   }
 
   return (
     <KeyboardAvoidingView
       style={styles.flex}
-      behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
     >
       <ScrollView
+        style={styles.scrollView}
         contentContainerStyle={styles.scroll}
         keyboardShouldPersistTaps="handled"
+        showsVerticalScrollIndicator={false}
       >
         <Text style={styles.sub} allowFontScaling>
           Crie sua conta com e-mail e senha.
         </Text>
         {!configured ? (
           <Text style={styles.warn} allowFontScaling>
-            Configure o Supabase para cadastro funcionar.
+            Configure EXPO_PUBLIC_API_URL para cadastro funcionar.
           </Text>
         ) : null}
         <AppTextField
@@ -85,7 +87,7 @@ export default function RegisterScreen() {
         ) : null}
         <AppButton title="Cadastrar" onPress={onSubmit} loading={loading} />
         <Link href="/(auth)/login" asChild>
-          <AppButton title="Já tenho conta" variant="outline" style={styles.mt} />
+          <AppButton title="JÃ¡ tenho conta" variant="outline" style={styles.mt} />
         </Link>
       </ScrollView>
     </KeyboardAvoidingView>
@@ -94,7 +96,13 @@ export default function RegisterScreen() {
 
 const styles = StyleSheet.create({
   flex: { flex: 1, backgroundColor: palette.background },
-  scroll: { padding: spacing.lg, paddingTop: spacing.md },
+  scrollView: { flex: 1 },
+  scroll: {
+    flexGrow: 1,
+    padding: spacing.lg,
+    paddingTop: spacing.md,
+    justifyContent: 'center',
+  },
   sub: {
     fontSize: 16,
     color: palette.textSecondary,
@@ -113,3 +121,4 @@ const styles = StyleSheet.create({
   info: { color: palette.success, marginBottom: spacing.md },
   mt: { marginTop: spacing.md },
 });
+

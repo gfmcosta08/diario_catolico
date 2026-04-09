@@ -1,4 +1,4 @@
-import { AppButton } from '@/components/ui/AppButton';
+﻿import { AppButton } from '@/components/ui/AppButton';
 import { AppTextField } from '@/components/ui/AppTextField';
 import { useAuth } from '@/context/AuthContext';
 import { palette, spacing } from '@/constants/theme';
@@ -35,23 +35,25 @@ export default function LoginScreen() {
   return (
     <KeyboardAvoidingView
       style={styles.flex}
-      behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
     >
       <ScrollView
+        style={styles.scrollView}
         contentContainerStyle={styles.scroll}
         keyboardShouldPersistTaps="handled"
+        showsVerticalScrollIndicator={false}
       >
         <Text style={styles.title} allowFontScaling>
-          Agenda Católica
+          Leia a BÃ­blia em 365 dias
         </Text>
         <Text style={styles.sub} allowFontScaling>
           Entre para sincronizar seu progresso espiritual.
         </Text>
         {!configured ? (
           <Text style={styles.warn} allowFontScaling>
-            Defina EXPO_PUBLIC_SUPABASE_URL e EXPO_PUBLIC_SUPABASE_ANON_KEY para
-            autenticação na nuvem. Sem isso, use o fluxo de demonstração pelo
-            redirecionamento automático na primeira tela.
+            Defina EXPO_PUBLIC_API_URL para
+            autenticaÃ§Ã£o na nuvem. Sem isso, use o fluxo de demonstraÃ§Ã£o pelo
+            redirecionamento automÃ¡tico na primeira tela.
           </Text>
         ) : null}
         <AppTextField
@@ -89,9 +91,12 @@ export default function LoginScreen() {
 
 const styles = StyleSheet.create({
   flex: { flex: 1, backgroundColor: palette.background },
+  scrollView: { flex: 1 },
   scroll: {
+    flexGrow: 1,
     padding: spacing.lg,
     paddingTop: spacing.xl,
+    justifyContent: 'center',
   },
   title: {
     fontSize: 28,
@@ -118,3 +123,4 @@ const styles = StyleSheet.create({
   mt: { marginTop: spacing.md },
   mtSm: { marginTop: spacing.sm },
 });
+

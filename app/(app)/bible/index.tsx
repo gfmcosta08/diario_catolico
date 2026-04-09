@@ -1,14 +1,20 @@
 import { useBibleProgressMap } from '@/hooks/useBibleProgress';
 import { palette, spacing, touchMin } from '@/constants/theme';
 import { Link } from 'expo-router';
+import { useMemo, useState } from 'react';
 import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 
-export const options = { title: 'Leitura em 365 dias' };
+export const options = { title: 'Leia a Bíblia em 365 dias' };
 
 const COLS = 7;
+const TOTAL_DAYS = 365;
+const WEEKLY_GOAL = 7;
+
+type FilterMode = 'all' | 'pending' | 'done' | 'today';
 
 export default function BiblePlanScreen() {
-  const { hydrated, completedCount, isDayDone } = useBibleProgressMap();
+  const { hydrated, completedCount, completedDays, isDayDone } = useBibleProgressMap();
+  const [filter, setFilter] = useState<FilterMode>('all');
 
   if (!hydrated) {
     return (
@@ -18,34 +24,70 @@ export default function BiblePlanScreen() {
     );
   }
 
+  const percentage = Math.round((completedCount / TOTAL_DAYS) * 100);
+  const dayOfYear = useMemo(() => {
+    const start = new Date(new Date().getFullYear(), 0, 1);
+    const today = new Date();
+    const diff = today.getTime() - start.getTime();
+    return Math.max(1, Math.min(TOTAL_DAYS, Math.floor(diff / 86400000) + 1));
+  }, []);
+
+  const weeklyProgress = Math.min(WEEKLY_GOAL, completedDays.filter((d) => d >= dayOfYear - 6).length);
+  const visibleDays = useMemo(() => {
+    switch (filter) {
+      case 'done':
+        return Array.from({ length: TOTAL_DAYS }, (_, i) => i + 1).filter((d) => isDayDone(d));
+      case 'pending':
+        return Array.from({ length: TOTAL_DAYS }, (_, i) => i + 1).filter((d) => !isDayDone(d));
+      case 'today':
+        return [dayOfYear];
+      default:
+        return Array.from({ length: TOTAL_DAYS }, (_, i) => i + 1);
+    }
+  }, [dayOfYear, filter, isDayDone]);
+
   const rows: number[][] = [];
-  for (let r = 0; r < Math.ceil(365 / COLS); r++) {
+  for (let r = 0; r < Math.ceil(visibleDays.length / COLS); r++) {
     rows.push(
-      Array.from({ length: COLS }, (_, c) => r * COLS + c + 1).filter((d) => d <= 365)
+      visibleDays.slice(r * COLS, r * COLS + COLS)
     );
   }
 
   return (
     <ScrollView contentContainerStyle={styles.container}>
       <Text style={styles.head} allowFontScaling>
-        Plano de 365 dias
+        Leia a Bíblia em 365 dias
       </Text>
       <View style={styles.progressRow}>
         <View style={styles.progressBar}>
           <View
             style={[
               styles.progressFill,
-              { width: `${(completedCount / 365) * 100}%` },
+              { width: `${(completedCount / TOTAL_DAYS) * 100}%` },
             ]}
           />
         </View>
         <Text style={styles.progressTxt} allowFontScaling>
-          {completedCount} de 365 dias concluídos
+          {completedCount} de {TOTAL_DAYS} dias concluídos ({percentage}%)
         </Text>
+        <Text style={styles.metaTxt} allowFontScaling>
+          Meta semanal: {weeklyProgress}/{WEEKLY_GOAL} dias
+        </Text>
+      </View>
+      <View style={styles.filters}>
+        <FilterButton title="Todos" active={filter === 'all'} onPress={() => setFilter('all')} />
+        <FilterButton title="Não lidos" active={filter === 'pending'} onPress={() => setFilter('pending')} />
+        <FilterButton title="Lidos" active={filter === 'done'} onPress={() => setFilter('done')} />
+        <FilterButton title="Hoje" active={filter === 'today'} onPress={() => setFilter('today')} />
       </View>
       <Text style={styles.sub} allowFontScaling>
         Toque no dia para ler e marcar. Dias anteriores permanecem acessíveis.
       </Text>
+      {visibleDays.length === 0 ? (
+        <Text style={styles.emptyState} allowFontScaling>
+          Nenhum dia encontrado para este filtro.
+        </Text>
+      ) : null}
       {rows.map((row, ri) => (
         <View key={ri} style={styles.row}>
           {row.map((day) => {
@@ -70,6 +112,24 @@ export default function BiblePlanScreen() {
         </View>
       ))}
     </ScrollView>
+  );
+}
+
+function FilterButton({
+  title,
+  active,
+  onPress,
+}: {
+  title: string;
+  active: boolean;
+  onPress: () => void;
+}) {
+  return (
+    <Pressable style={[styles.filterBtn, active && styles.filterBtnActive]} onPress={onPress}>
+      <Text style={[styles.filterTxt, active && styles.filterTxtActive]} allowFontScaling>
+        {title}
+      </Text>
+    </Pressable>
   );
 }
 
@@ -104,10 +164,46 @@ const styles = StyleSheet.create({
     backgroundColor: palette.success,
   },
   progressTxt: { fontSize: 15, color: palette.textSecondary, fontWeight: '600' },
+  metaTxt: {
+    marginTop: spacing.xs,
+    fontSize: 14,
+    color: palette.textSecondary,
+  },
+  filters: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: 8,
+    marginBottom: spacing.sm,
+  },
+  filterBtn: {
+    paddingVertical: 8,
+    paddingHorizontal: 12,
+    backgroundColor: palette.surface,
+    borderWidth: 1,
+    borderColor: palette.border,
+    borderRadius: 999,
+  },
+  filterBtnActive: {
+    backgroundColor: palette.primary,
+    borderColor: palette.primary,
+  },
+  filterTxt: {
+    fontSize: 13,
+    fontWeight: '600',
+    color: palette.text,
+  },
+  filterTxtActive: {
+    color: palette.surface,
+  },
   sub: {
     fontSize: 14,
     color: palette.textSecondary,
     lineHeight: 20,
+    marginBottom: spacing.md,
+  },
+  emptyState: {
+    fontSize: 14,
+    color: palette.textSecondary,
     marginBottom: spacing.md,
   },
   row: {

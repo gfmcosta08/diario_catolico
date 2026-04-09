@@ -1,6 +1,6 @@
-import { HomeCard } from '@/components/ui/HomeCard';
+﻿import { HomeCard } from '@/components/ui/HomeCard';
 
-export const options = { title: 'Início' };
+export const options = { title: 'InÃ­cio' };
 import { useAuth } from '@/context/AuthContext';
 import { palette, spacing } from '@/constants/theme';
 import { Link } from 'expo-router';
@@ -15,12 +15,12 @@ export default function HomeScreen() {
         Paz e bem
       </Text>
       <Text style={styles.lead} allowFontScaling>
-        Escolha uma prática para hoje. Seu progresso é salvo na nuvem quando você
-        está autenticado.
+        Escolha uma prÃ¡tica para hoje. Seu progresso Ã© salvo na nuvem quando vocÃª
+        estÃ¡ autenticado.
       </Text>
       {!configured ? (
         <Text style={styles.banner} allowFontScaling>
-          Modo local: configure o Supabase para login e sincronização entre
+          Modo local: configure o Supabase para login e sincronizaÃ§Ã£o entre
           dispositivos.
         </Text>
       ) : null}
@@ -34,25 +34,34 @@ export default function HomeScreen() {
       <View style={styles.cards}>
         <Link href="/(app)/rosary-daily" asChild>
           <HomeCard
-            title="Terço do dia"
-            subtitle="Mistérios do dia da semana, passo a passo com checklist."
+            title="TerÃ§o do dia"
+            subtitle="MistÃ©rios do dia da semana, passo a passo com checklist."
             icon="circle"
           />
         </Link>
         <Link href="/(app)/rosary-full" asChild>
           <HomeCard
-            title="O Rosário"
-            subtitle="Quatro terços em sequência — contemplação completa."
+            title="O RosÃ¡rio"
+            subtitle="Quatro terÃ§os em sequÃªncia â€” contemplaÃ§Ã£o completa."
             icon="dot-circle-o"
           />
         </Link>
         <Link href="/(app)/bible" asChild>
           <HomeCard
-            title="Leitura bíblica anual"
-            subtitle="Plano de 365 dias com referências e progresso."
+            title="Leia a BÃ­blia em 365 dias"
+            subtitle="Plano de 365 dias com referÃªncias e progresso."
             icon="book"
           />
         </Link>
+        {configured && session ? (
+          <Link href="/(app)/settings" asChild>
+            <HomeCard
+              title="ConfiguraÃ§Ãµes e ministÃ©rios"
+              subtitle="Seu ID, perfil, criar ministÃ©rio e convites."
+              icon="users"
+            />
+          </Link>
+        ) : null}
       </View>
     </ScrollView>
   );
@@ -101,3 +110,4 @@ const styles = StyleSheet.create({
   },
   cards: { marginTop: spacing.sm },
 });
+

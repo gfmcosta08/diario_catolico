@@ -1,89 +1,51 @@
+﻿import { READING_PLAN_BODY_DATA } from './readingPlanBodyData';
+import { READING_PLAN_PUBLIC_DOMAIN_DATA } from './readingPlanPublicDomainData';
+import { READING_PLAN_DATA } from './readingPlanData';
+
+const STRICT_FIDELITY_MODE = true;
+
 export type ReadingDay = {
   day: number;
   references: string[];
-  /** Texto autorizado — preencha via CMS ou importação; null = mostrar apenas referências */
   body: string | null;
+  bodySource: 'licensed' | 'public_domain' | null;
+  coverage: number;
+  missingReferences: string[];
   optionalAudioUrl?: string | null;
 };
 
-const OT_HINTS = [
-  'Gn',
-  'Êx',
-  'Lv',
-  'Nm',
-  'Dt',
-  'Jos',
-  'Jz',
-  'Rt',
-  '1Sm',
-  '2Sm',
-  '1Rs',
-  '2Rs',
-  '1Cr',
-  '2Cr',
-  'Ed',
-  'Ne',
-  'Et',
-  'Jó',
-  'Sl',
-  'Pv',
-  'Ec',
-  'Ct',
-  'Is',
-  'Jr',
-  'Lm',
-  'Ez',
-  'Dn',
-  'Os',
-  'Jl',
-  'Am',
-  'Ob',
-  'Jn',
-  'Mq',
-  'Na',
-  'Hc',
-  'Sf',
-  'Ag',
-  'Zc',
-  'Ml',
-];
+const planCache: ReadingDay[] = READING_PLAN_DATA.map((item) => {
+  const licensedBody = READING_PLAN_BODY_DATA[item.day] ?? null;
+  const publicDomainDay = READING_PLAN_PUBLIC_DOMAIN_DATA[item.day] ?? null;
 
-function refForDay(day: number): string[] {
-  const i = day - 1;
-  const ot = OT_HINTS[i % OT_HINTS.length];
-  const otCh = (Math.floor(i / OT_HINTS.length) % 50) + 1;
-  const psalm = (i % 150) + 1;
-  const prov = (i % 31) + 1;
-  const mt = (i % 28) + 1;
-  return [
-    `${ot} ${otCh} (trecho do Antigo Testamento — substitua pelo plano NVT 365 licenciado)`,
-    `Salmos ${psalm}`,
-    `Provérbios ${prov}`,
-    `Evangelho sugerido: Mt ${mt} (ajuste conforme seu roteiro)`,
-  ];
-}
-
-const planCache: ReadingDay[] = [];
-
-export function getReadingPlanDay(day: number): ReadingDay {
-  if (day < 1 || day > 365) {
+  if (STRICT_FIDELITY_MODE) {
     return {
-      day: Math.min(365, Math.max(1, day)),
-      references: [],
-      body: null,
-    };
-  }
-  if (!planCache[day - 1]) {
-    planCache[day - 1] = {
-      day,
-      references: refForDay(day),
-      body: null,
+      day: item.day,
+      references: item.references,
+      body: licensedBody,
+      bodySource: licensedBody ? 'licensed' : null,
+      coverage: licensedBody ? 1 : 0,
+      missingReferences: item.references,
       optionalAudioUrl: null,
     };
   }
-  return planCache[day - 1];
+
+  return {
+    day: item.day,
+    references: item.references,
+    body: licensedBody ?? publicDomainDay?.body ?? null,
+    bodySource: licensedBody ? 'licensed' : (publicDomainDay ? 'public_domain' : null),
+    coverage: licensedBody ? 1 : (publicDomainDay?.coverage ?? 0),
+    missingReferences: licensedBody ? [] : (publicDomainDay?.missingReferences ?? item.references),
+    optionalAudioUrl: null,
+  };
+});
+
+export function getReadingPlanDay(day: number): ReadingDay {
+  const safeDay = Math.min(365, Math.max(1, day));
+  return planCache[safeDay - 1];
 }
 
 export function getAllReadingDays(): ReadingDay[] {
-  return Array.from({ length: 365 }, (_, i) => getReadingPlanDay(i + 1));
+  return planCache;
 }

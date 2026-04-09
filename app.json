@@ -1,11 +1,11 @@
 {
   "expo": {
-    "name": "agenda-catolica",
-    "slug": "agenda-catolica",
+    "name": "Leia a Bíblia em 365 dias",
+    "slug": "leia-biblia-365-dias",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
-    "scheme": "agendacatolica",
+    "scheme": "leiabiblia365",
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
     "splash": {

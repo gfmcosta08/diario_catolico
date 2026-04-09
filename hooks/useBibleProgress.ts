@@ -1,5 +1,5 @@
+﻿import { api, isApiConfigured } from '@/lib/api';
 import { useDebouncedCallback } from '@/hooks/useDebouncedCallback';
-import { isSupabaseConfigured, supabase } from '@/lib/supabase';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 
@@ -15,21 +15,15 @@ export function useBibleProgressMap() {
   const { data: remoteDays, isFetched } = useQuery({
     queryKey,
     queryFn: async (): Promise<number[]> => {
-      if (!isSupabaseConfigured) return [];
-      const { data: userData } = await supabase.auth.getUser();
-      if (!userData.user) return [];
-      const { data, error } = await supabase
-        .from('bible_reading_progress')
-        .select('day_index')
-        .order('day_index');
-      if (error) throw error;
-      return (data ?? []).map((r) => r.day_index as number);
+      if (!isApiConfigured) return [];
+      const data = await api.getBibleProgress();
+      return data.checkedDays;
     },
-    enabled: isSupabaseConfigured,
+    enabled: isApiConfigured,
   });
 
   useEffect(() => {
-    if (!isSupabaseConfigured) {
+    if (!isApiConfigured) {
       setLocalDone(new Set());
       setHydrated(true);
       return;
@@ -40,25 +34,8 @@ export function useBibleProgressMap() {
   }, [remoteDays, isFetched]);
 
   const persistMark = useDebouncedCallback(async (day: number, done: boolean) => {
-    if (!isSupabaseConfigured) return;
-    const { data: userData } = await supabase.auth.getUser();
-    if (!userData.user) return;
-    if (done) {
-      await supabase.from('bible_reading_progress').upsert(
-        {
-          user_id: userData.user.id,
-          day_index: day,
-          completed_at: new Date().toISOString(),
-        },
-        { onConflict: 'user_id,day_index' }
-      );
-    } else {
-      await supabase
-        .from('bible_reading_progress')
-        .delete()
-        .eq('day_index', day)
-        .eq('user_id', userData.user.id);
-    }
+    if (!isApiConfigured) return;
+    await api.toggleBibleDay(day, done);
     queryClient.invalidateQueries({ queryKey });
   }, DEBOUNCE_MS);
 
@@ -80,9 +57,14 @@ export function useBibleProgressMap() {
     [localDone]
   );
 
+  const completedDays = useMemo(() => {
+    return Array.from(localDone).sort((a, b) => a - b);
+  }, [localDone]);
+
   return {
     hydrated,
     completedCount: localDone.size,
+    completedDays,
     setDayDone,
     isDayDone,
   };

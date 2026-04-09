@@ -1,7 +1,7 @@
-import { AppButton } from '@/components/ui/AppButton';
+﻿import { AppButton } from '@/components/ui/AppButton';
+import { palette, spacing } from '@/constants/theme';
 import { getReadingPlanDay } from '@/data/readingPlan';
 import { useBibleProgressMap } from '@/hooks/useBibleProgress';
-import { palette, spacing } from '@/constants/theme';
 import { useLocalSearchParams, useNavigation } from 'expo-router';
 import { useLayoutEffect, useMemo } from 'react';
 import { ScrollView, StyleSheet, Text, View } from 'react-native';
@@ -27,7 +27,7 @@ export default function BibleDayScreen() {
   if (!hydrated) {
     return (
       <View style={styles.center}>
-        <Text allowFontScaling>Carregando…</Text>
+        <Text allowFontScaling>Carregando...</Text>
       </View>
     );
   }
@@ -39,14 +39,21 @@ export default function BibleDayScreen() {
       </Text>
       {plan.references.map((line, i) => (
         <Text key={i} style={styles.refLine} allowFontScaling>
-          • {line}
+          - {line}
         </Text>
       ))}
-      <Text style={styles.note} allowFontScaling>
-        Substitua estas referências pelo seu roteiro NVT 365 / Ave-Maria licenciado.
-        O campo de texto integral abaixo fica vazio até você importar conteúdo
-        autorizado.
-      </Text>
+
+      {plan.bodySource === 'licensed' ? (
+        <Text style={styles.note} allowFontScaling>
+          Texto integral oficial/licenciado carregado para este dia.
+        </Text>
+      ) : (
+        <Text style={styles.warning} allowFontScaling>
+          Para garantir fidelidade a Biblia Catolica Apostolica Romana, este app exibe
+          texto integral somente de fonte oficial/licenciada.
+        </Text>
+      )}
+
       <View style={styles.bodyBox}>
         {plan.body ? (
           <Text style={styles.body} allowFontScaling>
@@ -54,13 +61,13 @@ export default function BibleDayScreen() {
           </Text>
         ) : (
           <Text style={styles.placeholder} allowFontScaling>
-            Nenhum texto embutido para este dia. Adicione via JSON/CMS quando tiver
-            direitos de uso.
+            Texto integral ainda nao disponivel para este dia. Siga as referencias acima.
           </Text>
         )}
       </View>
+
       <AppButton
-        title={done ? 'Desmarcar leitura' : 'Leitura concluída'}
+        title={done ? 'Desmarcar leitura' : 'Leitura concluida'}
         variant={done ? 'outline' : 'primary'}
         onPress={() => setDayDone(dayNum, !done)}
         style={styles.btn}
@@ -97,6 +104,13 @@ const styles = StyleSheet.create({
     marginTop: spacing.md,
     fontSize: 14,
     color: palette.textSecondary,
+    lineHeight: 20,
+    marginBottom: spacing.md,
+  },
+  warning: {
+    marginTop: spacing.md,
+    fontSize: 14,
+    color: palette.error,
     lineHeight: 20,
     marginBottom: spacing.md,
   },

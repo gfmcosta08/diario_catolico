@@ -1,5 +1,4 @@
-import { isSupabaseConfigured, supabase } from '@/lib/supabase';
-import type { Session } from '@supabase/supabase-js';
+﻿import { api, clearToken, isApiConfigured } from '@/lib/api';
 import { useQueryClient } from '@tanstack/react-query';
 import React, {
   createContext,
@@ -10,6 +9,8 @@ import React, {
   useState,
 } from 'react';
 
+type Session = { user: { id: string; email: string } };
+
 type AuthContextValue = {
   session: Session | null;
   loading: boolean;
@@ -17,7 +18,7 @@ type AuthContextValue = {
   signIn: (email: string, password: string) => Promise<{ error: Error | null }>;
   signUp: (email: string, password: string) => Promise<{ error: Error | null }>;
   signOut: () => Promise<void>;
-  resetPassword: (email: string) => Promise<{ error: Error | null }>;
+  resetPassword: (email: string) => Promise<{ error: Error | null; debugToken?: string | null }>;
 };
 
 const AuthContext = createContext<AuthContextValue | null>(null);
@@ -28,60 +29,85 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    if (!isSupabaseConfigured) {
-      setSession(null);
-      setLoading(false);
-      return;
-    }
-    supabase.auth.getSession().then(({ data }) => {
-      setSession(data.session ?? null);
-      setLoading(false);
-    });
-    const {
-      data: { subscription },
-    } = supabase.auth.onAuthStateChange((_event, next) => {
-      setSession(next);
-      queryClient.invalidateQueries();
-    });
-    return () => subscription.unsubscribe();
-  }, [queryClient]);
+    let active = true;
+    const bootstrap = async () => {
+      if (!isApiConfigured) {
+        if (!active) return;
+        setSession(null);
+        setLoading(false);
+        return;
+      }
+
+      try {
+        const me = await api.me();
+        if (!active) return;
+        setSession({ user: { id: me.id, email: me.email } });
+      } catch {
+        if (!active) return;
+        setSession(null);
+      } finally {
+        if (active) setLoading(false);
+      }
+    };
+
+    bootstrap();
+    return () => {
+      active = false;
+    };
+  }, []);
 
   const signIn = useCallback(async (email: string, password: string) => {
-    if (!isSupabaseConfigured) {
-      return { error: new Error('Configure EXPO_PUBLIC_SUPABASE_URL e ANON_KEY') };
+    if (!isApiConfigured) {
+      return { error: new Error('Configure EXPO_PUBLIC_API_URL') };
     }
-    const { error } = await supabase.auth.signInWithPassword({ email, password });
-    return { error: error as Error | null };
-  }, []);
+    try {
+      const user = await api.signIn(email, password);
+      setSession({ user });
+      queryClient.invalidateQueries();
+      return { error: null };
+    } catch (error) {
+      return { error: error as Error };
+    }
+  }, [queryClient]);
 
   const signUp = useCallback(async (email: string, password: string) => {
-    if (!isSupabaseConfigured) {
-      return { error: new Error('Configure EXPO_PUBLIC_SUPABASE_URL e ANON_KEY') };
+    if (!isApiConfigured) {
+      return { error: new Error('Configure EXPO_PUBLIC_API_URL') };
     }
-    const { error } = await supabase.auth.signUp({ email, password });
-    return { error: error as Error | null };
-  }, []);
+    try {
+      const user = await api.signUp(email, password);
+      setSession({ user });
+      queryClient.invalidateQueries();
+      return { error: null };
+    } catch (error) {
+      return { error: error as Error };
+    }
+  }, [queryClient]);
 
   const signOut = useCallback(async () => {
-    if (!isSupabaseConfigured) return;
-    await supabase.auth.signOut();
-  }, []);
+    await clearToken();
+    setSession(null);
+    queryClient.clear();
+  }, [queryClient]);
 
   const resetPassword = useCallback(async (email: string) => {
-    if (!isSupabaseConfigured) {
-      return { error: new Error('Configure EXPO_PUBLIC_SUPABASE_URL e ANON_KEY') };
+    if (!isApiConfigured) {
+      return { error: new Error('Configure EXPO_PUBLIC_API_URL') };
     }
-    const { error } = await supabase.auth.resetPasswordForEmail(email, {
-      redirectTo: 'agendacatolica://reset-password',
-    });
-    return { error: error as Error | null };
+
+    try {
+      const data = await api.requestPasswordReset(email.trim());
+      return { error: null, debugToken: data.debugToken ?? null };
+    } catch (error) {
+      return { error: error as Error };
+    }
   }, []);
 
   const value = useMemo(
     () => ({
       session,
       loading,
-      configured: isSupabaseConfigured,
+      configured: isApiConfigured,
       signIn,
       signUp,
       signOut,
@@ -98,3 +124,4 @@ export function useAuth() {
   if (!ctx) throw new Error('useAuth dentro de AuthProvider');
   return ctx;
 }
+

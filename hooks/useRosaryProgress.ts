@@ -1,5 +1,5 @@
-import { useDebouncedCallback } from '@/hooks/useDebouncedCallback';
-import { isSupabaseConfigured, supabase } from '@/lib/supabase';
+﻿import { useDebouncedCallback } from '@/hooks/useDebouncedCallback';
+import { api, isApiConfigured } from '@/lib/api';
 import type { RosaryMode, RosaryProgressPayload } from '@/types/progress';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { useCallback, useEffect, useMemo, useState } from 'react';
@@ -16,25 +16,17 @@ export function useRosaryProgress(mode: RosaryMode, allIds: string[]) {
   const { data: remotePayload, isFetched } = useQuery({
     queryKey,
     queryFn: async (): Promise<RosaryProgressPayload> => {
-      if (!isSupabaseConfigured) {
+      if (!isApiConfigured) {
         return { checkedIds: [] };
       }
-      const { data: userData } = await supabase.auth.getUser();
-      if (!userData.user) return { checkedIds: [] };
-      const { data, error } = await supabase
-        .from('rosary_progress')
-        .select('payload')
-        .eq('mode', mode)
-        .maybeSingle();
-      if (error) throw error;
-      const payload = data?.payload as RosaryProgressPayload | undefined;
-      return payload?.checkedIds ? payload : { checkedIds: [] };
+      const data = await api.getRosaryProgress(mode);
+      return { checkedIds: data.checkedIds ?? [] };
     },
-    enabled: isSupabaseConfigured,
+    enabled: isApiConfigured,
   });
 
   useEffect(() => {
-    if (!isSupabaseConfigured) {
+    if (!isApiConfigured) {
       setLocalChecked(new Set());
       setHydrated(true);
       return;
@@ -44,23 +36,12 @@ export function useRosaryProgress(mode: RosaryMode, allIds: string[]) {
     const valid = new Set(ids.filter((id) => allIds.includes(id)));
     setLocalChecked(valid);
     setHydrated(true);
-  }, [remotePayload, allIds, mode, isFetched]);
+  }, [remotePayload, allIds, isFetched]);
 
   const persist = useDebouncedCallback(
     async (checkedIds: string[]) => {
-      if (!isSupabaseConfigured) return;
-      const { data: userData } = await supabase.auth.getUser();
-      if (!userData.user) return;
-      const payload: RosaryProgressPayload = { checkedIds };
-      await supabase.from('rosary_progress').upsert(
-        {
-          user_id: userData.user.id,
-          mode,
-          payload,
-          updated_at: new Date().toISOString(),
-        },
-        { onConflict: 'user_id,mode' }
-      );
+      if (!isApiConfigured) return;
+      await api.setRosaryProgress(mode, checkedIds);
       queryClient.invalidateQueries({ queryKey });
     },
     DEBOUNCE_MS
