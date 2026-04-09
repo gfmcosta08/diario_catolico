@@ -5,11 +5,12 @@ const extra = Constants.expoConfig?.extra as { apiUrl?: string } | undefined;
 const configuredApiUrl = process.env.EXPO_PUBLIC_API_URL ?? extra?.apiUrl ?? '';
 const API_URL = configuredApiUrl.replace(/\/$/, '');
 
-function hasBaseUrl() {
-  return Boolean(API_URL) || (typeof window !== 'undefined' && typeof window.location?.origin === 'string');
+/** Sempre em tempo de execução — nunca cachear no load do módulo (SSR/export estático definem window depois). */
+export function isApiConfigured(): boolean {
+  if (API_URL) return true;
+  if (typeof window !== 'undefined' && window.location?.origin) return true;
+  return false;
 }
-
-export const isApiConfigured = hasBaseUrl();
 const TOKEN_KEY = 'auth_token';
 
 export type AuthUser = { id: string; email: string };
@@ -37,7 +38,9 @@ function getBaseUrl() {
 async function request<T>(path: string, init: RequestInit = {}, auth = true): Promise<T> {
   const baseUrl = getBaseUrl();
   if (!baseUrl) {
-    throw new Error('Configure EXPO_PUBLIC_API_URL');
+    throw new Error(
+      'API indisponível: defina EXPO_PUBLIC_API_URL ou abra o app no browser no mesmo host da API.'
+    );
   }
 
   const headers: Record<string, string> = {

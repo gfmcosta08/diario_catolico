@@ -9,21 +9,22 @@ export function useBibleProgressMap() {
   const queryClient = useQueryClient();
   const [localDone, setLocalDone] = useState<Set<number>>(new Set());
   const [hydrated, setHydrated] = useState(false);
+  const apiOk = isApiConfigured();
 
   const queryKey = useMemo(() => ['bible365'] as const, []);
 
   const { data: remoteDays, isFetched } = useQuery({
     queryKey,
     queryFn: async (): Promise<number[]> => {
-      if (!isApiConfigured) return [];
+      if (!isApiConfigured()) return [];
       const data = await api.getBibleProgress();
       return data.checkedDays;
     },
-    enabled: isApiConfigured,
+    enabled: apiOk,
   });
 
   useEffect(() => {
-    if (!isApiConfigured) {
+    if (!apiOk) {
       setLocalDone(new Set());
       setHydrated(true);
       return;
@@ -31,10 +32,10 @@ export function useBibleProgressMap() {
     if (!isFetched) return;
     setLocalDone(new Set(remoteDays ?? []));
     setHydrated(true);
-  }, [remoteDays, isFetched]);
+  }, [apiOk, remoteDays, isFetched]);
 
   const persistMark = useDebouncedCallback(async (day: number, done: boolean) => {
-    if (!isApiConfigured) return;
+    if (!isApiConfigured()) return;
     await api.toggleBibleDay(day, done);
     queryClient.invalidateQueries({ queryKey });
   }, DEBOUNCE_MS);

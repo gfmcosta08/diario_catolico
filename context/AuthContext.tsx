@@ -1,4 +1,4 @@
-﻿import { api, clearToken, isApiConfigured } from '@/lib/api';
+﻿import { api, clearToken, isApiConfigured as checkApiConfigured } from '@/lib/api';
 import { useQueryClient } from '@tanstack/react-query';
 import React, {
   createContext,
@@ -27,11 +27,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const queryClient = useQueryClient();
   const [session, setSession] = useState<Session | null>(null);
   const [loading, setLoading] = useState(true);
+  const configured = checkApiConfigured();
 
   useEffect(() => {
     let active = true;
     const bootstrap = async () => {
-      if (!isApiConfigured) {
+      if (!checkApiConfigured()) {
         if (!active) return;
         setSession(null);
         setLoading(false);
@@ -54,11 +55,15 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     return () => {
       active = false;
     };
-  }, []);
+  }, [configured]);
 
   const signIn = useCallback(async (email: string, password: string) => {
-    if (!isApiConfigured) {
-      return { error: new Error('Configure EXPO_PUBLIC_API_URL') };
+    if (!checkApiConfigured()) {
+      return {
+        error: new Error(
+          'API indisponível neste ambiente. No celular, configure EXPO_PUBLIC_API_URL com a URL do servidor.'
+        ),
+      };
     }
     try {
       const user = await api.signIn(email, password);
@@ -71,8 +76,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }, [queryClient]);
 
   const signUp = useCallback(async (email: string, password: string) => {
-    if (!isApiConfigured) {
-      return { error: new Error('Configure EXPO_PUBLIC_API_URL') };
+    if (!checkApiConfigured()) {
+      return {
+        error: new Error(
+          'API indisponível neste ambiente. No celular, configure EXPO_PUBLIC_API_URL com a URL do servidor.'
+        ),
+      };
     }
     try {
       const user = await api.signUp(email, password);
@@ -91,8 +100,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }, [queryClient]);
 
   const resetPassword = useCallback(async (email: string) => {
-    if (!isApiConfigured) {
-      return { error: new Error('Configure EXPO_PUBLIC_API_URL') };
+    if (!checkApiConfigured()) {
+      return { error: new Error('Configure EXPO_PUBLIC_API_URL para recuperar senha.') };
     }
 
     try {
@@ -107,13 +116,13 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     () => ({
       session,
       loading,
-      configured: isApiConfigured,
+      configured,
       signIn,
       signUp,
       signOut,
       resetPassword,
     }),
-    [session, loading, signIn, signUp, signOut, resetPassword]
+    [session, loading, configured, signIn, signUp, signOut, resetPassword]
   );
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

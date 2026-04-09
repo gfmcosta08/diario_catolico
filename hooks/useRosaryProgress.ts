@@ -10,23 +10,24 @@ export function useRosaryProgress(mode: RosaryMode, allIds: string[]) {
   const queryClient = useQueryClient();
   const [localChecked, setLocalChecked] = useState<Set<string>>(new Set());
   const [hydrated, setHydrated] = useState(false);
+  const apiOk = isApiConfigured();
 
   const queryKey = useMemo(() => ['rosary', mode] as const, [mode]);
 
   const { data: remotePayload, isFetched } = useQuery({
     queryKey,
     queryFn: async (): Promise<RosaryProgressPayload> => {
-      if (!isApiConfigured) {
+      if (!isApiConfigured()) {
         return { checkedIds: [] };
       }
       const data = await api.getRosaryProgress(mode);
       return { checkedIds: data.checkedIds ?? [] };
     },
-    enabled: isApiConfigured,
+    enabled: apiOk,
   });
 
   useEffect(() => {
-    if (!isApiConfigured) {
+    if (!apiOk) {
       setLocalChecked(new Set());
       setHydrated(true);
       return;
@@ -36,11 +37,11 @@ export function useRosaryProgress(mode: RosaryMode, allIds: string[]) {
     const valid = new Set(ids.filter((id) => allIds.includes(id)));
     setLocalChecked(valid);
     setHydrated(true);
-  }, [remotePayload, allIds, isFetched]);
+  }, [apiOk, remotePayload, allIds, isFetched]);
 
   const persist = useDebouncedCallback(
     async (checkedIds: string[]) => {
-      if (!isApiConfigured) return;
+      if (!isApiConfigured()) return;
       await api.setRosaryProgress(mode, checkedIds);
       queryClient.invalidateQueries({ queryKey });
     },
