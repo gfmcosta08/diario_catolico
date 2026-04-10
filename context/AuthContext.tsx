@@ -1,4 +1,4 @@
-﻿import { api, clearToken, isApiConfigured as checkApiConfigured } from '@/lib/api';
+import { api, clearToken, getToken, isApiConfigured as checkApiConfigured } from '@/lib/api';
 import { useQueryClient } from '@tanstack/react-query';
 import React, {
   createContext,
@@ -32,14 +32,29 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     let active = true;
     const bootstrap = async () => {
+      const failsafe = setTimeout(() => {
+        if (active) setLoading(false);
+      }, 8000);
+
       if (!checkApiConfigured()) {
         if (!active) return;
         setSession(null);
         setLoading(false);
+        clearTimeout(failsafe);
         return;
       }
 
       try {
+        const token = await getToken();
+        if (!active) return;
+
+        if (!token) {
+          setSession(null);
+          setLoading(false);
+          clearTimeout(failsafe);
+          return;
+        }
+
         const me = await api.me();
         if (!active) return;
         setSession({ user: { id: me.id, email: me.email } });
@@ -47,6 +62,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         if (!active) return;
         setSession(null);
       } finally {
+        clearTimeout(failsafe);
         if (active) setLoading(false);
       }
     };
@@ -61,7 +77,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     if (!checkApiConfigured()) {
       return {
         error: new Error(
-          'API indisponível neste ambiente. No celular, configure EXPO_PUBLIC_API_URL com a URL do servidor.'
+          'API indisponivel neste ambiente. No celular, configure EXPO_PUBLIC_API_URL com a URL do servidor.'
         ),
       };
     }
@@ -79,7 +95,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     if (!checkApiConfigured()) {
       return {
         error: new Error(
-          'API indisponível neste ambiente. No celular, configure EXPO_PUBLIC_API_URL com a URL do servidor.'
+          'API indisponivel neste ambiente. No celular, configure EXPO_PUBLIC_API_URL com a URL do servidor.'
         ),
       };
     }
