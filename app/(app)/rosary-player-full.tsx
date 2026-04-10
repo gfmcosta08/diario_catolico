@@ -1,34 +1,33 @@
 import { useCallback, useMemo, useState } from 'react';
 import { StyleSheet, View } from 'react-native';
 import { RosaryPlayer } from '@/components/RosaryPlayer';
-import { createFullRosaryBeads } from '@/data/rosary-beads';
-import { FULL_ROSARY_ORDER, MYSTERY_TITLES } from '@/data/rosary';
+import { MYSTERY_TITLES } from '@/data/rosary';
 import { palette } from '@/constants/theme';
+import { createRosarySession } from '@/services/rosarySessionService';
 import type { MysterySet } from '@/types/progress';
 
-export const options = { title: 'Rosário Completo' };
+export const options = { title: 'Rezar o Santo Rosário' };
 
 export default function RosaryPlayerFullScreen() {
-  const mysterySets = FULL_ROSARY_ORDER;
-  
+  const session = useMemo(() => createRosarySession('santo_rosario'), []);
+  const beads = session.steps;
+
   const allMysteryTitles = useMemo(() => {
     const titles: string[] = [];
-    for (const set of mysterySets) {
+    for (const set of session.meta.mysterySets) {
       titles.push(...MYSTERY_TITLES[set]);
     }
     return titles;
-  }, []);
-  
-  const beads = useMemo(() => createFullRosaryBeads(mysterySets as MysterySet[]), [mysterySets]);
-  
+  }, [session.meta.mysterySets]);
+
   const [currentIndex, setCurrentIndex] = useState(0);
 
   const handleAdvance = useCallback(() => {
-    setCurrentIndex(prev => Math.min(prev + 1, beads.length - 1));
+    setCurrentIndex((prev) => Math.min(prev + 1, beads.length - 1));
   }, [beads.length]);
 
   const handleBack = useCallback(() => {
-    setCurrentIndex(prev => Math.max(prev - 1, 0));
+    setCurrentIndex((prev) => Math.max(prev - 1, 0));
   }, []);
 
   const mysterySet = useMemo(() => {
@@ -36,8 +35,8 @@ export default function RosaryPlayerFullScreen() {
     if (bead?.mysterySet) {
       return bead.mysterySet;
     }
-    return 'joyful' as MysterySet;
-  }, [currentIndex, beads]);
+    return session.meta.mysterySets[0] as MysterySet;
+  }, [currentIndex, beads, session.meta.mysterySets]);
 
   return (
     <View style={styles.container}>
@@ -48,6 +47,7 @@ export default function RosaryPlayerFullScreen() {
         onBack={handleBack}
         mysterySet={mysterySet}
         mysteryTitles={allMysteryTitles}
+        sessionMeta={session.meta}
       />
     </View>
   );

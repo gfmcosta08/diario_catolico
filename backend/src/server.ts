@@ -50,6 +50,9 @@ if (hasWebBuild) {
 }
 
 const port = Number(process.env.PORT || 3001);
-app.listen(port, () => {
-  console.log(`Server running on port ${port} | web=${hasWebBuild ? 'enabled' : 'disabled'}`);
+const host = process.env.HOST || '0.0.0.0';
+app.listen(port, host, () => {
+  console.log(
+    `Server running on http://${host}:${port} | web=${hasWebBuild ? 'enabled' : 'disabled'}`
+  );
 });

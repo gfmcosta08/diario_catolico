@@ -13,8 +13,13 @@ import {
 import { palette, spacing } from '@/constants/theme';
 import type { RosaryBead } from '@/data/rosary-beads';
 import { LITAINHA_LAURETANA, PRAYER_TEXTS } from '@/data/rosary-beads';
-import { getMysterySetLabel, MYSTERY_BIBLICAL_READINGS, MYSTERY_FRUITS } from '@/data/rosary';
-import type { MysterySet } from '@/types/progress';
+import {
+  getMysterySetLabel,
+  MYSTERY_BIBLICAL_READINGS,
+  MYSTERY_FRUITS,
+  MYSTERY_TITLES,
+} from '@/data/rosary';
+import type { MysterySet, RosarySessionMeta } from '@/types/progress';
 
 const { width: SCREEN_WIDTH } = Dimensions.get('window');
 const BEAD_SIZE = 28;
@@ -28,6 +33,7 @@ type Props = {
   onBack: () => void;
   mysterySet: MysterySet;
   mysteryTitles?: string[];
+  sessionMeta?: RosarySessionMeta;
 };
 
 function triggerHaptic() {
@@ -174,23 +180,33 @@ export function RosaryPlayer({
   onAdvance, 
   onBack, 
   mysterySet,
-  mysteryTitles 
+  mysteryTitles,
+  sessionMeta
 }: Props) {
   const [showLitany, setShowLitany] = useState(false);
   const [litanyIndex, setLitanyIndex] = useState(0);
   const [showSalve, setShowSalve] = useState(false);
   
   const currentBead = beads[currentIndex];
-  const decadeInfo = beads[currentIndex]?.mysteryIndex !== undefined 
+  const resolvedMysteryTitle =
+    currentBead?.mysterySet !== undefined && currentBead.decadeInSet !== undefined
+      ? MYSTERY_TITLES[currentBead.mysterySet][currentBead.decadeInSet]
+      : undefined;
+  const decadeInfo =
+    currentBead?.mysteryIndex !== undefined &&
+    currentBead.mysterySet !== undefined &&
+    currentBead.decadeInSet !== undefined
     ? { 
-        mysteryIndex: beads[currentIndex].mysteryIndex!, 
-        mysterySet: beads[currentIndex].mysterySet!,
-        mysteryTitle: mysteryTitles?.[beads[currentIndex].mysteryIndex!] || beads[currentIndex].displayLabel,
-        decadeInSet: beads[currentIndex].decadeInSet!
+        mysteryIndex: currentBead.mysteryIndex,
+        mysterySet: currentBead.mysterySet,
+        mysteryTitle:
+          resolvedMysteryTitle || mysteryTitles?.[currentBead.mysteryIndex] || currentBead.displayLabel,
+        decadeInSet: currentBead.decadeInSet,
       }
     : null;
   
-  const progress = ((currentIndex + 1) / beads.length) * 100;
+  const totalSteps = sessionMeta?.totalSteps ?? beads.length;
+  const progress = ((currentIndex + 1) / totalSteps) * 100;
   const isClosing = currentBead?.phase === 'closing';
 
   const handleAdvance = useCallback(() => {
@@ -260,6 +276,9 @@ export function RosaryPlayer({
     <View style={styles.container}>
       <View style={styles.header}>
         <Text style={styles.mysterySetLabel}>{getMysterySetLabel(mysterySet)}</Text>
+        {sessionMeta ? (
+          <Text style={styles.sessionLabel}>{sessionMeta.entryLabel}</Text>
+        ) : null}
         <Text style={styles.mysteryTitle}>{mysteryTitle}</Text>
         {decadeInfo && (
           <>
@@ -285,7 +304,7 @@ export function RosaryPlayer({
           <View style={[styles.progressFill, { width: `${progress}%` }]} />
         </View>
         <Text style={styles.progressText}>
-          {currentIndex + 1} de {beads.length}
+          {currentIndex + 1} de {totalSteps}
         </Text>
       </View>
 
@@ -355,6 +374,12 @@ const styles = StyleSheet.create({
     fontWeight: '700',
     textTransform: 'uppercase',
     letterSpacing: 1,
+  },
+  sessionLabel: {
+    fontSize: 12,
+    color: palette.textSecondary,
+    marginTop: 4,
+    textAlign: 'center',
   },
   mysteryTitle: {
     fontSize: 16,

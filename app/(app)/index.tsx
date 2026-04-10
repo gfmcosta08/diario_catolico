@@ -34,15 +34,15 @@ export default function HomeScreen() {
       <View style={styles.cards}>
         <Link href="/(app)/rosary-player-daily" asChild>
           <HomeCard
-            title="Terço do Dia"
-            subtitle="Reze o terço guiado com 59 contas. Textos completos e mistérios do dia."
+            title="Rezar o Terço Mariano"
+            subtitle="Inicia direto no conjunto do dia (5 mistérios, 50 Ave-Marias)."
             icon="circle"
           />
         </Link>
         <Link href="/(app)/rosary-player-full" asChild>
           <HomeCard
-            title="Rosário Completo"
-            subtitle="20 mistérios em sequência. Rosário guiado com Ladainha Lauretana."
+            title="Rezar o Santo Rosário"
+            subtitle="Percorre os 20 mistérios em sequência (200 Ave-Marias)."
             icon="dot-circle-o"
           />
         </Link>
@@ -117,4 +117,3 @@ const styles = StyleSheet.create({
   },
   cards: { marginTop: spacing.sm },
 });
-
