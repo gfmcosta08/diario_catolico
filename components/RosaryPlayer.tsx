@@ -101,6 +101,7 @@ function RosaryBeadCircle({
   const scaleAnim = useRef(new Animated.Value(1)).current;
 
   useEffect(() => {
+    scaleAnim.setValue(1);
     Animated.sequence([
       Animated.timing(scaleAnim, {
         toValue: 1.3,
@@ -113,7 +114,7 @@ function RosaryBeadCircle({
         useNativeDriver: true,
       }),
     ]).start();
-  }, [currentIndex, scaleAnim]);
+  }, [currentIndex]);
 
   const introEnd = 6;
   const decadesPerCircle = 5;

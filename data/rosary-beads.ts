@@ -291,24 +291,26 @@ export function createDailyRosaryBeads(mysterySet: MysterySet): RosaryBead[] {
   const beads: RosaryBead[] = [];
   
   for (const bead of createIntroBeads()) {
-    beads.push(bead);
+    beads.push({ ...bead });
   }
   
-  let currentIndex = 6;
+  let decadeIndex = 0;
   for (let i = 0; i < 5; i++) {
-    const decadeBeads = createDecadeBeads(mysterySet, i, currentIndex);
+    const decadeBeads = createDecadeBeads(mysterySet, i, beads.length);
     for (const bead of decadeBeads) {
-      beads.push(bead);
+      beads.push({ ...bead });
     }
     
     if (i < 4) {
-      beads.push(createGloriaBead(i));
+      beads.push({
+        ...createGloriaBead(decadeIndex),
+        index: beads.length,
+      });
     }
-    
-    currentIndex += 11;
+    decadeIndex++;
   }
   
-  beads.push(createClosingBead());
+  beads.push({ ...createClosingBead(), index: beads.length });
   
   return beads;
 }
@@ -317,17 +319,16 @@ export function createFullRosaryBeads(mysterySets: MysterySet[]): RosaryBead[] {
   const beads: RosaryBead[] = [];
   
   for (const bead of createIntroBeads()) {
-    beads.push(bead);
+    beads.push({ ...bead });
   }
   
   let globalDecadeIndex = 0;
-  let currentIndex = 6;
   
   for (const mysterySet of mysterySets) {
     for (let i = 0; i < 5; i++) {
-      const decadeBeads = createDecadeBeads(mysterySet, i, currentIndex);
+      const decadeBeads = createDecadeBeads(mysterySet, i, beads.length);
       for (const bead of decadeBeads) {
-        beads.push(bead);
+        beads.push({ ...bead });
       }
       
       beads.push({
@@ -342,11 +343,10 @@ export function createFullRosaryBeads(mysterySets: MysterySet[]): RosaryBead[] {
       });
       
       globalDecadeIndex++;
-      currentIndex += 11;
     }
   }
   
-  beads.push(createClosingBead());
+  beads.push({ ...createClosingBead(), index: beads.length });
   
   return beads;
 }
