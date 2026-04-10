@@ -18,6 +18,13 @@ if (runningOnRender) {
       });
     });
 
+  if (!process.env.DATABASE_URL) {
+    console.error(
+      '[ERRO] DATABASE_URL não configurada. Acesse o dashboard do Render e adicione a variável de ambiente DATABASE_URL apontando para o seu banco PostgreSQL.'
+    );
+    process.exit(1);
+  }
+
   try {
     // Deps já instalados no build step (postinstall do root package.json)
     // Aplica migrations e inicia o servidor
