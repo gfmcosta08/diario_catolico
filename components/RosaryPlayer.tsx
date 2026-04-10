@@ -12,14 +12,14 @@ import {
 } from 'react-native';
 import { palette, spacing } from '@/constants/theme';
 import type { RosaryBead } from '@/data/rosary-beads';
-import { getDecadeInfoForBead, LITAINHA_LAURETANA, PRAYER_TEXTS } from '@/data/rosary-beads';
-import { CLOSING_PRAYERS, getMysterySetLabel, MYSTERY_BIBLICAL_READINGS, MYSTERY_FRUITS, MYSTERY_TITLES } from '@/data/rosary';
+import { LITAINHA_LAURETANA, PRAYER_TEXTS } from '@/data/rosary-beads';
+import { getMysterySetLabel, MYSTERY_BIBLICAL_READINGS, MYSTERY_FRUITS } from '@/data/rosary';
 import type { MysterySet } from '@/types/progress';
 
 const { width: SCREEN_WIDTH } = Dimensions.get('window');
-const BEAD_SIZE = 36;
-const BEAD_SIZE_ACTIVE = 48;
-const CIRCLE_RADIUS = Math.min(SCREEN_WIDTH * 0.38, 160);
+const BEAD_SIZE = 28;
+const BEAD_SIZE_ACTIVE = 40;
+const CIRCLE_RADIUS = Math.min(SCREEN_WIDTH * 0.42, 150);
 
 type Props = {
   beads: RosaryBead[];
@@ -32,102 +32,97 @@ type Props = {
 
 function triggerHaptic() {
   if (Platform.OS === 'ios' || Platform.OS === 'android') {
-    Vibration.vibrate(10);
+    Vibration.vibrate(15);
   }
 }
 
-function getBeadPosition(index: number, totalIntro: number, totalDecades: number, closing: number): { x: number; y: number; isLarge: boolean } {
-  const introEnd = totalIntro;
-  const decadesEnd = introEnd + totalDecades;
-  const closingIndex = closing;
-
+function getBeadPosition(
+  index: number, 
+  introEnd: number, 
+  decadesPerCircle: number
+): { x: number; y: number; isLarge: boolean; isMedallion: boolean } {
+  
   if (index === 0) {
-    return { x: CIRCLE_RADIUS, y: 0, isLarge: true };
+    return { x: CIRCLE_RADIUS, y: 0, isLarge: true, isMedallion: false };
   }
   
   if (index < introEnd) {
     const normalizedIndex = index - 1;
-    const angle = (normalizedIndex / (introEnd - 1)) * (Math.PI / 3) - Math.PI / 6;
+    const angle = (normalizedIndex / (introEnd - 1)) * (Math.PI * 0.5) - Math.PI * 0.25;
     const radius = CIRCLE_RADIUS * 0.85;
     return {
       x: CIRCLE_RADIUS + Math.cos(angle) * radius,
       y: CIRCLE_RADIUS + Math.sin(angle) * radius,
       isLarge: index === 1,
+      isMedallion: false,
     };
   }
   
-  if (index >= introEnd && index < decadesEnd) {
-    const decadeIndex = Math.floor((index - introEnd) / 12);
-    const posInDecade = (index - introEnd) % 12;
+  if (index >= introEnd) {
+    const decadeGroups = Math.floor((index - introEnd) / 11);
+    const posInGroup = (index - introEnd) % 11;
     
-    const baseAngle = -Math.PI / 2;
-    const decadeSpread = (2 * Math.PI) / 5;
-    const decadeAngle = baseAngle + decadeIndex * decadeSpread + (posInDecade / 12) * decadeSpread;
+    const groupsPerCircle = decadesPerCircle;
+    const circleIndex = Math.floor(decadeGroups / groupsPerCircle);
+    const posInCircle = decadeGroups % groupsPerCircle;
     
-    const radius = CIRCLE_RADIUS * 0.7;
-    const x = CIRCLE_RADIUS + Math.cos(decadeAngle) * radius;
-    const y = CIRCLE_RADIUS + Math.sin(decadeAngle) * radius;
+    const baseAngle = -Math.PI / 2 + circleIndex * Math.PI * 2;
+    const decadeSpread = (2 * Math.PI) / groupsPerCircle;
+    const angle = baseAngle + posInCircle * decadeSpread + (posInGroup / 11) * decadeSpread;
     
-    return { x, y, isLarge: posInDecade === 0 };
-  }
-  
-  if (index >= decadesEnd) {
-    const normalizedClosing = index - decadesEnd;
-    const angle = (normalizedClosing / closing) * (Math.PI / 3) - Math.PI / 6;
-    const radius = CIRCLE_RADIUS * 0.85;
-    return {
-      x: CIRCLE_RADIUS + Math.cos(angle) * radius,
-      y: CIRCLE_RADIUS + Math.sin(angle) * radius,
-      isLarge: true,
+    const radius = CIRCLE_RADIUS * (0.5 + circleIndex * 0.25);
+    const x = CIRCLE_RADIUS + Math.cos(angle) * radius;
+    const y = CIRCLE_RADIUS + Math.sin(angle) * radius;
+    
+    return { 
+      x, 
+      y, 
+      isLarge: posInGroup === 0, 
+      isMedallion: posInGroup === 10 
     };
   }
   
-  return { x: CIRCLE_RADIUS, y: CIRCLE_RADIUS, isLarge: false };
+  return { x: CIRCLE_RADIUS, y: CIRCLE_RADIUS, isLarge: false, isMedallion: false };
 }
 
 function RosaryBeadCircle({
   beads,
   currentIndex,
-  totalIntro,
-  totalDecades,
-  closing,
 }: {
   beads: RosaryBead[];
   currentIndex: number;
-  totalIntro: number;
-  totalDecades: number;
-  closing: number;
 }) {
   const scaleAnim = useRef(new Animated.Value(1)).current;
 
   useEffect(() => {
     Animated.sequence([
       Animated.timing(scaleAnim, {
-        toValue: 1.2,
-        duration: 100,
+        toValue: 1.3,
+        duration: 150,
         useNativeDriver: true,
       }),
       Animated.timing(scaleAnim, {
         toValue: 1,
-        duration: 100,
+        duration: 150,
         useNativeDriver: true,
       }),
     ]).start();
   }, [currentIndex, scaleAnim]);
 
-  const introEnd = totalIntro;
-  const decadesEnd = introEnd + totalDecades;
+  const introEnd = 6;
+  const decadesPerCircle = 5;
 
   return (
     <View style={styles.circleContainer}>
       <View style={[styles.circle, { width: CIRCLE_RADIUS * 2, height: CIRCLE_RADIUS * 2 }]}>
         {beads.map((bead, idx) => {
-          const { x, y, isLarge } = getBeadPosition(idx, totalIntro, totalDecades, closing);
+          const { x, y, isLarge, isMedallion } = getBeadPosition(idx, introEnd, decadesPerCircle);
           const isActive = idx === currentIndex;
           const isPast = idx < currentIndex;
           
-          const size = isLarge ? BEAD_SIZE * 1.3 : BEAD_SIZE;
-          const activeSize = isLarge ? BEAD_SIZE_ACTIVE * 1.3 : BEAD_SIZE_ACTIVE;
+          const baseSize = isLarge ? BEAD_SIZE * 1.4 : BEAD_SIZE;
+          const activeSize = isLarge ? BEAD_SIZE_ACTIVE * 1.4 : BEAD_SIZE_ACTIVE;
+          const size = isActive ? activeSize : baseSize;
           
           let backgroundColor = palette.surface;
           let borderColor = palette.border;
@@ -143,15 +138,15 @@ function RosaryBeadCircle({
           
           return (
             <Animated.View
-              key={bead.index}
+              key={`${bead.index}-${idx}`}
               style={[
                 styles.bead,
                 {
                   left: x - size / 2,
                   top: y - size / 2,
-                  width: isActive ? activeSize : size,
-                  height: isActive ? activeSize : size,
-                  borderRadius: (isActive ? activeSize : size) / 2,
+                  width: size,
+                  height: size,
+                  borderRadius: size / 2,
                   backgroundColor,
                   borderColor,
                   borderWidth: isActive ? 3 : 1,
@@ -160,10 +155,7 @@ function RosaryBeadCircle({
               ]}
             >
               {bead.beadType === 'crucifix' && (
-                <Text style={styles.beadCrucifix}>✝</Text>
-              )}
-              {bead.beadType === 'medallion' && (
-                <Text style={styles.beadMedallion}>♦</Text>
+                <Text style={styles.beadCrucifix}>†</Text>
               )}
               {bead.beadType === 'closing' && (
                 <Text style={styles.beadHeart}>♥</Text>
@@ -176,20 +168,30 @@ function RosaryBeadCircle({
   );
 }
 
-export function RosaryPlayer({ beads, currentIndex, onAdvance, onBack, mysterySet, mysteryTitles }: Props) {
+export function RosaryPlayer({ 
+  beads, 
+  currentIndex, 
+  onAdvance, 
+  onBack, 
+  mysterySet,
+  mysteryTitles 
+}: Props) {
   const [showLitany, setShowLitany] = useState(false);
   const [litanyIndex, setLitanyIndex] = useState(0);
+  const [showSalve, setShowSalve] = useState(false);
   
   const currentBead = beads[currentIndex];
-  const decadeInfo = getDecadeInfoForBead(currentBead);
-  
-  const totalIntro = 6;
-  const totalDecades = 5 * 12;
-  const closing = 1;
+  const decadeInfo = beads[currentIndex]?.mysteryIndex !== undefined 
+    ? { 
+        mysteryIndex: beads[currentIndex].mysteryIndex!, 
+        mysterySet: beads[currentIndex].mysterySet!,
+        mysteryTitle: mysteryTitles?.[beads[currentIndex].mysteryIndex!] || beads[currentIndex].displayLabel,
+        decadeInSet: beads[currentIndex].decadeInSet!
+      }
+    : null;
   
   const progress = ((currentIndex + 1) / beads.length) * 100;
   const isClosing = currentBead?.phase === 'closing';
-  const isFinished = currentIndex >= beads.length - 1;
 
   const handleAdvance = useCallback(() => {
     triggerHaptic();
@@ -205,12 +207,22 @@ export function RosaryPlayer({ beads, currentIndex, onAdvance, onBack, mysterySe
       return;
     }
     
+    if (showLitany && litanyIndex >= LITAINHA_LAURETANA.length - 1 && !showSalve) {
+      setShowSalve(true);
+      return;
+    }
+    
     if (currentIndex < beads.length - 1) {
       onAdvance();
     }
-  }, [currentIndex, beads.length, isClosing, showLitany, litanyIndex, onAdvance]);
+  }, [currentIndex, beads.length, isClosing, showLitany, litanyIndex, showSalve, onAdvance]);
 
   const handleBack = useCallback(() => {
+    if (showSalve) {
+      setShowSalve(false);
+      return;
+    }
+    
     if (showLitany && litanyIndex > 0) {
       setLitanyIndex(prev => prev - 1);
       return;
@@ -224,53 +236,40 @@ export function RosaryPlayer({ beads, currentIndex, onAdvance, onBack, mysterySe
     if (currentIndex > 0) {
       onBack();
     }
-  }, [currentIndex, showLitany, litanyIndex, onBack]);
+  }, [currentIndex, showLitany, litanyIndex, showSalve, onBack]);
 
   const getDisplayText = () => {
     if (isClosing) {
-      if (currentBead.displayLabel === 'Agradecimento') {
-        return CLOSING_PRAYERS.agradecimiento;
-      }
       if (showLitany) {
         const item = LITAINHA_LAURETANA[litanyIndex];
         return `${item.invocacao}\n\n${item.resposta}`;
       }
-      if (litanyIndex >= LITAINHA_LAURETANA.length - 1) {
-        return CLOSING_PRAYERS.salveRainha;
+      if (showSalve) {
+        return PRAYER_TEXTS.salveRainha;
       }
+      return PRAYER_TEXTS.agradecimiento;
     }
     
     return currentBead?.prayerText || '';
   };
 
-  const getMysteryInfo = () => {
-    if (!decadeInfo) {
-      if (isClosing) {
-        return { title: 'Encerramento', reading: '', fruit: '' };
-      }
-      return { title: 'Introdução', reading: '', fruit: '' };
-    }
-    
-    const mysteryIndex = decadeInfo.mysteryIndex;
-    return {
-      title: mysteryTitles?.[mysteryIndex] || decadeInfo.mysteryTitle,
-      reading: MYSTERY_BIBLICAL_READINGS[mysterySet]?.[mysteryIndex] || '',
-      fruit: MYSTERY_FRUITS[mysterySet]?.[mysteryIndex] || '',
-    };
-  };
-
-  const mysteryInfo = getMysteryInfo();
+  const mysteryTitle = decadeInfo?.mysteryTitle || (isClosing ? 'Encerramento' : 'Introdução');
+  const mysteryIndex = decadeInfo?.mysteryIndex ?? 0;
 
   return (
     <View style={styles.container}>
       <View style={styles.header}>
         <Text style={styles.mysterySetLabel}>{getMysterySetLabel(mysterySet)}</Text>
-        <Text style={styles.mysteryTitle}>{mysteryInfo.title}</Text>
-        {mysteryInfo.reading && (
-          <Text style={styles.mysteryReading}>📖 {mysteryInfo.reading}</Text>
-        )}
-        {mysteryInfo.fruit && (
-          <Text style={styles.mysteryFruit}>Fruto: {mysteryInfo.fruit}</Text>
+        <Text style={styles.mysteryTitle}>{mysteryTitle}</Text>
+        {decadeInfo && (
+          <>
+            <Text style={styles.mysteryReading}>
+              📖 {MYSTERY_BIBLICAL_READINGS[mysterySet]?.[mysteryIndex] || ''}
+            </Text>
+            <Text style={styles.mysteryFruit}>
+              Fruto: {MYSTERY_FRUITS[mysterySet]?.[mysteryIndex] || ''}
+            </Text>
+          </>
         )}
       </View>
 
@@ -278,9 +277,6 @@ export function RosaryPlayer({ beads, currentIndex, onAdvance, onBack, mysterySe
         <RosaryBeadCircle
           beads={beads}
           currentIndex={currentIndex}
-          totalIntro={totalIntro}
-          totalDecades={totalDecades}
-          closing={closing}
         />
       </View>
 
@@ -297,8 +293,9 @@ export function RosaryPlayer({ beads, currentIndex, onAdvance, onBack, mysterySe
         style={styles.prayerScroll}
         contentContainerStyle={styles.prayerContainer}
       >
+        <Text style={styles.prayerLabel}>{currentBead?.displayLabel}</Text>
         <Text style={styles.prayerText}>{getDisplayText()}</Text>
-        {isClosing && showLitany && (
+        {showLitany && (
           <Text style={styles.litanyCounter}>
             {litanyIndex + 1} de {LITAINHA_LAURETANA.length}
           </Text>
@@ -307,31 +304,32 @@ export function RosaryPlayer({ beads, currentIndex, onAdvance, onBack, mysterySe
 
       <View style={styles.controls}>
         <Pressable
-          style={[styles.controlBtn, styles.backBtn, currentIndex === 0 && styles.disabledBtn]}
+          style={[styles.backBtn, (currentIndex === 0 && !showLitany) && styles.disabledBtn]}
           onPress={handleBack}
           disabled={currentIndex === 0 && !showLitany}
         >
-          <Text style={styles.controlBtnText}>◀</Text>
+          <Text style={styles.backBtnText}>◀</Text>
         </Pressable>
         
         <Pressable
-          style={[styles.controlBtn, styles.advanceBtn, isFinished && !showLitany && styles.disabledBtn]}
+          style={[styles.advanceBtn]}
           onPress={handleAdvance}
-          disabled={isFinished && !showLitany && litanyIndex >= LITAINHA_LAURETANA.length - 1}
         >
           <Text style={styles.advanceBtnText}>
-            {isClosing && litanyIndex >= LITAINHA_LAURETANA.length - 1 ? 'FIM' : 
-             showLitany && litanyIndex >= LITAINHA_LAURETANA.length - 1 ? 'Salve' : '►'}
+            {isClosing && showSalve ? 'FIM ✝' : 
+             showLitany && litanyIndex >= LITAINHA_LAURETANA.length - 1 ? 'Salve Rainha' : 
+             isClosing && showLitany ? '►' :
+             '►'}
           </Text>
         </Pressable>
       </View>
 
       <View style={styles.beadTypeIndicator}>
         <Text style={styles.beadTypeLabel}>
-          {currentBead?.beadType === 'crucifix' && '✝ Crucifixo - Início'}
-          {currentBead?.beadType === 'large' && '◯ Conta Grande - Pai-Nosso'}
-          {currentBead?.beadType === 'small' && '• Conta Pequena - Ave-Maria'}
-          {currentBead?.beadType === 'medallion' && '♦ Medalha - Glória'}
+          {currentBead?.beadType === 'crucifix' && '† Crucifixo'}
+          {currentBead?.beadType === 'large' && '◯ Pai-Nosso'}
+          {currentBead?.beadType === 'small' && '• Ave-Maria'}
+          {currentBead?.beadType === 'medallion' && '♦ Glória'}
           {currentBead?.beadType === 'closing' && '♥ Encerramento'}
         </Text>
       </View>
@@ -346,33 +344,32 @@ const styles = StyleSheet.create({
   },
   header: {
     padding: spacing.md,
-    paddingTop: spacing.sm,
     alignItems: 'center',
     backgroundColor: palette.surface,
     borderBottomWidth: 1,
     borderBottomColor: palette.border,
   },
   mysterySetLabel: {
-    fontSize: 12,
+    fontSize: 11,
     color: palette.primary,
-    fontWeight: '600',
+    fontWeight: '700',
     textTransform: 'uppercase',
     letterSpacing: 1,
   },
   mysteryTitle: {
-    fontSize: 18,
+    fontSize: 16,
     fontWeight: '700',
     color: palette.text,
     marginTop: 4,
     textAlign: 'center',
   },
   mysteryReading: {
-    fontSize: 13,
+    fontSize: 12,
     color: palette.textSecondary,
     marginTop: 4,
   },
   mysteryFruit: {
-    fontSize: 12,
+    fontSize: 11,
     color: palette.primaryMuted,
     fontStyle: 'italic',
     marginTop: 2,
@@ -380,7 +377,7 @@ const styles = StyleSheet.create({
   circleWrapper: {
     alignItems: 'center',
     justifyContent: 'center',
-    paddingVertical: spacing.md,
+    paddingVertical: spacing.sm,
   },
   circleContainer: {
     width: CIRCLE_RADIUS * 2 + 20,
@@ -401,23 +398,18 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     borderWidth: 1,
     shadowColor: '#000',
-    shadowOpacity: 0.1,
-    shadowRadius: 2,
-    shadowOffset: { width: 0, height: 1 },
-    elevation: 2,
+    shadowOpacity: 0.15,
+    shadowRadius: 3,
+    shadowOffset: { width: 0, height: 2 },
+    elevation: 3,
   },
   beadCrucifix: {
-    fontSize: 16,
-    color: palette.surface,
-    fontWeight: 'bold',
-  },
-  beadMedallion: {
-    fontSize: 14,
+    fontSize: 18,
     color: palette.surface,
     fontWeight: 'bold',
   },
   beadHeart: {
-    fontSize: 14,
+    fontSize: 16,
     color: palette.surface,
   },
   progressContainer: {
@@ -428,37 +420,45 @@ const styles = StyleSheet.create({
   },
   progressBar: {
     flex: 1,
-    height: 6,
+    height: 8,
     backgroundColor: palette.border,
-    borderRadius: 3,
+    borderRadius: 4,
     overflow: 'hidden',
   },
   progressFill: {
     height: '100%',
     backgroundColor: palette.primary,
-    borderRadius: 3,
+    borderRadius: 4,
   },
   progressText: {
     fontSize: 12,
     color: palette.textSecondary,
     fontWeight: '600',
-    minWidth: 50,
+    minWidth: 55,
     textAlign: 'right',
   },
   prayerScroll: {
     flex: 1,
-    marginTop: spacing.md,
+    marginTop: spacing.sm,
   },
   prayerContainer: {
     padding: spacing.lg,
     paddingBottom: spacing.xl,
   },
+  prayerLabel: {
+    fontSize: 14,
+    color: palette.primary,
+    fontWeight: '600',
+    textAlign: 'center',
+    marginBottom: spacing.sm,
+    textTransform: 'uppercase',
+    letterSpacing: 1,
+  },
   prayerText: {
-    fontSize: 18,
-    lineHeight: 28,
+    fontSize: 17,
+    lineHeight: 26,
     color: palette.text,
     textAlign: 'center',
-    fontWeight: '500',
   },
   litanyCounter: {
     fontSize: 12,
@@ -474,36 +474,36 @@ const styles = StyleSheet.create({
     borderTopWidth: 1,
     borderTopColor: palette.border,
   },
-  controlBtn: {
+  backBtn: {
     width: 60,
     height: 60,
     borderRadius: 30,
     alignItems: 'center',
     justifyContent: 'center',
-  },
-  backBtn: {
     backgroundColor: palette.surface,
     borderWidth: 2,
     borderColor: palette.primary,
   },
   advanceBtn: {
     flex: 1,
-    backgroundColor: palette.primary,
-    borderRadius: 30,
     height: 64,
+    borderRadius: 32,
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: palette.primary,
   },
   advanceBtnText: {
-    fontSize: 20,
+    fontSize: 22,
     color: palette.surface,
     fontWeight: '700',
   },
-  disabledBtn: {
-    opacity: 0.4,
-  },
-  controlBtnText: {
+  backBtnText: {
     fontSize: 24,
     color: palette.primary,
     fontWeight: 'bold',
+  },
+  disabledBtn: {
+    opacity: 0.4,
   },
   beadTypeIndicator: {
     padding: spacing.sm,

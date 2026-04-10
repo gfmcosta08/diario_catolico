@@ -1,5 +1,4 @@
 import type { MysterySet } from '@/types/progress';
-import { MYSTERY_TITLES } from './rosary';
 
 export type BeadType = 
   | 'crucifix'      
@@ -31,6 +30,37 @@ export interface DecadeInfo {
   decadeInSet: number;
 }
 
+const MYSTERY_TITLES: Record<MysterySet, string[]> = {
+  joyful: [
+    'Anunciação do anjo a Maria',
+    'Visitação de Maria a Santa Isabel',
+    'Nascimento do Menino Jesus em Belém',
+    'Apresentação do Menino Jesus no templo',
+    'Encontro do Menino Jesus no templo',
+  ],
+  luminous: [
+    'Batismo de Jesus no Jordão',
+    'Auto-revelação nas bodas de Caná',
+    'Anúncio do Reino e convite à conversão',
+    'Transfiguração de Jesus',
+    'Instituição da Eucaristia',
+  ],
+  sorrowful: [
+    'Agonia de Jesus no horto',
+    'Flagelação de Jesus',
+    'Coroação de espinhos',
+    'Jesus carrega a cruz a caminho do Calvário',
+    'Crucifixão e morte de Jesus',
+  ],
+  glorious: [
+    'Ressurreição do Senhor',
+    'Ascensão do Senhor aos céus',
+    'Vinda do Espírito Santo sobre os apóstolos',
+    'Assunção de Nossa Senhora ao céu',
+    'Coroação de Maria como Rainha do Céu e da terra',
+  ],
+};
+
 function getMysteryTitle(mysterySet: MysterySet, mysteryIndex: number): string {
   return MYSTERY_TITLES[mysterySet][mysteryIndex];
 }
@@ -38,18 +68,7 @@ function getMysteryTitle(mysterySet: MysterySet, mysteryIndex: number): string {
 export const PRAYER_TEXTS = {
   sinalDaCruz: 'Em nome do Pai, e do Filho, e do Espírito Santo. Amém.',
   
-  credo: `Creio em Deus Pai Todo-poderoso, criador do céu e da terra,
-e em Jesus Cristo, seu único Filho, nosso Senhor;
-que foi concebido pelo poder do Espírito Santo;
-nasceu da Virgem Maria, padeceu sob Pôncio Pilatos,
-foi crucificado, morto e sepultado;
-desceu à mansão dos mortos;
-ressuscitou ao terceiro dia;
-subiu aos céus, está sentado à direita de Deus Pai todo-poderoso,
-donde há de vir a julgar os vivos e os mortos;
-creio no Espírito Santo, na Santa Igreja Católica,
-na comunhão dos Santos, na remissão dos pecados,
-na ressurreição da carne, na vida eterna. Amém.`,
+  credito: `Divino Jesus, eu vos ofereço este Terço, que vou rezar, meditando em cada um dos mistérios que se seguem, e a graça de ganhar as indulgências anexas a esta santa devoção.`,
 
   paiNosso: `Pai Nosso, que estais nos céus,
 santificado seja o Vosso nome,
@@ -74,7 +93,7 @@ e socorrei principalmente as que mais precisarem.`,
 
   agradecimiento: `Infinitas graças vos damos, Soberana Rainha,
 pelos benefícios que todos os dias recebemos de vossas mãos liberais.
- Dignai-vos, agora e para sempre,
+Dignai-vos, agora e para sempre,
 tomar-nos debaixo do vosso poderoso amparo
 e, para mais vos suplicar, vos saudamos com uma Salve Rainha...`,
 
@@ -90,9 +109,9 @@ Para que sejamos dignos das promessas de Cristo. Amém.`,
 
   oracaoFinal: `Ó Deus, cujo Filho Unigênito, por Sua vida, morte e ressurreição,
 nos obteve o prêmio da salvação eterna,
-concedei-nos, nós Vos pedimos,
+concedei-nos, nós Vositamos,
 que, meditando estes mistérios do Sacratíssimo Rosário da Bem-Aventurada Virgem Maria,
-imitemos o que contêm e consigamos o que prometem.
+imitemos o que contêm e consigamos o que prometemos.
 Por Cristo, Senhor Nosso. Amém.`,
 };
 
@@ -101,7 +120,7 @@ export const LITAINHA_LAURETANA = [
   { invocacao: 'Cristo, tende piedade de nós.', resposta: 'Cristo, tende piedade de nós.' },
   { invocacao: 'Senhor, tende piedade de nós.', resposta: 'Senhor, tende piedade de nós.' },
   { invocacao: 'Cristo, ouvi-nos.', resposta: 'Cristo, ouvi-nos.' },
-  { invocacao: 'Cristo, atendei-nos.', resposta: 'Cristo, atendei-nos.' },
+  { invocacao: 'Cristo, atendei-nos.', resposta: 'Cristo, atenei-nos.' },
   { invocacao: 'Deus Pai do céu.', resposta: 'Tende piedade de nós.' },
   { invocacao: 'Deus Filho, Redentor do mundo.', resposta: 'Tende piedade de nós.' },
   { invocacao: 'Deus Espírito Santo.', resposta: 'Tende piedade de nós.' },
@@ -162,6 +181,7 @@ export const LITAINHA_LAURETANA = [
   { invocacao: 'Cordeiro de Deus, que tirais os pecados do mundo.', resposta: 'Perdoai-nos, Senhor.' },
   { invocacao: 'Cordeiro de Deus, que tirais os pecados do mundo.', resposta: 'Ouvi-nos, Senhor.' },
   { invocacao: 'Cordeiro de Deus, que tirais os pecados do mundo.', resposta: 'Tende piedade de nós.' },
+  { invocacao: 'Rogai por nós, Santa Mãe de Deus.', resposta: 'Para que sejamos dignos das promessas de Cristo.' },
 ];
 
 function createIntroBeads(): RosaryBead[] {
@@ -170,8 +190,8 @@ function createIntroBeads(): RosaryBead[] {
       index: 0,
       beadType: 'crucifix',
       phase: 'intro',
-      prayerText: `${PRAYER_TEXTS.sinalDaCruz}\n\n${PRAYER_TEXTS.credo}`,
-      displayLabel: 'Sinal da Cruz e Credo',
+      prayerText: `✝ ${PRAYER_TEXTS.sinalDaCruz}\n\n${PRAYER_TEXTS.credito}`,
+      displayLabel: 'Sinal da Cruz e Oferecimento',
     },
     {
       index: 1,
@@ -185,21 +205,21 @@ function createIntroBeads(): RosaryBead[] {
       beadType: 'small',
       phase: 'intro',
       prayerText: `${PRAYER_TEXTS.aveMaria}\n\nIntenção: Fé`,
-      displayLabel: 'Ave-Maria (1/3)',
+      displayLabel: 'Ave-Maria 1/3',
     },
     {
       index: 3,
       beadType: 'small',
       phase: 'intro',
       prayerText: `${PRAYER_TEXTS.aveMaria}\n\nIntenção: Esperança`,
-      displayLabel: 'Ave-Maria (2/3)',
+      displayLabel: 'Ave-Maria 2/3',
     },
     {
       index: 4,
       beadType: 'small',
       phase: 'intro',
       prayerText: `${PRAYER_TEXTS.aveMaria}\n\nIntenção: Caridade`,
-      displayLabel: 'Ave-Maria (3/3)',
+      displayLabel: 'Ave-Maria 3/3',
     },
     {
       index: 5,
@@ -224,7 +244,7 @@ function createDecadeBeads(
     beadType: 'large',
     phase: 'decade',
     prayerText: `Mistério: ${mysteryTitle}\n\n${PRAYER_TEXTS.paiNosso}`,
-    displayLabel: `Pai-Nosso — ${mysteryTitle}`,
+    displayLabel: `Mistério ${mysteryIndex + 1}: ${mysteryTitle}`,
     mysteryIndex,
     mysterySet,
     decadeInSet: mysteryIndex,
@@ -236,67 +256,97 @@ function createDecadeBeads(
       beadType: 'small',
       phase: 'decade',
       prayerText: `${PRAYER_TEXTS.aveMaria}\n\n(${i}/10)`,
-      displayLabel: `Ave-Maria (${i}/10)`,
+      displayLabel: `Ave-Maria ${i}/10`,
       mysteryIndex,
       mysterySet,
       decadeInSet: mysteryIndex,
     });
   }
 
-  beads.push({
-    index: startIndex + 11,
-    beadType: 'large',
-    phase: 'decade',
-    prayerText: `${PRAYER_TEXTS.gloriaAoPai}\n\n${PRAYER_TEXTS.oracaoDeFatima}`,
-    displayLabel: 'Glória e Ó meu Jesus',
-    mysteryIndex,
-    mysterySet,
-    decadeInSet: mysteryIndex,
-  });
-
   return beads;
 }
 
-function createClosingBeads(): RosaryBead[] {
-  return [
-    {
-      index: 59,
-      beadType: 'closing',
-      phase: 'closing',
-      prayerText: PRAYER_TEXTS.agradecimiento,
-      displayLabel: 'Agradecimento',
-    },
-  ];
+function createClosingBead(): RosaryBead {
+  return {
+    index: 58,
+    beadType: 'closing',
+    phase: 'closing',
+    prayerText: PRAYER_TEXTS.agradecimiento,
+    displayLabel: 'Agradecimento',
+  };
+}
+
+function createGloriaBead(decadeIndex: number): RosaryBead {
+  return {
+    index: 6 + (decadeIndex * 11) + 10,
+    beadType: 'medallion',
+    phase: 'decade',
+    prayerText: `${PRAYER_TEXTS.gloriaAoPai}\n\n${PRAYER_TEXTS.oracaoDeFatima}`,
+    displayLabel: 'Glória ao Pai',
+    mysteryIndex: decadeIndex,
+  };
 }
 
 export function createDailyRosaryBeads(mysterySet: MysterySet): RosaryBead[] {
-  const beads: RosaryBead[] = [...createIntroBeads()];
+  const beads: RosaryBead[] = [];
   
-  let nextIndex = 6;
-  for (let i = 0; i < 5; i++) {
-    const decadeBeads = createDecadeBeads(mysterySet, i, nextIndex);
-    beads.push(...decadeBeads);
-    nextIndex += 12;
+  for (const bead of createIntroBeads()) {
+    beads.push(bead);
   }
   
-  beads.push(...createClosingBeads());
+  let currentIndex = 6;
+  for (let i = 0; i < 5; i++) {
+    const decadeBeads = createDecadeBeads(mysterySet, i, currentIndex);
+    for (const bead of decadeBeads) {
+      beads.push(bead);
+    }
+    
+    if (i < 4) {
+      beads.push(createGloriaBead(i));
+    }
+    
+    currentIndex += 11;
+  }
+  
+  beads.push(createClosingBead());
   
   return beads;
 }
 
 export function createFullRosaryBeads(mysterySets: MysterySet[]): RosaryBead[] {
-  const beads: RosaryBead[] = [...createIntroBeads()];
+  const beads: RosaryBead[] = [];
   
-  let nextIndex = 6;
+  for (const bead of createIntroBeads()) {
+    beads.push(bead);
+  }
+  
+  let globalDecadeIndex = 0;
+  let currentIndex = 6;
+  
   for (const mysterySet of mysterySets) {
     for (let i = 0; i < 5; i++) {
-      const decadeBeads = createDecadeBeads(mysterySet, i, nextIndex);
-      beads.push(...decadeBeads);
-      nextIndex += 12;
+      const decadeBeads = createDecadeBeads(mysterySet, i, currentIndex);
+      for (const bead of decadeBeads) {
+        beads.push(bead);
+      }
+      
+      beads.push({
+        index: beads.length,
+        beadType: 'medallion',
+        phase: 'decade',
+        prayerText: `${PRAYER_TEXTS.gloriaAoPai}\n\n${PRAYER_TEXTS.oracaoDeFatima}`,
+        displayLabel: 'Glória ao Pai',
+        mysteryIndex: globalDecadeIndex,
+        mysterySet,
+        decadeInSet: i,
+      });
+      
+      globalDecadeIndex++;
+      currentIndex += 11;
     }
   }
   
-  beads.push(...createClosingBeads());
+  beads.push(createClosingBead());
   
   return beads;
 }
@@ -314,4 +364,4 @@ export function getDecadeInfoForBead(bead: RosaryBead): DecadeInfo | null {
 }
 
 export const TOTAL_BEADS_DAILY = 59;
-export const TOTAL_BEADS_FULL = 59 + (3 * 12 * 4);
+export const TOTAL_BEADS_FULL = 206;
