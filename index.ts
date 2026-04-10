@@ -29,6 +29,7 @@ async function start() {
     }
 
     try {
+      await runStep('npm', ['--prefix', 'backend', 'run', 'prisma:generate']);
       await runStep('npm', ['--prefix', 'backend', 'run', 'prisma:migrate']);
       const child = spawn('npm', ['--prefix', 'backend', 'run', 'start'], {
         stdio: 'inherit',
