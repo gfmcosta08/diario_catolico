@@ -12,6 +12,7 @@ export function isApiConfigured(): boolean {
   return false;
 }
 const TOKEN_KEY = 'auth_token';
+const FETCH_TIMEOUT_MS = 12000;
 
 export type AuthUser = { id: string; email: string };
 
@@ -53,7 +54,28 @@ async function request<T>(path: string, init: RequestInit = {}, auth = true): Pr
     if (token) headers.Authorization = `Bearer ${token}`;
   }
 
-  const res = await fetch(`${baseUrl}${path}`, { ...init, headers });
+  const controller =
+    typeof AbortController !== 'undefined' && !init.signal ? new AbortController() : null;
+  const timeoutId = controller
+    ? setTimeout(() => controller.abort(), FETCH_TIMEOUT_MS)
+    : null;
+
+  let res: Response;
+  try {
+    res = await fetch(`${baseUrl}${path}`, {
+      ...init,
+      headers,
+      signal: init.signal ?? controller?.signal,
+    });
+  } catch (error) {
+    if (timeoutId) clearTimeout(timeoutId);
+    if (controller?.signal.aborted) {
+      throw new Error('A API demorou para responder. Tente novamente em alguns segundos.');
+    }
+    throw error instanceof Error ? error : new Error('Falha de conexão com a API.');
+  } finally {
+    if (timeoutId) clearTimeout(timeoutId);
+  }
 
   let data: any = null;
   try {
@@ -236,4 +258,3 @@ export const api = {
     return request(`/api/ministries/${ministryId}/assignments/${assignmentId}`, { method: 'DELETE' });
   },
 };
-
