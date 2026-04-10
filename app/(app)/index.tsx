@@ -32,18 +32,25 @@ export default function HomeScreen() {
         </Link>
       ) : null}
       <View style={styles.cards}>
-        <Link href="/(app)/rosary-daily" asChild>
+        <Link href="/(app)/rosary-player-daily" asChild>
           <HomeCard
-            title="TerÃ§o do dia"
-            subtitle="MistÃ©rios do dia da semana, passo a passo com checklist."
+            title="Terço do Dia"
+            subtitle="Reze o terço guiado com 59 contas. Textos completos e mistérios do dia."
             icon="circle"
           />
         </Link>
-        <Link href="/(app)/rosary-full" asChild>
+        <Link href="/(app)/rosary-player-full" asChild>
           <HomeCard
-            title="O RosÃ¡rio"
-            subtitle="Quatro terÃ§os em sequÃªncia â€” contemplaÃ§Ã£o completa."
+            title="Rosário Completo"
+            subtitle="20 mistérios em sequência. Rosário guiado com Ladainha Lauretana."
             icon="dot-circle-o"
+          />
+        </Link>
+        <Link href="/(app)/rosary-daily" asChild>
+          <HomeCard
+            title="Terço (Lista)"
+            subtitle="Modo checklist - marque orações já rezadas."
+            icon="list"
           />
         </Link>
         <Link href="/(app)/bible" asChild>
