@@ -15,7 +15,7 @@ function runStep(cmd, args) {
 
     child.on('exit', (code) => {
       if (code === 0) resolve();
-      else reject(new Error(${cmd}  failed with code ));
+      else reject(new Error(`${cmd} failed with code ${code}`));
     });
   });
 }
