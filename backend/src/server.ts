@@ -38,7 +38,19 @@ const distPath = path.resolve(process.cwd(), '..', 'dist');
 const hasWebBuild = fs.existsSync(path.join(distPath, 'index.html'));
 
 if (hasWebBuild) {
-  app.use(express.static(distPath));
+  app.use(
+    express.static(distPath, {
+      etag: false,
+      lastModified: false,
+      maxAge: 0,
+      setHeaders: (res) => {
+        res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate');
+        res.setHeader('Pragma', 'no-cache');
+        res.setHeader('Expires', '0');
+        res.setHeader('Surrogate-Control', 'no-store');
+      },
+    })
+  );
   app.get('*', (req, res, next) => {
     if (req.path.startsWith('/api')) return next();
     return res.sendFile(path.join(distPath, 'index.html'));
