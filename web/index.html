@@ -1,0 +1,4387 @@
+﻿<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CatholicApp - Super App Católico</title>
+<link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fontsource/inter@5.0.16/400.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fontsource/inter@5.0.16/500.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fontsource/inter@5.0.16/600.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fontsource/inter@5.0.16/700.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fontsource/merriweather@5.0.18/400.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fontsource/merriweather@5.0.18/700.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+<style>
+:root {
+  --primary: #5B2C6F;
+  --primary-light: #7D3C98;
+  --primary-dark: #4A235A;
+  --gold: #D4A017;
+  --gold-light: #F4D03F;
+  --bg: #F8F5F0;
+  --bg-dark: #1A1A2E;
+  --surface: #FFFFFF;
+  --surface-dark: #16213E;
+  --text: #2C3E50;
+  --text-light: #7F8C8D;
+  --text-inverse: #F8F5F0;
+  --success: #27AE60;
+  --danger: #E74C3C;
+  --warning: #F39C12;
+  --border: #E8E0D8;
+  --shadow: 0 2px 12px rgba(91, 44, 111, 0.1);
+  --shadow-lg: 0 8px 32px rgba(91, 44, 111, 0.15);
+  --radius: 12px;
+  --radius-lg: 20px;
+  --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+  font-family: 'Inter', sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  overflow-x: hidden;
+  min-height: 100vh;
+}
+
+/* Auth Screen */
+.auth-container {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, var(--primary-dark) 0%, var(--primary) 50%, var(--primary-light) 100%);
+  position: relative;
+  overflow: hidden;
+}
+
+.auth-container::before {
+  content: '';
+  position: absolute;
+  width: 600px; height: 600px;
+  background: radial-gradient(circle, rgba(212,160,23,0.2) 0%, transparent 70%);
+  top: -200px; right: -200px;
+  border-radius: 50%;
+}
+
+.auth-container::after {
+  content: '';
+  position: absolute;
+  width: 400px; height: 400px;
+  background: radial-gradient(circle, rgba(255,255,255,0.08) 0%, transparent 70%);
+  bottom: -100px; left: -100px;
+  border-radius: 50%;
+}
+
+.auth-card {
+  background: rgba(255,255,255,0.95);
+  backdrop-filter: blur(20px);
+  border-radius: var(--radius-lg);
+  padding: 48px 40px;
+  width: 100%;
+  max-width: 440px;
+  box-shadow: var(--shadow-lg);
+  position: relative;
+  z-index: 1;
+  animation: slideUp 0.6s ease;
+}
+
+@keyframes slideUp {
+  from { opacity: 0; transform: translateY(30px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.auth-logo {
+  text-align: center;
+  margin-bottom: 32px;
+}
+
+.auth-logo i {
+  font-size: 48px;
+  color: var(--primary);
+  margin-bottom: 12px;
+}
+
+.auth-logo h1 {
+  font-size: 28px;
+  font-weight: 700;
+  color: var(--primary-dark);
+  font-family: 'Merriweather', serif;
+}
+
+.auth-logo p {
+  color: var(--text-light);
+  font-size: 14px;
+  margin-top: 4px;
+}
+
+.auth-tabs {
+  display: flex;
+  background: var(--bg);
+  border-radius: var(--radius);
+  padding: 4px;
+  margin-bottom: 24px;
+}
+
+.auth-tab {
+  flex: 1;
+  padding: 10px;
+  border: none;
+  background: transparent;
+  border-radius: 8px;
+  font-weight: 600;
+  font-size: 14px;
+  cursor: pointer;
+  transition: var(--transition);
+  color: var(--text-light);
+}
+
+.auth-tab.active {
+  background: var(--surface);
+  color: var(--primary);
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+
+.auth-form { display: none; }
+.auth-form.active { display: block; }
+
+.form-group {
+  margin-bottom: 16px;
+}
+
+.form-group label {
+  display: block;
+  font-size: 13px;
+  font-weight: 600;
+  margin-bottom: 6px;
+  color: var(--text);
+}
+
+.form-group input, .form-group select {
+  width: 100%;
+  padding: 12px 16px;
+  border: 2px solid var(--border);
+  border-radius: var(--radius);
+  font-size: 15px;
+  font-family: inherit;
+  transition: var(--transition);
+  background: var(--surface);
+}
+
+.form-group input:focus, .form-group select:focus {
+  outline: none;
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px rgba(91,44,111,0.1);
+}
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 12px 24px;
+  border: none;
+  border-radius: var(--radius);
+  font-size: 15px;
+  font-weight: 600;
+  font-family: inherit;
+  cursor: pointer;
+  transition: var(--transition);
+  text-decoration: none;
+}
+
+.btn-primary {
+  background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%);
+  color: white;
+  width: 100%;
+  padding: 14px;
+  margin-top: 8px;
+}
+
+.btn-primary:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 16px rgba(91,44,111,0.3);
+}
+
+.btn-secondary {
+  background: var(--bg);
+  color: var(--text);
+}
+
+.btn-secondary:hover { background: var(--border); }
+
+.btn-gold {
+  background: linear-gradient(135deg, var(--gold) 0%, var(--gold-light) 100%);
+  color: var(--primary-dark);
+}
+
+.btn-gold:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 16px rgba(212,160,23,0.3);
+}
+
+.btn-success {
+  background: var(--success);
+  color: white;
+}
+
+.btn-danger {
+  background: var(--danger);
+  color: white;
+}
+
+.btn-sm {
+  padding: 8px 16px;
+  font-size: 13px;
+}
+
+.sso-buttons {
+  display: flex;
+  gap: 12px;
+  margin-top: 20px;
+}
+
+.sso-btn {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 10px;
+  border: 2px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--surface);
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: var(--transition);
+  font-family: inherit;
+}
+
+.sso-btn:hover {
+  border-color: var(--primary);
+  background: rgba(91,44,111,0.05);
+}
+
+.divider {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin: 20px 0;
+  color: var(--text-light);
+  font-size: 13px;
+}
+
+.divider::before, .divider::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: var(--border);
+}
+
+/* Main App Layout */
+.app-container {
+  display: none;
+  min-height: 100vh;
+}
+
+.app-container.active { display: flex; }
+
+/* Sidebar */
+.sidebar {
+  width: 260px;
+  background: var(--surface);
+  border-right: 1px solid var(--border);
+  display: flex;
+  flex-direction: column;
+  position: fixed;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  z-index: 100;
+  transition: var(--transition);
+}
+
+.sidebar-header {
+  padding: 20px 24px;
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.sidebar-header i {
+  font-size: 28px;
+  color: var(--primary);
+}
+
+.sidebar-header h2 {
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--primary-dark);
+  font-family: 'Merriweather', serif;
+}
+
+.sidebar-nav {
+  flex: 1;
+  padding: 12px;
+  overflow-y: auto;
+}
+
+.nav-section {
+  margin-bottom: 8px;
+}
+
+.nav-section-title {
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: var(--text-light);
+  padding: 12px 12px 6px;
+}
+
+.nav-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 12px;
+  border-radius: var(--radius);
+  cursor: pointer;
+  transition: var(--transition);
+  color: var(--text);
+  font-size: 14px;
+  font-weight: 500;
+  border: none;
+  background: transparent;
+  width: 100%;
+  text-align: left;
+  font-family: inherit;
+}
+
+.nav-item:hover { background: var(--bg); }
+
+.nav-item.active {
+  background: linear-gradient(135deg, rgba(91,44,111,0.1) 0%, rgba(91,44,111,0.05) 100%);
+  color: var(--primary);
+  font-weight: 600;
+}
+
+.nav-item i { width: 20px; text-align: center; font-size: 16px; }
+
+.nav-item .badge {
+  margin-left: auto;
+  background: var(--danger);
+  color: white;
+  font-size: 11px;
+  padding: 2px 6px;
+  border-radius: 10px;
+  font-weight: 700;
+}
+
+.sidebar-profile {
+  padding: 16px 20px;
+  border-top: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.avatar {
+  width: 40px; height: 40px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--primary) 0%, var(--gold) 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  font-weight: 700;
+  font-size: 16px;
+}
+
+.sidebar-profile-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.sidebar-profile-info h4 {
+  font-size: 14px;
+  font-weight: 600;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.sidebar-profile-info span {
+  font-size: 12px;
+  color: var(--text-light);
+}
+
+/* Main Content */
+.main-content {
+  flex: 1;
+  margin-left: 260px;
+  min-height: 100vh;
+}
+
+.page { display: none; padding: 32px; max-width: 900px; }
+.page.active { display: block; animation: fadeIn 0.3s ease; }
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.page-header {
+  margin-bottom: 28px;
+}
+
+.page-header h1 {
+  font-size: 26px;
+  font-weight: 700;
+  color: var(--primary-dark);
+  font-family: 'Merriweather', serif;
+}
+
+.page-header p {
+  color: var(--text-light);
+  margin-top: 4px;
+  font-size: 14px;
+}
+
+/* Cards */
+.card {
+  background: var(--surface);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow);
+  padding: 24px;
+  margin-bottom: 20px;
+  border: 1px solid var(--border);
+}
+
+.card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 16px;
+}
+
+.card-header h3 {
+  font-size: 16px;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.card-header h3 i { color: var(--primary); }
+
+/* Stats Grid */
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+.stat-card {
+  background: var(--surface);
+  border-radius: var(--radius);
+  padding: 20px;
+  border: 1px solid var(--border);
+  transition: var(--transition);
+  cursor: pointer;
+}
+
+.stat-card:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-lg);
+}
+
+.stat-card .icon-wrap {
+  width: 44px; height: 44px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 20px;
+  margin-bottom: 12px;
+}
+
+.stat-card .icon-wrap.purple { background: rgba(91,44,111,0.1); color: var(--primary); }
+.stat-card .icon-wrap.gold { background: rgba(212,160,23,0.1); color: var(--gold); }
+.stat-card .icon-wrap.green { background: rgba(39,174,96,0.1); color: var(--success); }
+.stat-card .icon-wrap.red { background: rgba(231,76,60,0.1); color: var(--danger); }
+
+.stat-card h4 {
+  font-size: 24px;
+  font-weight: 700;
+  margin-bottom: 2px;
+}
+
+.stat-card p {
+  font-size: 13px;
+  color: var(--text-light);
+}
+
+/* Rosary Module */
+.rosary-mystery-selector {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 20px;
+  flex-wrap: wrap;
+}
+
+.mystery-btn {
+  padding: 8px 16px;
+  border: 2px solid var(--border);
+  border-radius: 20px;
+  background: var(--surface);
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: var(--transition);
+  font-family: inherit;
+}
+
+.mystery-btn.active {
+  border-color: var(--primary);
+  background: rgba(91,44,111,0.1);
+  color: var(--primary);
+}
+
+.mystery-btn:hover { border-color: var(--primary); }
+
+.rosary-container {
+  text-align: center;
+  padding: 20px 0;
+}
+
+.bead-visual {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 8px;
+  margin: 24px 0;
+  max-width: 500px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.bead {
+  width: 28px; height: 28px;
+  border-radius: 50%;
+  background: var(--border);
+  border: 2px solid #D0C8C0;
+  transition: var(--transition);
+  cursor: pointer;
+}
+
+.bead.completed {
+  background: var(--primary);
+  border-color: var(--primary);
+  box-shadow: 0 0 8px rgba(91,44,111,0.3);
+}
+
+.bead.current {
+  background: var(--gold);
+  border-color: var(--gold);
+  box-shadow: 0 0 12px rgba(212,160,23,0.5);
+  transform: scale(1.2);
+  animation: beadPulse 1.5s infinite;
+}
+
+@keyframes beadPulse {
+  0%, 100% { box-shadow: 0 0 8px rgba(212,160,23,0.3); }
+  50% { box-shadow: 0 0 20px rgba(212,160,23,0.6); }
+}
+
+.prayer-text {
+  font-family: 'Merriweather', serif;
+  font-size: 20px;
+  line-height: 1.8;
+  color: var(--text);
+  max-width: 600px;
+  margin: 0 auto 24px;
+  min-height: 80px;
+  padding: 20px;
+  background: var(--bg);
+  border-radius: var(--radius);
+  border-left: 4px solid var(--primary);
+}
+
+.prayer-text.highlight {
+  animation: textGlow 0.5s ease;
+}
+
+@keyframes textGlow {
+  0% { background: rgba(91,44,111,0.05); }
+  50% { background: rgba(91,44,111,0.1); }
+  100% { background: var(--bg); }
+}
+
+.rosary-controls {
+  display: flex;
+  gap: 12px;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.rosary-progress {
+  font-size: 14px;
+  color: var(--text-light);
+  margin-top: 16px;
+}
+
+/* Bible Module */
+.bible-progress-bar {
+  width: 100%;
+  height: 8px;
+  background: var(--border);
+  border-radius: 4px;
+  overflow: hidden;
+  margin-bottom: 16px;
+}
+
+.bible-progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--primary), var(--gold));
+  border-radius: 4px;
+  transition: width 0.5s ease;
+}
+
+.bible-readings {
+  display: grid;
+  gap: 16px;
+  margin-bottom: 20px;
+}
+
+.reading-card {
+  padding: 20px;
+  border-radius: var(--radius);
+  border: 2px solid var(--border);
+  transition: var(--transition);
+}
+
+.reading-card:hover { border-color: var(--primary); }
+
+.reading-card h4 {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--primary);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 8px;
+}
+
+.reading-card h3 {
+  font-size: 18px;
+  font-weight: 700;
+  margin-bottom: 4px;
+  font-family: 'Merriweather', serif;
+}
+
+.reading-card p {
+  font-size: 13px;
+  color: var(--text-light);
+  margin-bottom: 12px;
+}
+
+.reading-text {
+  font-family: 'Merriweather', serif;
+  font-size: 15px;
+  line-height: 1.9;
+  color: var(--text);
+  max-height: 200px;
+  overflow-y: auto;
+  padding: 16px;
+  background: var(--bg);
+  border-radius: var(--radius);
+  margin-top: 12px;
+}
+
+.bible-audio-bar {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 16px;
+  background: var(--bg);
+  border-radius: var(--radius);
+  margin-top: 12px;
+}
+
+.bible-audio-bar button {
+  width: 36px; height: 36px;
+  border-radius: 50%;
+  border: none;
+  background: var(--primary);
+  color: white;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: var(--transition);
+}
+
+.bible-audio-bar button:hover { background: var(--primary-light); }
+
+.audio-progress {
+  flex: 1;
+  height: 4px;
+  background: var(--border);
+  border-radius: 2px;
+  overflow: hidden;
+}
+
+.audio-progress-fill {
+  height: 100%;
+  background: var(--primary);
+  width: 0%;
+  transition: width 0.1s linear;
+}
+
+/* Ministry Module */
+.ministry-list {
+  display: grid;
+  gap: 12px;
+  margin-bottom: 20px;
+}
+
+.ministry-card {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 16px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  cursor: pointer;
+  transition: var(--transition);
+}
+
+.ministry-card:hover {
+  border-color: var(--primary);
+  box-shadow: var(--shadow);
+}
+
+.ministry-icon {
+  width: 48px; height: 48px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 20px;
+  flex-shrink: 0;
+}
+
+.ministry-icon.music { background: rgba(142,68,173,0.1); color: #8E44AD; }
+.ministry-icon.readers { background: rgba(41,128,185,0.1); color: #2980B9; }
+.ministry-icon.eucharist { background: rgba(212,160,23,0.1); color: var(--gold); }
+.ministry-icon.acolytes { background: rgba(39,174,96,0.1); color: var(--success); }
+.ministry-icon.welcoming { background: rgba(230,126,34,0.1); color: #E67E22; }
+.ministry-icon.catechesis { background: rgba(52,152,219,0.1); color: #3498DB; }
+
+.ministry-info { flex: 1; min-width: 0; }
+.ministry-info h4 { font-size: 15px; font-weight: 600; margin-bottom: 2px; }
+.ministry-info p { font-size: 13px; color: var(--text-light); }
+
+.ministry-members-count {
+  font-size: 12px;
+  color: var(--text-light);
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.create-ministry-card {
+  border: 2px dashed var(--primary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  padding: 24px;
+  border-radius: var(--radius);
+  cursor: pointer;
+  transition: var(--transition);
+  background: rgba(91,44,111,0.03);
+  width: 100%;
+  font-family: inherit;
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--primary);
+}
+
+.create-ministry-card:hover {
+  background: rgba(91,44,111,0.08);
+  transform: translateY(-2px);
+  box-shadow: var(--shadow);
+}
+
+/* Feed Module */
+.feed-container {
+  max-width: 640px;
+  margin: 0 auto;
+}
+
+.feed-header-tabs {
+  display: flex;
+  gap: 0;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  overflow: hidden;
+  margin-bottom: 20px;
+}
+
+.feed-header-tab {
+  flex: 1;
+  padding: 12px;
+  border: none;
+  background: transparent;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: var(--transition);
+  font-family: inherit;
+  color: var(--text-light);
+  border-bottom: 3px solid transparent;
+}
+
+.feed-header-tab.active {
+  color: var(--primary);
+  border-bottom-color: var(--primary);
+  background: rgba(91,44,111,0.05);
+}
+
+.post-composer {
+  background: var(--surface);
+  border-radius: var(--radius-lg);
+  padding: 20px;
+  margin-bottom: 20px;
+  border: 1px solid var(--border);
+  box-shadow: var(--shadow);
+}
+
+.post-composer-top {
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+}
+
+.post-composer textarea {
+  flex: 1;
+  border: none;
+  resize: none;
+  font-family: inherit;
+  font-size: 15px;
+  min-height: 60px;
+  outline: none;
+  background: transparent;
+  color: var(--text);
+}
+
+.post-composer-actions {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 12px;
+  padding-top: 12px;
+  border-top: 1px solid var(--border);
+}
+
+.post-composer-actions .action-btns {
+  display: flex;
+  gap: 4px;
+}
+
+.post-action-btn {
+  width: 36px; height: 36px;
+  border: none;
+  background: transparent;
+  border-radius: 50%;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-light);
+  transition: var(--transition);
+  font-size: 16px;
+}
+
+.post-action-btn:hover { background: var(--bg); color: var(--primary); }
+
+.prayer-request-btn {
+  background: rgba(212,160,23,0.1) !important;
+  color: var(--gold) !important;
+  border-radius: 20px !important;
+  padding: 0 12px !important;
+  width: auto !important;
+  font-size: 13px !important;
+  font-weight: 600;
+  font-family: inherit;
+}
+
+.feed-post {
+  background: var(--surface);
+  border-radius: var(--radius-lg);
+  padding: 20px;
+  margin-bottom: 12px;
+  border: 1px solid var(--border);
+  transition: var(--transition);
+  animation: fadeIn 0.4s ease;
+}
+
+.feed-post:hover { box-shadow: var(--shadow); }
+
+.post-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+.post-meta { flex: 1; }
+.post-meta h4 { font-size: 14px; font-weight: 600; }
+.post-meta span { font-size: 12px; color: var(--text-light); }
+
+.post-content {
+  font-size: 15px;
+  line-height: 1.6;
+  margin-bottom: 12px;
+}
+
+.post-content.prayer-request {
+  background: rgba(212,160,23,0.08);
+  padding: 12px 16px;
+  border-radius: var(--radius);
+  border-left: 3px solid var(--gold);
+}
+
+.post-actions {
+  display: flex;
+  gap: 8px;
+  padding-top: 12px;
+  border-top: 1px solid var(--border);
+}
+
+.post-action {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  border: none;
+  background: transparent;
+  border-radius: 20px;
+  cursor: pointer;
+  font-size: 13px;
+  color: var(--text-light);
+  transition: var(--transition);
+  font-family: inherit;
+}
+
+.post-action:hover { background: var(--bg); }
+.post-action.liked { color: var(--danger); }
+.post-action.prayed { color: var(--gold); font-weight: 600; }
+.post-action.reposted { color: var(--success); }
+
+.post-action i { font-size: 14px; }
+
+.pinned-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 12px;
+  color: var(--primary);
+  font-weight: 600;
+  margin-bottom: 8px;
+}
+
+/* Thread/Reply */
+.post-thread {
+  margin-top: 12px;
+  padding-top: 12px;
+  border-top: 1px solid var(--border);
+  display: none;
+}
+
+.post-thread.open { display: block; }
+
+.reply-item {
+  display: flex;
+  gap: 10px;
+  padding: 10px 0;
+}
+
+.reply-avatar {
+  width: 32px; height: 32px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 11px;
+  font-weight: 700;
+  color: white;
+  flex-shrink: 0;
+}
+
+.reply-content { flex: 1; }
+.reply-content h5 { font-size: 13px; font-weight: 600; }
+.reply-content h5 span { font-weight: 400; color: var(--text-light); font-size: 11px; }
+.reply-content p { font-size: 13px; line-height: 1.5; margin-top: 2px; }
+
+.reply-input-row {
+  display: flex;
+  gap: 8px;
+  margin-top: 8px;
+}
+
+.reply-input-row input {
+  flex: 1;
+  padding: 8px 12px;
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  font-size: 13px;
+  font-family: inherit;
+  outline: none;
+  background: var(--bg);
+}
+
+.reply-input-row input:focus { border-color: var(--primary); }
+
+.reply-input-row button {
+  padding: 8px 16px;
+  border: none;
+  background: var(--primary);
+  color: white;
+  border-radius: 20px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  font-family: inherit;
+}
+
+/* Schedule Module */
+.schedule-calendar {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 4px;
+  margin-bottom: 20px;
+}
+
+.calendar-day-header {
+  text-align: center;
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--text-light);
+  padding: 8px;
+  text-transform: uppercase;
+}
+
+.calendar-day {
+  aspect-ratio: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: var(--transition);
+  position: relative;
+}
+
+.calendar-day:hover { background: var(--bg); }
+.calendar-day.today { background: var(--primary); color: white; font-weight: 700; }
+.calendar-day.has-event::after {
+  content: '';
+  position: absolute;
+  bottom: 4px;
+  width: 4px; height: 4px;
+  background: var(--gold);
+  border-radius: 50%;
+}
+
+.calendar-day.selected { background: var(--gold); color: white; font-weight: 700; }
+.calendar-day.other-month { color: var(--border); }
+
+.event-list { margin-top: 16px; }
+
+.event-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 16px;
+  margin-bottom: 12px;
+  transition: var(--transition);
+}
+
+.event-card:hover { box-shadow: var(--shadow); }
+
+.event-card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 12px;
+}
+
+.event-card-header h4 {
+  font-size: 16px;
+  font-weight: 600;
+}
+
+.event-card-header .event-time {
+  font-size: 13px;
+  color: var(--text-light);
+  background: var(--bg);
+  padding: 4px 10px;
+  border-radius: 12px;
+}
+
+.event-card-header .event-status {
+  font-size: 11px;
+  padding: 3px 8px;
+  border-radius: 10px;
+  font-weight: 600;
+}
+
+.event-card-header .event-status.open { background: rgba(39,174,96,0.1); color: var(--success); }
+.event-card-header .event-status.full { background: rgba(231,76,60,0.1); color: var(--danger); }
+.event-card-header .event-status.partial { background: rgba(243,156,18,0.1); color: var(--warning); }
+
+.event-positions {
+  display: grid;
+  gap: 8px;
+}
+
+.position-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 14px;
+  background: var(--bg);
+  border-radius: 8px;
+  font-size: 14px;
+}
+
+.position-info {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.position-slots {
+  display: flex;
+  gap: 6px;
+}
+
+.position-slot {
+  width: 28px; height: 28px;
+  border-radius: 50%;
+  border: 2px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 11px;
+  font-weight: 600;
+}
+
+.position-slot.filled {
+  background: var(--success);
+  border-color: var(--success);
+  color: white;
+}
+
+.position-slot.available {
+  border-color: var(--success);
+  color: var(--success);
+  cursor: pointer;
+  transition: var(--transition);
+}
+
+.position-slot.available:hover {
+  background: var(--success);
+  color: white;
+}
+
+.position-slot.my-slot {
+  background: var(--primary);
+  border-color: var(--primary);
+  color: white;
+  cursor: pointer;
+}
+
+.event-template-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--surface);
+  font-size: 13px;
+  cursor: pointer;
+  transition: var(--transition);
+  font-family: inherit;
+  margin-right: 8px;
+  margin-bottom: 8px;
+}
+
+.event-template-btn:hover {
+  border-color: var(--primary);
+  background: rgba(91,44,111,0.05);
+}
+
+/* Modal */
+.modal-overlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.5);
+  z-index: 1000;
+  align-items: center;
+  justify-content: center;
+  backdrop-filter: blur(4px);
+}
+
+.modal-overlay.active { display: flex; }
+
+.modal {
+  background: var(--surface);
+  border-radius: var(--radius-lg);
+  width: 100%;
+  max-width: 500px;
+  max-height: 85vh;
+  overflow-y: auto;
+  padding: 28px;
+  animation: slideUp 0.3s ease;
+}
+
+.modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 20px;
+}
+
+.modal-header h2 {
+  font-size: 20px;
+  font-weight: 700;
+  font-family: 'Merriweather', serif;
+}
+
+.modal-close {
+  width: 32px; height: 32px;
+  border: none;
+  background: var(--bg);
+  border-radius: 50%;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: var(--transition);
+}
+
+.modal-close:hover { background: var(--border); }
+
+/* Profile Module */
+.profile-header-card {
+  text-align: center;
+  padding: 32px;
+  background: linear-gradient(135deg, var(--primary-dark) 0%, var(--primary) 50%, var(--primary-light) 100%);
+  color: white;
+  border-radius: var(--radius-lg);
+  margin-bottom: 20px;
+  position: relative;
+  overflow: hidden;
+}
+
+.profile-header-card::before {
+  content: '';
+  position: absolute;
+  width: 200px; height: 200px;
+  background: rgba(255,255,255,0.05);
+  border-radius: 50%;
+  top: -60px; right: -60px;
+}
+
+.profile-avatar-lg {
+  width: 80px; height: 80px;
+  border-radius: 50%;
+  background: rgba(255,255,255,0.2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 32px;
+  font-weight: 700;
+  margin: 0 auto 16px;
+  border: 3px solid rgba(255,255,255,0.3);
+}
+
+.profile-header-card h2 {
+  font-size: 24px;
+  font-weight: 700;
+  margin-bottom: 4px;
+  font-family: 'Merriweather', serif;
+}
+
+.profile-header-card p {
+  opacity: 0.8;
+  font-size: 14px;
+}
+
+.badges-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+  gap: 12px;
+}
+
+.badge-item {
+  text-align: center;
+  padding: 16px 8px;
+  background: var(--bg);
+  border-radius: var(--radius);
+  transition: var(--transition);
+}
+
+.badge-item.locked { opacity: 0.4; filter: grayscale(1); }
+
+.badge-item .badge-icon {
+  font-size: 32px;
+  margin-bottom: 8px;
+}
+
+.badge-item h5 {
+  font-size: 13px;
+  font-weight: 600;
+  margin-bottom: 2px;
+}
+
+.badge-item p {
+  font-size: 11px;
+  color: var(--text-light);
+}
+
+.streak-display {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 16px 20px;
+  background: linear-gradient(135deg, rgba(212,160,23,0.1) 0%, rgba(244,208,63,0.1) 100%);
+  border-radius: var(--radius);
+  border: 1px solid rgba(212,160,23,0.2);
+  margin-bottom: 20px;
+}
+
+.streak-display i { font-size: 28px; color: var(--gold); }
+.streak-display .streak-num { font-size: 32px; font-weight: 700; color: var(--gold); }
+.streak-display .streak-label { font-size: 14px; color: var(--text-light); }
+
+/* Prayer Wall */
+.prayer-wall {
+  display: grid;
+  gap: 12px;
+}
+
+.prayer-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 16px 20px;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  transition: var(--transition);
+  animation: fadeIn 0.4s ease;
+}
+
+.prayer-card:hover { box-shadow: var(--shadow); }
+
+.pray-btn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  padding: 8px 16px;
+  border: 2px solid var(--gold);
+  border-radius: 12px;
+  background: transparent;
+  cursor: pointer;
+  transition: var(--transition);
+  font-family: inherit;
+  color: var(--gold);
+}
+
+.pray-btn:hover {
+  background: var(--gold);
+  color: white;
+}
+
+.pray-btn.prayed {
+  background: var(--gold);
+  color: white;
+}
+
+.pray-btn i { font-size: 18px; }
+.pray-btn span { font-size: 11px; font-weight: 600; }
+
+.prayer-content { flex: 1; }
+.prayer-content h4 { font-size: 14px; font-weight: 600; margin-bottom: 4px; }
+.prayer-content p { font-size: 13px; color: var(--text-light); line-height: 1.5; }
+.prayer-meta { font-size: 12px; color: var(--text-light); margin-top: 8px; }
+
+/* Tabs */
+.tabs {
+  display: flex;
+  gap: 4px;
+  margin-bottom: 20px;
+  background: var(--bg);
+  padding: 4px;
+  border-radius: var(--radius);
+}
+
+.tab-btn {
+  flex: 1;
+  padding: 10px 16px;
+  border: none;
+  background: transparent;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: var(--transition);
+  font-family: inherit;
+  color: var(--text-light);
+}
+
+.tab-btn.active {
+  background: var(--surface);
+  color: var(--primary);
+  box-shadow: 0 2px 4px rgba(0,0,0,0.08);
+}
+
+/* Toast */
+.toast {
+  position: fixed;
+  bottom: 80px;
+  left: 50%;
+  transform: translateX(-50%) translateY(100px);
+  background: var(--primary-dark);
+  color: white;
+  padding: 12px 24px;
+  border-radius: 24px;
+  font-size: 14px;
+  font-weight: 500;
+  z-index: 2000;
+  transition: var(--transition);
+  box-shadow: var(--shadow-lg);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.toast.show {
+  transform: translateX(-50%) translateY(0);
+}
+
+/* Mobile Bottom Nav */
+.mobile-nav {
+  display: none;
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: var(--surface);
+  border-top: 1px solid var(--border);
+  z-index: 100;
+  padding: 6px 0 env(safe-area-inset-bottom, 6px);
+}
+
+.mobile-nav-inner {
+  display: flex;
+  justify-content: space-around;
+}
+
+.mobile-nav-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  padding: 6px 12px;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  transition: var(--transition);
+  font-family: inherit;
+  color: var(--text-light);
+  font-size: 10px;
+  font-weight: 600;
+  position: relative;
+}
+
+.mobile-nav-item.active { color: var(--primary); }
+.mobile-nav-item i { font-size: 20px; }
+
+/* Responsive */
+@media (max-width: 768px) {
+  .sidebar { display: none; }
+  .main-content { margin-left: 0; padding-bottom: 70px; }
+  .mobile-nav { display: block; }
+  .page { padding: 20px 16px; }
+  .stats-grid { grid-template-columns: repeat(2, 1fr); }
+  .auth-card { padding: 32px 24px; margin: 16px; }
+  .badges-grid { grid-template-columns: repeat(2, 1fr); }
+}
+
+@media (min-width: 769px) and (max-width: 1024px) {
+  .sidebar { width: 72px; }
+  .sidebar-header h2,
+  .nav-item span,
+  .nav-section-title,
+  .sidebar-profile-info { display: none; }
+  .sidebar-header { justify-content: center; padding: 16px 0; }
+  .nav-item { justify-content: center; padding: 12px; }
+  .nav-item i { width: auto; }
+  .sidebar-profile { justify-content: center; padding: 16px 0; }
+  .main-content { margin-left: 72px; }
+}
+
+/* Scrollbar */
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: var(--text-light); }
+
+/* Animations */
+.fade-in { animation: fadeIn 0.3s ease; }
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+.loading-spinner {
+  display: inline-block;
+  width: 20px; height: 20px;
+  border: 2px solid rgba(255,255,255,0.3);
+  border-top-color: white;
+  border-radius: 50%;
+  animation: spin 0.6s linear infinite;
+}
+
+/* Notification dot */
+.notif-dot {
+  width: 8px; height: 8px;
+  background: var(--danger);
+  border-radius: 50%;;
+  display: inline-block;
+  margin-left: 4px;
+}
+
+/* Invite link */
+.invite-link-box {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 14px;
+  background: var(--bg);
+  border-radius: var(--radius);
+  margin-top: 12px;
+}
+
+.invite-link-box input {
+  flex: 1;
+  border: none;
+  background: transparent;
+  font-size: 13px;
+  font-family: monospace;
+  outline: none;
+  color: var(--text);
+}
+
+.invite-link-box button {
+  padding: 6px 12px;
+  border: none;
+  background: var(--primary);
+  color: white;
+  border-radius: 6px;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: var(--transition);
+  font-family: inherit;
+}
+
+/* Approval list */
+.approval-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 0;
+  border-bottom: 1px solid var(--border);
+}
+
+.approval-item:last-child { border-bottom: none; }
+
+.approval-actions {
+  margin-left: auto;
+  display: flex;
+  gap: 6px;
+}
+
+/* Dark mode toggle */
+.theme-toggle {
+  position: fixed;
+  top: 16px;
+  right: 16px;
+  z-index: 200;
+  width: 40px; height: 40px;
+  border: none;
+  background: var(--surface);
+  border-radius: 50%;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: var(--shadow);
+  transition: var(--transition);
+  font-size: 18px;
+  color: var(--text);
+}
+
+.theme-toggle:hover { transform: scale(1.1); }
+
+/* Dark mode */
+body.dark {
+  --bg: #0F0F1A;
+  --surface: #1A1A2E;
+  --text: #E8E0D8;
+  --text-light: #8A8A9A;
+  --border: #2A2A3E;
+}
+
+body.dark .auth-card { background: rgba(26,26,46,0.95); }
+body.dark .form-group input,
+body.dark .form-group select { background: #2A2A3E; border-color: #3A3A4E; color: var(--text); }
+body.dark .sso-btn { background: #2A2A3E; border-color: #3A3A4E; color: var(--text); }
+body.dark .prayer-text { background: #2A2A3E; }
+body.dark .reading-text { background: #2A2A3E; }
+body.dark .post-composer textarea { color: var(--text); }
+body.dark .invite-link-box { background: #2A2A3E; }
+body.dark .invite-link-box input { color: var(--text); }
+body.dark .post-composer textarea { color: var(--text); }
+body.dark .reply-input-row input { background: #2A2A3E; border-color: #3A3A4E; color: var(--text); }
+
+/* Quick action bar on dashboard */
+.quick-actions {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+  margin-bottom: 24px;
+}
+
+.quick-action-btn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  padding: 20px 12px;
+  border: 2px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--surface);
+  cursor: pointer;
+  transition: var(--transition);
+  font-family: inherit;
+  color: var(--text);
+}
+
+.quick-action-btn:hover {
+  border-color: var(--primary);
+  transform: translateY(-2px);
+  box-shadow: var(--shadow);
+}
+
+.quick-action-btn i {
+  font-size: 24px;
+  color: var(--primary);
+}
+
+.quick-action-btn span {
+  font-size: 13px;
+  font-weight: 600;
+}
+
+/* Event creation templates */
+.template-section {
+  margin-bottom: 16px;
+}
+
+.template-section h4 {
+  font-size: 13px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: var(--text-light);
+  margin-bottom: 8px;
+}
+
+.templates-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+/* Ministry type selector in create */
+.ministry-type-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+  margin-top: 8px;
+}
+
+.ministry-type-option {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  padding: 12px 8px;
+  border: 2px solid var(--border);
+  border-radius: var(--radius);
+  background: var(--surface);
+  cursor: pointer;
+  transition: var(--transition);
+  font-family: inherit;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text);
+}
+
+.ministry-type-option.selected {
+  border-color: var(--primary);
+  background: rgba(91,44,111,0.08);
+  color: var(--primary);
+}
+
+.ministry-type-option:hover { border-color: var(--primary); }
+.ministry-type-option i { font-size: 20px; }
+
+/* Feed ministry selector */
+.feed-ministry-selector {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 16px;
+  overflow-x: auto;
+  padding-bottom: 4px;
+}
+
+.feed-ministry-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 14px;
+  border: 2px solid var(--border);
+  border-radius: 20px;
+  background: var(--surface);
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: var(--transition);
+  font-family: inherit;
+  white-space: nowrap;
+  color: var(--text);
+}
+
+.feed-ministry-chip.active {
+  border-color: var(--primary);
+  background: rgba(91,44,111,0.1);
+  color: var(--primary);
+}
+
+.feed-ministry-chip:hover { border-color: var(--primary); }
+
+/* Schedule month navigation */
+.month-nav {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 16px;
+}
+
+.month-nav h3 {
+  font-size: 18px;
+  font-weight: 700;
+}
+
+.month-nav button {
+  width: 36px; height: 36px;
+  border: 1px solid var(--border);
+  background: var(--surface);
+  border-radius: 50%;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: var(--transition);
+}
+
+.month-nav button:hover {
+  border-color: var(--primary);
+  background: rgba(91,44,111,0.05);
+}
+
+/* Event detail modal */
+.event-detail-positions {
+  display: grid;
+  gap: 8px;
+}
+
+.event-detail-position {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 16px;
+  background: var(--bg);
+  border-radius: var(--radius);
+}
+
+.position-name {
+  font-weight: 600;
+  font-size: 14px;
+}
+
+.position-status {
+  font-size: 12px;
+  color: var(--text-light);
+}
+</style>
+</head>
+<body>
+<!-- Auth Screen -->
+<div class="auth-container" id="authScreen">
+  <div class="auth-card">
+    <div class="auth-logo">
+      <i class="fas fa-cross"></i>
+      <h1>CatholicApp</h1>
+      <p>Sua fé, sua comunidade, unidas</p>
+    </div>
+
+    <div class="auth-tabs">
+      <button class="auth-tab active" onclick="switchAuthTab('login')">Entrar</button>
+      <button class="auth-tab" onclick="switchAuthTab('register')">Cadastrar</button>
+    </div>
+
+    <!-- Login Form -->
+    <form class="auth-form active" id="loginForm" onsubmit="handleLogin(event)">
+      <div class="form-group">
+        <label>E-mail</label>
+        <input type="email" id="loginEmail" placeholder="seu@email.com" required>
+      </div>
+      <div class="form-group">
+        <label>Senha</label>
+        <input type="password" id="loginPassword" placeholder="••••••••" required>
+      </div>
+      <button type="submit" class="btn btn-primary">
+        <i class="fas fa-sign-in-alt"></i> Entrar
+      </button>
+      <div class="divider">ou continue com</div>
+      <div class="sso-buttons">
+        <button type="button" class="sso-btn" onclick="handleSSO('google')">
+          <i class="fab fa-google"></i> Google
+        </button>
+        <button type="button" class="sso-btn" onclick="handleSSO('apple')">
+          <i class="fab fa-apple"></i> Apple
+        </button>
+      </div>
+    </form>
+
+    <!-- Register Form -->
+    <form class="auth-form" id="registerForm" onsubmit="handleRegister(event)">
+      <div class="form-group">
+        <label>Nome completo</label>
+        <input type="text" id="regName" placeholder="Seu nome" required>
+      </div>
+      <div class="form-group">
+        <label>E-mail</label>
+        <input type="email" id="regEmail" placeholder="seu@email.com" required>
+      </div>
+      <div class="form-group">
+        <label>Senha</label>
+        <input type="password" id="regPassword" placeholder="Mínimo 8 caracteres" required minlength="8">
+      </div>
+      <div class="form-group">
+        <label>Paróquia (opcional)</label>
+        <input type="text" id="regParish" placeholder="Nome da sua paróquia">
+      </div>
+      <button type="submit" class="btn btn-primary">
+        <i class="fas fa-user-plus"></i> Criar CatholicID
+      </button>
+      <div class="divider">ou continue com</div>
+      <div class="sso-buttons">
+        <button type="button" class="sso-btn" onclick="handleSSO('google')">
+          <i class="fab fa-google"></i> Google
+        </button>
+        <button type="button" class="sso-btn" onclick="handleSSO('apple')">
+          <i class="fab fa-apple"></i> Apple
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- Main App -->
+<div class="app-container" id="appContainer">
+  <!-- Sidebar -->
+  <aside class="sidebar">
+    <div class="sidebar-header">
+      <i class="fas fa-cross"></i>
+      <h2>CatholicApp</h2>
+    </div>
+
+    <nav class="sidebar-nav">
+      <div class="nav-section">
+        <div class="nav-section-title">Principal</div>
+        <button class="nav-item active" data-page="dashboard" onclick="navigate('dashboard')">
+          <i class="fas fa-home"></i>
+          <span>Início</span>
+        </button>
+        <button class="nav-item" data-page="rosary" onclick="navigate('rosary')">
+          <i class="fas fa-pray"></i>
+          <span>Santo Rosário</span>
+        </button>
+        <button class="nav-item" data-page="bible" onclick="navigate('bible')">
+          <i class="fas fa-book-bible"></i>
+          <span>Bíblia 365</span>
+        </button>
+        <button class="nav-item" data-page="liturgy" onclick="navigate('liturgy')">
+          <i class="fas fa-church"></i>
+          <span>Liturgia do Dia</span>
+        </button>
+      </div>
+
+      <div class="nav-section">
+        <div class="nav-section-title">Comunidade</div>
+        <button class="nav-item" data-page="ministries" onclick="navigate('ministries')">
+          <i class="fas fa-users"></i>
+          <span>Meus Ministérios</span>
+          <span class="badge">2</span>
+        </button>
+        <button class="nav-item" data-page="feed" onclick="navigate('feed')">
+          <i class="fas fa-comments"></i>
+          <span>Feed / Fórum</span>
+          <span class="badge">5</span>
+        </button>
+        <button class="nav-item" data-page="schedule" onclick="navigate('schedule')">
+          <i class="fas fa-calendar-alt"></i>
+          <span>Escalas</span>
+        </button>
+        <button class="nav-item" data-page="prayers" onclick="navigate('prayers')">
+          <i class="fas fa-hands-praying"></i>
+          <span>Mural de Oração</span>
+        </button>
+      </div>
+
+      <div class="nav-section">
+        <div class="nav-section-title">Conta</div>
+        <button class="nav-item" data-page="profile" onclick="navigate('profile')">
+          <i class="fas fa-user-circle"></i>
+          <span>Meu Perfil</span>
+        </button>
+      </div>
+    </nav>
+
+    <div class="sidebar-profile">
+      <div class="avatar" id="sidebarAvatar">M</div>
+      <div class="sidebar-profile-info">
+        <h4 id="sidebarName">Maria Silva</h4>
+        <span>CatholicID</span>
+      </div>
+    </div>
+  </aside>
+
+  <!-- Main Content -->
+  <main class="main-content">
+    <!-- Dashboard -->
+    <div class="page active" id="page-dashboard">
+      <div class="page-header">
+        <h1>Bom dia, <span id="dashUserName">Maria</span>! ☀️</h1>
+        <p id="dashDate"></p>
+      </div>
+
+      <!-- Quick Actions -->
+      <div class="quick-actions">
+        <button class="quick-action-btn" onclick="navigate('rosary')">
+          <i class="fas fa-pray"></i>
+          <span>Rezar o Terço</span>
+        </button>
+        <button class="quick-action-btn" onclick="navigate('bible')">
+          <i class="fas fa-book-open"></i>
+          <span>Ler a Bíblia</span>
+        </button>
+        <button class="quick-action-btn" onclick="navigate('feed')">
+          <i class="fas fa-comments"></i>
+          <span>Abrir o Feed</span>
+        </button>
+        <button class="quick-action-btn" onclick="navigate('schedule')">
+          <i class="fas fa-calendar-check"></i>
+          <span>Ver Escalas</span>
+        </button>
+        <button class="quick-action-btn" onclick="navigate('ministries')">
+          <i class="fas fa-plus-circle"></i>
+          <span>Criar Ministério</span>
+        </button>
+        <button class="quick-action-btn" onclick="navigate('prayers')">
+          <i class="fas fa-hands-praying"></i>
+          <span>Mural de Oração</span>
+        </button>
+      </div>
+
+      <div class="stats-grid">
+        <div class="stat-card" onclick="navigate('profile')">
+          <div class="icon-wrap purple"><i class="fas fa-fire"></i></div>
+          <h4 id="streakCount">7</h4>
+          <p>Dias de Ofensiva</p>
+        </div>
+        <div class="stat-card" onclick="navigate('bible')">
+          <div class="icon-wrap gold"><i class="fas fa-book-open"></i></div>
+          <h4 id="bibleDayNum">42</h4>
+          <p>Dia de 365 na Bíblia</p>
+        </div>
+        <div class="stat-card" onclick="navigate('schedule')">
+          <div class="icon-wrap green"><i class="fas fa-calendar-check"></i></div>
+          <h4 id="scheduleCount">3</h4>
+          <p>Escalas este Mês</p>
+        </div>
+        <div class="stat-card" onclick="navigate('rosary')">
+          <div class="icon-wrap red"><i class="fas fa-rosary"></i></div>
+          <h4 id="rosaryCount">15</h4>
+          <p>Terços Rezados</p>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-header">
+          <h3><i class="fas fa-bible"></i> Leitura de Hoje</h3>
+          <button class="btn btn-sm btn-secondary" onclick="navigate('bible')">Ler Agora</button>
+        </div>
+        <div class="bible-readings">
+          <div class="reading-card">
+            <h4>📖 Leitura Principal — Antigo Testamento</h4>
+            <h3>Êxodo 12:1-28</h3>
+            <p>A instituição da Páscoa</p>
+            <button class="btn btn-sm btn-secondary" onclick="navigate('bible')">Ler trecho completo →</button>
+          </div>
+          <div class="reading-card">
+            <h4>✝️ Leitura Secundária — Novo Testamento</h4>
+            <h3>1 Coríntios 5:7-8</h3>
+            <p>Cristo, nossa Páscoa</p>
+            <button class="btn btn-sm btn-secondary" onclick="navigate('bible')">Ler trecho completo →</button>
+          </div>
+          <div class="reading-card">
+            <h4>🙏 Salmo / Meditação</h4>
+            <h3>Salmo 116:12-19</h3>
+            <p>O cálice da salvação</p>
+            <button class="btn btn-sm btn-secondary" onclick="navigate('bible')">Ler trecho completo →</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-header">
+          <h3><i class="fas fa-calendar-alt"></i> Próximas Escalas</h3>
+          <button class="btn btn-sm btn-secondary" onclick="navigate('schedule')">Ver Todas</button>
+        </div>
+        <div id="dashEvents"></div>
+      </div>
+
+      <div class="card">
+        <div class="card-header">
+          <h3><i class="fas fa-bolt"></i> Atividade Recente do Feed</h3>
+          <button class="btn btn-sm btn-secondary" onclick="navigate('feed')">Ver Feed Completo</button>
+        </div>
+        <div style="display:grid; gap:12px;">
+          <div style="display:flex; align-items:center; gap:12px; padding:12px; background:var(--bg); border-radius:8px;">
+            <div class="avatar" style="width:36px;height:36px;font-size:13px;background:linear-gradient(135deg,#2980B9,#3498DB);">RG</div>
+            <div style="flex:1;"><span style="font-size:14px;"><strong>Rafael Gomes</strong> publicou no feed de <strong>Música</strong></span></div>
+            <span style="font-size:12px; color:var(--text-light);">há 1h</span>
+          </div>
+          <div style="display:flex; align-items:center; gap:12px; padding:12px; background:var(--bg); border-radius:8px;">
+            <div class="avatar" style="width:36px;height:36px;font-size:13px;background:linear-gradient(135deg,#E67E22,#F39C12);">LF</div>
+            <div style="flex:1;"><span style="font-size:14px;"><strong>Luísa Fernandes</strong> fez um pedido de oração</span></div>
+            <span style="font-size:12px; color:var(--text-light);">há 3h</span>
+          </div>
+          <div style="display:flex; align-items:center; gap:12px; padding:12px; background:var(--bg); border-radius:8px;">
+            <div class="avatar" style="width:36px;height:36px;font-size:13px;">CF</div>
+            <div style="flex:1;"><span style="font-size:14px;"><strong>Carlos Ferreira</strong> criou nova escala para domingo</span></div>
+            <span style="font-size:12px; color:var(--text-light);">há 5h</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Rosary Page -->
+    <div class="page" id="page-rosary">
+      <div class="page-header">
+        <h1>📿 Santo Rosário</h1>
+        <p>Reze e medite os mistérios da nossa fé</p>
+      </div>
+
+      <div class="card">
+        <div class="card-header">
+          <h3><i class="fas fa-sun"></i> Mistério do Dia</h3>
+          <button class="btn btn-sm btn-secondary" id="overrideMysteryBtn" onclick="toggleMysteryOverride()">
+            <i class="fas fa-exchange-alt"></i> Alterar Mistério
+          </button>
+        </div>
+
+        <div class="rosary-mystery-selector" id="mysterySelector" style="display:none;">
+          <button class="mystery-btn" onclick="selectMystery('gozosos')">Gozosos</button>
+          <button class="mystery-btn" onclick="selectMystery('dolorosos')">Dolorosos</button>
+          <button class="mystery-btn" onclick="selectMystery('gloriosos')">Gloriosos</button>
+          <button class="mystery-btn" onclick="selectMystery('luminosos')">Luminosos</button>
+        </div>
+
+        <div id="mysteryDisplay" style="text-align:center; padding: 8px 0;">
+          <h4 id="mysteryName" style="color:var(--primary); font-size:18px; margin-bottom:4px;"></h4>
+          <p id="mysteryDesc" style="font-size:13px; color:var(--text-light);"></p>
+        </div>
+
+        <div class="rosary-container">
+          <div class="bead-visual" id="beadVisual"></div>
+
+          <div class="prayer-text" id="prayerText">
+            Toque no botão abaixo para começar o Santo Rosário
+          </div>
+
+          <div class="rosary-controls">
+            <button class="btn btn-primary" id="rosaryStartBtn" onclick="toggleRosary()">
+              <i class="fas fa-play"></i> Iniciar Terço
+            </button>
+            <button class="btn btn-secondary" onclick="advanceBead()">
+              <i class="fas fa-forward"></i> Avançar Conta
+            </button>
+            <button class="btn btn-secondary" onclick="resetRosary()">
+              <i class="fas fa-redo"></i> Recomeçar
+            </button>
+          </div>
+
+          <div class="rosary-progress" id="rosaryProgress">0 de 63 orações</div>
+        </div>
+
+        <div style="text-align:center; margin-top:16px;">
+          <button class="btn btn-secondary" onclick="toggleAudioSync()">
+            <i class="fas fa-headphones"></i> <span id="audioSyncLabel">Ouvir Áudio Guiado</span>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Bible Page -->
+    <div class="page" id="page-bible">
+      <div class="page-header">
+        <h1>📖 Bíblia em 365 Dias</h1>
+        <p>Plano de leitura baseado na Grande Linha do Tempo — Jeff Cavins</p>
+      </div>
+
+      <div class="card">
+        <div class="card-header">
+          <h3><i class="fas fa-calendar-day"></i> Dia <span id="currentBibleDay">42</span> de 365</h3>
+          <span id="biblePercent" style="font-size:14px; color:var(--primary); font-weight:600;">11,5%</span>
+        </div>
+        <div class="bible-progress-bar">
+          <div class="bible-progress-fill" id="bibleProgressFill" style="width: 11.5%"></div>
+        </div>
+
+        <div class="tabs">
+          <button class="tab-btn active" onclick="switchBibleTab('read', this)">📖 Ler</button>
+          <button class="tab-btn" onclick="switchBibleTab('listen', this)">🎧 Ouvir</button>
+        </div>
+
+        <div id="bibleReadTab">
+          <div class="bible-readings">
+            <div class="reading-card">
+              <h4>📖 Leitura Principal — Antigo Testamento</h4>
+              <h3>Êxodo 12:1-28</h3>
+              <p>A instituição da Páscoa — O Senhor instrui Moisés e Aarão sobre a celebração que marcará a libertação do povo de Israel.</p>
+              <div class="reading-text" id="bibleMainText">
+                <p><strong>1</strong> O Senhor disse a Moisés e Aarão na terra do Egito: <strong>2</strong> "Este mês será para vós o principal dos meses; será o primeiro mês do ano. <strong>3</strong> Falai a toda a comunidade de Israel: 'No décimo dia deste mês, cada um tomará um cordeiro por família, um cordeiro por casa. <strong>4</strong> Se a família for pequena demais para comer um cordeiro, convidará seu vizinho mais próximo, conforme o número de pessoas. Contareis quantas pessoas precisarão para comer o cordeiro. <strong>5</strong> O cordeiro será macho, de um ano, sem defeito. Podereis escolher um cordeiro ou um cabrito. <strong>6</strong> E o guardareis até o décimo quarto dia deste mês; então toda a assembleia da comunidade de Israel o imolará ao entardecer. <strong>7</strong> Tomarão um pouco do sangue e o colocarão nos dois batentes e na verga das portas das casas em que o comerem.</p>
+              </div>
+            </div>
+
+            <div class="reading-card">
+              <h4>✝️ Novo Testamento</h4>
+              <h3>1 Coríntios 5:7-8</h3>
+              <p>Purificação da comunidade — Paulo exorta os coríntios a celebrar a festa com sinceridade e verdade.</p>
+              <div class="reading-text">
+                <p><strong>7</strong> Livrai-vos do velho fermento, para que sejais uma nova massa, uma vez que sois ázimos. Pois Cristo, nossa Páscoa, foi imolado. <strong>8</strong> Celebremos, pois, a festa, não com o velho fermento, nem com o fermento da malícia e da perversidade, mas com os ázimos da pureza e da verdade.</p>
+              </div>
+            </div>
+
+            <div class="reading-card">
+              <h4>🙏 Salmo de Meditação</h4>
+              <h3>Salmo 116:12-19</h3>
+              <p>Ação de graças pela libertação</p>
+              <div class="reading-text">
+                <p><strong>12</strong> Que poderei retribuir ao Senhor Deus por tudo aquilo que ele fez em meu favor? <strong>13</strong> Elevo o cálice da minha salvação, invocando o nome do Senhor. <strong>14</strong> Cumprirei meus votos ao Senhor, em presença de todo o seu povo. <strong>15</strong> É sentida demais pelo Senhor a morte de seus santos, fiéis amigos. <strong>16</strong> Eis que sou o vosso servo, ó Senhor, mas me quebrastes os grilhões da escravidão! Por isso oferto um sacrifício de louvor, invocando o nome do Senhor.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div id="bibleListenTab" style="display:none;">
+          <div class="bible-audio-bar">
+            <button onclick="toggleBibleAudio()" id="biblePlayBtn"><i class="fas fa-play"></i></button>
+            <div class="audio-progress">
+              <div class="audio-progress-fill" id="bibleAudioProgress"></div>
+            </div>
+            <span style="font-size:12px; color:var(--text-light); min-width:80px;" id="bibleAudioTime">0:00 / 4:32</span>
+          </div>
+          <p style="text-align:center; margin-top:16px; font-size:14px; color:var(--text-light);">
+            Áudio sincronizado — o texto será destacado automaticamente durante a narração.
+          </p>
+          <div style="padding:20px; background:var(--bg); border-radius:var(--radius); margin-top:16px; font-family:'Merriweather',serif; line-height:1.9; font-size:15px;">
+            <p id="bibleAudioHighlight">O Senhor disse a Moisés e a Aarão na terra do Egito: "Este mês será para vós o principal dos meses; será o primeiro mês do ano..."</p>
+          </div>
+        </div>
+
+        <div style="text-align:center; margin-top:20px;">
+          <button class="btn btn-success" id="markReadBtn" onclick="markBibleRead()">
+            <i class="fas fa-check-circle"></i> Marcar como Lido
+          </button>
+          <button class="btn btn-secondary" onclick="prevBibleDay()" style="margin-left:8px;">
+            <i class="fas fa-arrow-left"></i>
+          </button>
+          <button class="btn btn-secondary" onclick="nextBibleDay()" style="margin-left:8px;">
+            <i class="fas fa-arrow-right"></i>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Liturgy Page -->
+    <div class="page" id="page-liturgy">
+      <div class="page-header">
+        <h1>⛪ Liturgia do Dia</h1>
+        <p id="liturgyDate"></p>
+      </div>
+
+      <div class="card">
+        <div class="card-header">
+          <h3><i class="fas fa-cross"></i> Leituras da Missa de Hoje</h3>
+        </div>
+        <div class="bible-readings">
+          <div class="reading-card">
+            <h4>1ª Leitura</h4>
+            <h3>Êxodo 12,1-8.11-14</h3>
+            <p>Instituição da Páscoa</p>
+          </div>
+          <div class="reading-card">
+            <h4>Salmo Responsorial</h4>
+            <h3>Salmo 115(116)</h3>
+            <p>Como retribuirei ao Senhor tudo o que ele fez por mim?</p>
+          </div>
+          <div class="reading-card">
+            <h4>2ª Leitura</h4>
+            <h3>1 Coríntios 11,23-26</h3>
+            <p>Cada vez que comeis deste pão e bebeis deste cálice, anunciais a morte do Senhor</p>
+          </div>
+          <div class="reading-card">
+            <h4>Evangelho</h4>
+            <h3>João 13,1-15</h3>
+            <p>Jesus lava os pés dos discípulos</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Ministries Page -->
+    <div class="page" id="page-ministries">
+      <div class="page-header">
+        <h1>👥 Meus Ministérios</h1>
+        <p>Gerencie suas comunidades, convites e aprovações</p>
+      </div>
+
+      <!-- CREATE MINISTRY SECTION -->
+      <div class="card" style="border: 2px solid var(--gold); background: linear-gradient(135deg, rgba(212,160,23,0.05) 0%, rgba(244,208,63,0.03) 100%);">
+        <div class="card-header">
+          <h3 style="color:var(--gold);"><i class="fas fa-star" style="color:var(--gold);"></i> Criar Novo Ministério</h3>
+        </div>
+        <p style="font-size:14px; color:var(--text-light); margin-bottom:16px;">
+          Crie seu próprio ministério e convite membros através de um link único. Você será automaticamente o coordenador.
+        </p>
+        <form onsubmit="createMinistry(event)">
+          <div class="form-group">
+            <label>Nome do Ministério</label>
+            <input type="text" id="ministryName" placeholder="Ex: Ministério de Música, Grupo de Oração..." required>
+          </div>
+          <div class="form-group">
+            <label>Paróquia</label>
+            <input type="text" id="ministryParish" placeholder="Nome da paróquia" required>
+          </div>
+          <div class="form-group">
+            <label>Descrição</label>
+            <input type="text" id="ministryDesc" placeholder="Breve descrição do ministério">
+          </div>
+          <div class="form-group">
+            <label>Tipo de Ministério</label>
+            <div class="ministry-type-grid">
+              <button type="button" class="ministry-type-option" onclick="selectMinistryType(this, 'music')" data-type="music">
+                <i class="fas fa-music"></i>
+                Música
+              </button>
+              <button type="button" class="ministry-type-option" onclick="selectMinistryType(this, 'readers')" data-type="readers">
+                <i class="fas fa-book-open"></i>
+                Leitores
+              </button>
+              <button type="button" class="ministry-type-option" onclick="selectMinistryType(this, 'eucharist')" data-type="eucharist">
+                <i class="fas fa-chalice"></i>
+                Eucaristia
+              </button>
+              <button type="button" class="ministry-type-option" onclick="selectMinistryType(this, 'acolytes')" data-type="acolytes">
+                <i class="fas fa-candle-holder"></i>
+                Acólitos
+              </button>
+              <button type="button" class="ministry-type-option" onclick="selectMinistryType(this, 'welcoming')" data-type="welcoming">
+                <i class="fas fa-hand-holding-heart"></i>
+                Acolhida
+              </button>
+              <button type="button" class="ministry-type-option" onclick="selectMinistryType(this, 'other')" data-type="other">
+                <i class="fas fa-star"></i>
+                Outro
+              </button>
+            </div>
+            <input type="hidden" id="selectedMinistryType" value="">
+          </div>
+          <button type="submit" class="btn btn-gold" style="width:100%;">
+            <i class="fas fa-plus-circle"></i> Criar Ministério Agora
+          </button>
+        </form>
+      </div>
+
+      <!-- MY MINISTRIES LIST -->
+      <h3 style="font-size:18px; font-weight:700; margin: 24px 0 16px; font-family:'Merriweather',serif;">Meus Ministérios Ativos</h3>
+      <div id="myMinistriesList">
+        <div class="ministry-card" onclick="selectMinistry(0)">
+          <div class="ministry-icon music"><i class="fas fa-music"></i></div>
+          <div class="ministry-info">
+            <h4>Ministério de Música</h4>
+            <p>Paróquia Nossa Senhora Aparecida</p>
+          </div>
+          <div class="ministry-members-count"><i class="fas fa-user"></i> 24</div>
+        </div>
+        <div class="ministry-card" onclick="selectMinistry(1)">
+          <div class="ministry-icon readers"><i class="fas fa-book-open"></i></div>
+          <div class="ministry-info">
+            <h4>Ministério de Leitores</h4>
+            <p>Paróquia Nossa Senhora Aparecida</p>
+          </div>
+          <div class="ministry-members-count"><i class="fas fa-user"></i> 18</div>
+        </div>
+        <div class="ministry-card" onclick="selectMinistry(2)">
+          <div class="ministry-icon eucharist"><i class="fas fa-chalice"></i></div>
+          <div class="ministry-info">
+            <h4>Ministros da Eucaristia</h4>
+            <p>Paróquia São José Operário</p>
+          </div>
+          <div class="ministry-members-count"><i class="fas fa-user"></i> 15</div>
+        </div>
+      </div>
+
+      <!-- MINISTRY DETAIL (hidden by default) -->
+      <div class="card" id="ministryDetailCard" style="display:none;">
+        <div class="card-header">
+          <h3><i class="fas fa-users"></i> <span id="ministryDetailName">Ministério</span></h3>
+          <button class="btn btn-sm btn-secondary" onclick="closeMinistryDetail()">
+            <i class="fas fa-arrow-left"></i> Voltar
+          </button>
+        </div>
+
+        <div class="invite-link-box">
+          <input type="text" id="inviteLink" value="https://app.catolico.com/invite/min_musica_001" readonly>
+          <button onclick="copyInviteLink()"><i class="fas fa-copy"></i> Copiar</button>
+        </div>
+
+        <div style="margin-top:20px;">
+          <h4 style="font-size:14px; font-weight:600; margin-bottom:12px;"><i class="fas fa-clock" style="color:var(--warning);"></i> Solicitações Pendentes</h4>
+          <div class="approval-item">
+            <div class="avatar" style="width:36px;height:36px;font-size:14px;">JP</div>
+            <div style="flex:1;">
+              <h5 style="font-size:14px;">João Pedro Santos</h5>
+              <span style="font-size:12px; color:var(--text-light);">Solicitou há 2 horas</span>
+            </div>
+            <div class="approval-actions">
+              <button class="btn btn-sm btn-success" onclick="approveMember(this)"><i class="fas fa-check"></i></button>
+              <button class="btn btn-sm btn-danger" onclick="rejectMember(this)"><i class="fas fa-times"></i></button>
+            </div>
+          </div>
+          <div class="approval-item">
+            <div class="avatar" style="width:36px;height:36px;font-size:14px;background:linear-gradient(135deg,#2980B9,#3498DB);">AC</div>
+            <div style="flex:1;">
+              <h5 style="font-size:14px;">Ana Clara Oliveira</h5>
+              <span style="font-size:12px; color:var(--text-light);">Solicitou há 5 horas</span>
+            </div>
+            <div class="approval-actions">
+              <button class="btn btn-sm btn-success" onclick="approveMember(this)"><i class="fas fa-check"></i></button>
+              <button class="btn btn-sm btn-danger" onclick="rejectMember(this)"><i class="fas fa-times"></i></button>
+            </div>
+          </div>
+        </div>
+
+        <div style="margin-top:20px;">
+          <h4 style="font-size:14px; font-weight:600; margin-bottom:12px;"><i class="fas fa-check-circle" style="color:var(--success);"></i> Membros Ativos</h4>
+          <div id="activeMembersList">
+            <div class="approval-item">
+              <div class="avatar" style="width:36px;height:36px;font-size:14px;">MS</div>
+              <div style="flex:1;">
+                <h5 style="font-size:14px;">Maria Silva <span style="font-size:11px; color:var(--gold);">⭐ Coordenadora</span></h5>
+              </div>
+            </div>
+            <div class="approval-item">
+              <div class="avatar" style="width:36px;height:36px;font-size:14px;background:linear-gradient(135deg,#27AE60,#2ECC71);">CF</div>
+              <div style="flex:1;">
+                <h5 style="font-size:14px;">Carlos Ferreira</h5>
+              </div>
+            </div>
+            <div class="approval-item">
+              <div class="avatar" style="width:36px;height:36px;font-size:14px;background:linear-gradient(135deg,#2980B9,#3498DB);">RG</div>
+              <div style="flex:1;">
+                <h5 style="font-size:14px;">Rafael Gomes</h5>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Feed Page -->
+    <div class="page" id="page-feed">
+      <div class="page-header">
+        <h1>💬 Feed do Ministério</h1>
+        <p>Microblogging — compartilhe, comente e interaja com seu ministério</p>
+      </div>
+
+      <!-- Ministry Selector -->
+      <div class="feed-ministry-selector">
+        <button class="feed-ministry-chip active" onclick="selectFeedMinistry(this)">
+          🎵 Todos os Ministérios
+        </button>
+        <button class="feed-ministry-chip" onclick="selectFeedMinistry(this)">
+          🎵 Música
+        </button>
+        <button class="feed-ministry-chip" onclick="selectFeedMinistry(this)">
+          📖 Leitores
+        </button>
+        <button class="feed-ministry-chip" onclick="selectFeedMinistry(this)">
+          🍷 Eucaristia
+        </button>
+      </div>
+
+      <div class="feed-container">
+        <!-- Post Composer -->
+        <div class="post-composer">
+          <div class="post-composer-top">
+            <div class="avatar" style="width:40px;height:40px;font-size:14px;">MS</div>
+            <textarea id="postInput" placeholder="O que está acontecendo no seu ministério?"></textarea>
+          </div>
+          <div class="post-composer-actions">
+            <div class="action-btns">
+              <button class="post-action-btn" title="Imagem"><i class="fas fa-image"></i></button>
+              <button class="post-action-btn" title="Arquivo"><i class="fas fa-paperclip"></i></button>
+              <button class="post-action-btn" title="Enquete"><i class="fas fa-poll"></i></button>
+            </div>
+            <div style="display:flex; gap:8px;">
+              <button class="post-action-btn prayer-request-btn" onclick="addPrayerTag()" title="Pedido de Oração">
+                <i class="fas fa-hands-praying"></i> Oração
+              </button>
+              <button class="btn btn-sm btn-primary" onclick="createPost()" style="width:auto; margin:0;">Publicar</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Feed Tabs -->
+        <div class="feed-header-tabs">
+          <button class="feed-header-tab active" onclick="filterFeedTab(this, 'all')">📰 Todos</button>
+          <button class="feed-header-tab" onclick="filterFeedTab(this, 'pinned')">📌 Fixados</button>
+          <button class="feed-header-tab" onclick="filterFeedTab(this, 'prayer')">🙏 Orações</button>
+        </div>
+
+        <!-- Feed Posts -->
+        <div id="feedPosts">
+          <!-- Pinned Post -->
+          <div class="feed-post" data-type="pinned">
+            <div class="pinned-badge"><i class="fas fa-thumbtack"></i> Fixado pela coordenação</div>
+            <div class="post-header">
+              <div class="avatar" style="width:40px;height:40px;font-size:14px;">CF</div>
+              <div class="post-meta">
+                <h4>Carlos Ferreira <span style="font-size:11px; color:var(--primary); font-weight:600;">⭐ Coordenador</span></h4>
+                <span>há 2 dias · Ministério de Música</span>
+              </div>
+            </div>
+            <div class="post-content">
+              📢 <strong>Ensaio Geral neste sábado!</strong><br><br>
+              Pessoal, teremos ensaio geral no sábado às 15h na igreja principal. Precisamos preparar os hinos para a Solenidade de Pentecostes. Presença de todos é fundamental! 🎶<br><br>
+              Quem puder chegar mais cedo para organizar as partituras, agradeço muito.
+            </div>
+            <div class="post-actions">
+              <button class="post-action" onclick="likePost(this)"><i class="far fa-heart"></i> <span>12</span></button>
+              <button class="post-action" onclick="toggleThread(this)"><i class="far fa-comment"></i> <span>5</span></button>
+              <button class="post-action" onclick="repostPost(this)"><i class="fas fa-retweet"></i> <span>3</span></button>
+            </div>
+            <div class="post-thread">
+              <div class="reply-item">
+                <div class="reply-avatar" style="background:linear-gradient(135deg,#E67E22,#F39C12);">LF</div>
+                <div class="reply-content">
+                  <h5>Luísa Fernandes <span>· há 1 dia</span></h5>
+                  <p>Estarei lá! Vou levar as partituras novas que ensaiei em casa 🎵</p>
+                </div>
+              </div>
+              <div class="reply-item">
+                <div class="reply-avatar" style="background:linear-gradient(135deg,#2980B9,#3498DB);">RG</div>
+                <div class="reply-content">
+                  <h5>Rafael Gomes <span>· há 18h</span></h5>
+                  <p>Vou chegar às 14h para ajudar com o som!</p>
+                </div>
+              </div>
+              <div class="reply-input-row">
+                <input type="text" placeholder="Escreva uma resposta...">
+                <button onclick="addReply(this)">Responder</button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Prayer Request Post -->
+          <div class="feed-post" data-type="prayer">
+            <div class="post-header">
+              <div class="avatar" style="width:40px;height:40px;font-size:14px;background:linear-gradient(135deg,#E67E22,#F39C12);">LF</div>
+              <div class="post-meta">
+                <h4>Luísa Fernandes</h4>
+                <span>há 5 horas · Ministério de Música</span>
+              </div>
+            </div>
+            <div class="post-content prayer-request">
+              🙏 <strong>Pedido de Oração</strong><br><br>
+              Peço orações pela minha mãe que fará uma cirurgia na próxima semana. Que Nossa Senhora interceda por ela! 🕊️
+            </div>
+            <div class="post-actions">
+              <button class="post-action prayed" onclick="prayFor(this)"><i class="fas fa-hands-praying"></i> <span>Eu rezei · 8</span></button>
+              <button class="post-action" onclick="toggleThread(this)"><i class="far fa-comment"></i> <span>3</span></button>
+            </div>
+            <div class="post-thread">
+              <div class="reply-item">
+                <div class="reply-avatar" style="background:linear-gradient(135deg,#27AE60,#2ECC71);">AC</div>
+                <div class="reply-content">
+                  <h5>Ana Clara <span>· há 4h</span></h5>
+                  <p>Já estou rezando, Luísa! Que Deus abençoe sua mãe 🙏</p>
+                </div>
+              </div>
+              <div class="reply-input-row">
+                <input type="text" placeholder="Escreva uma resposta...">
+                <button onclick="addReply(this)">Responder</button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Normal Post -->
+          <div class="feed-post" data-type="normal">
+            <div class="post-header">
+              <div class="avatar" style="width:40px;height:40px;font-size:14px;background:linear-gradient(135deg,#2980B9,#3498DB);">RG</div>
+              <div class="post-meta">
+                <h4>Rafael Gomes</h4>
+                <span>há 8 horas · Ministério de Música</span>
+              </div>
+            </div>
+            <div class="post-content">
+              Glória a Deus! Consegui aprender a cifra nova de "Espírito Santo Vem". Quem quiser a partitura, é só me pedir! 🎸🙌
+            </div>
+            <div class="post-actions">
+              <button class="post-action" onclick="likePost(this)"><i class="far fa-heart"></i> <span>7</span></button>
+              <button class="post-action" onclick="toggleThread(this)"><i class="far fa-comment"></i> <span>2</span></button>
+              <button class="post-action" onclick="repostPost(this)"><i class="fas fa-retweet"></i> <span>1</span></button>
+            </div>
+            <div class="post-thread">
+              <div class="reply-input-row">
+                <input type="text" placeholder="Escreva uma resposta...">
+                <button onclick="addReply(this)">Responder</button>
+              </div>
+            </div>
+          </div>
+
+          <!-- More posts -->
+          <div class="feed-post" data-type="normal">
+            <div class="post-header">
+              <div class="avatar" style="width:40px;height:40px;font-size:14px;background:linear-gradient(135deg,#8E44AD,#9B59B6);">TP</div>
+              <div class="post-meta">
+                <h4>Thiago Pereira</h4>
+                <span>há 12 horas · Ministério de Leitores</span>
+              </div>
+            </div>
+            <div class="post-content">
+              Pessoal, lembrem-se de ensaiar a proclamação antes da missa! O Padre Antônio pediu que todos os leitores treinem em casa. O Evangelho deste domingo é muito bonito — João 13, o lava-pés. 📖
+            </div>
+            <div class="post-actions">
+              <button class="post-action" onclick="likePost(this)"><i class="far fa-heart"></i> <span>9</span></button>
+              <button class="post-action" onclick="toggleThread(this)"><i class="far fa-comment"></i> <span>4</span></button>
+              <button class="post-action" onclick="repostPost(this)"><i class="fas fa-retweet"></i> <span>2</span></button>
+            </div>
+            <div class="post-thread">
+              <div class="reply-item">
+                <div class="reply-avatar" style="background:linear-gradient(135deg,#5B2C6F,#7D3C98);">MS</div>
+                <div class="reply-content">
+                  <h5>Maria Silva <span>· há 10h</span></h5>
+                  <p>Obrigada pelo lembrete Thiago! Já estou ensaiando 🙏</p>
+                </div>
+              </div>
+              <div class="reply-input-row">
+                <input type="text" placeholder="Escreva uma resposta...">
+                <button onclick="addReply(this)">Responder</button>
+              </div>
+            </div>
+          </div>
+
+          <div class="feed-post" data-type="prayer">
+            <div class="post-header">
+              <div class="avatar" style="width:40px;height:40px;font-size:14px;background:linear-gradient(135deg,#27AE60,#2ECC71);">AC</div>
+              <div class="post-meta">
+                <h4>Ana Clara Oliveira</h4>
+                <span>há 1 dia · Todos os Ministérios</span>
+              </div>
+            </div>
+            <div class="post-content prayer-request">
+              🙏 <strong>Pedido de Oração</strong><br><br>
+              Peço que rezem pela minha família. Estamos passando por um momento difícil, mas confiamos na providência divina. Que Deus nos dê força e sabedoria. 🕊️✨
+            </div>
+            <div class="post-actions">
+              <button class="post-action" onclick="prayFor(this)"><i class="far fa-hands-praying"></i> <span>Rezar · 15</span></button>
+              <button class="post-action" onclick="toggleThread(this)"><i class="far fa-comment"></i> <span>6</span></button>
+            </div>
+            <div class="post-thread">
+              <div class="reply-input-row">
+                <input type="text" placeholder="Escreva uma resposta...">
+                <button onclick="addReply(this)">Responder</button>
+              </div>
+            </div>
+          </div>
+
+          <div class="feed-post" data-type="normal">
+            <div class="post-header">
+              <div class="avatar" style="width:40px;height:40px;font-size:14px;background:linear-gradient(135deg,#E74C3C,#C0392B);">PB</div>
+              <div class="post-meta">
+                <h4>Padre Bernardo <span style="font-size:11px; color:var(--primary); font-weight:600;">🕊️ Pároco</span></h4>
+                <span>há 2 dias · Todos os Ministérios</span>
+              </div>
+            </div>
+            <div class="post-content">
+              Meus irmãos e irmãs, que a paz de Cristo esteja com todos vocês! Agradeço pelo serviço dedicado de cada um nos ministérios. Vocês são instrumentos de Deus na nossa comunidade. Que o Espírito Santo continue nos guiando! 🙌⛪
+            </div>
+            <div class="post-actions">
+              <button class="post-action liked" onclick="likePost(this)"><i class="fas fa-heart"></i> <span>34</span></button>
+              <button class="post-action" onclick="toggleThread(this)"><i class="far fa-comment"></i> <span>8</span></button>
+              <button class="post-action reposted" onclick="repostPost(this)"><i class="fas fa-retweet"></i> <span>12</span></button>
+            </div>
+            <div class="post-thread">
+              <div class="reply-input-row">
+                <input type="text" placeholder="Escreva uma resposta...">
+                <button onclick="addReply(this)">Responder</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Schedule Page -->
+    <div class="page" id="page-schedule">
+      <div class="page-header">
+        <h1>📅 Escalas Litúrgicas</h1>
+        <p>Ministério de Leitores — Gerencie vagas, crie eventos e acompanhe a escala</p>
+      </div>
+
+      <!-- Calendar Card -->
+      <div class="card">
+        <div class="card-header">
+          <h3><i class="fas fa-calendar-alt"></i> Abril 2026</h3>
+          <button class="btn btn-sm btn-primary" onclick="openModal('createEventModal')">
+            <i class="fas fa-plus"></i> Criar Novo Evento
+          </button>
+        </div>
+
+        <div class="schedule-calendar" id="scheduleCalendar"></div>
+
+        <p style="font-size:13px; color:var(--text-light); text-align:center; margin-top:8px;">
+          <span style="display:inline-block; width:8px; height:8px; background:var(--gold); border-radius:50%; margin-right:4px;"></span>
+          Dias com eventos marcados
+        </p>
+      </div>
+
+      <!-- Events List -->
+      <div class="card">
+        <div class="card-header">
+          <h3><i class="fas fa-list"></i> Eventos do Mês</h3>
+        </div>
+
+        <div class="event-list" id="eventList">
+          <div class="event-card">
+            <div class="event-card-header">
+              <h4>🕐 Missa Dominical — 19h</h4>
+              <span class="event-time">Dom, 12 Abr</span>
+            </div>
+            <div class="event-positions">
+              <div class="position-row">
+                <div class="position-info">
+                  <span>Orador/Comentarista</span>
+                </div>
+                <div class="position-slots">
+                  <div class="position-slot filled" title="Maria Silva">MS</div>
+                  <div class="position-slot available" onclick="claimSlot(this)" title="Vaga disponível — clique para assumir">+</div>
+                </div>
+              </div>
+              <div class="position-row">
+                <div class="position-info">
+                  <span>Leitor</span>
+                </div>
+                <div class="position-slots">
+                  <div class="position-slot filled" title="Carlos Ferreira">CF</div>
+                  <div class="position-slot available" onclick="claimSlot(this)">+</div>
+                  <div class="position-slot available" onclick="claimSlot(this)">+</div>
+                </div>
+              </div>
+              <div class="position-row">
+                <div class="position-info">
+                  <span>Recepção</span>
+                </div>
+                <div class="position-slots">
+                  <div class="position-slot filled" title="Ana Clara">AC</div>
+                  <div class="position-slot filled" title="João Pedro">JP</div>
+                  <div class="position-slot available" onclick="claimSlot(this)">+</div>
+                  <div class="position-slot available" onclick="claimSlot(this)">+</div>
+                  <div class="position-slot available" onclick="claimSlot(this)">+</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="event-card">
+            <div class="event-card-header">
+              <h4>🕐 Adoração ao Santíssimo</h4>
+              <span class="event-time">Qui, 16 Abr</span>
+            </div>
+            <div class="event-positions">
+              <div class="position-row">
+                <div class="position-info">
+                  <span>Ministro da Eucaristia</span>
+                </div>
+                <div class="position-slots">
+                  <div class="position-slot available" onclick="claimSlot(this)">+</div>
+                  <div class="position-slot available" onclick="claimSlot(this)">+</div>
+                </div>
+              </div>
+              <div class="position-row">
+                <div class="position-info">
+                  <span>Leitor</span>
+                </div>
+                <div class="position-slots">
+                  <div class="position-slot my-slot" onclick="dropSlot(this)" title="Clique para desocupar">MS</div>
+                  <div class="position-slot available" onclick="claimSlot(this)">+</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="event-card">
+            <div class="event-card-header">
+              <h4>🕐 Missa Dominical — 8h</h4>
+              <span class="event-time">Dom, 19 Abr</span>
+            </div>
+            <div class="event-positions">
+              <div class="position-row">
+                <div class="position-info">
+                  <span>Comentarista</span>
+                </div>
+                <div class="position-slots">
+                  <div class="position-slot available" onclick="claimSlot(this)">+</div>
+                  <div class="position-slot available" onclick="claimSlot(this)">+</div>
+                </div>
+              </div>
+              <div class="position-row">
+                <div class="position-info">
+                  <span>Leitor</span>
+                </div>
+                <div class="position-slots">
+                  <div class="position-slot available" onclick="claimSlot(this)">+</div>
+                  <div class="position-slot available" onclick="claimSlot(this)">+</div>
+                  <div class="position-slot available" onclick="claimSlot(this)">+</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="event-card">
+            <div class="event-card-header">
+              <h4>🎵 Ensaio do Ministério de Música</h4>
+              <span class="event-time">Sáb, 25 Abr</span>
+            </div>
+            <div class="event-positions">
+              <div class="position-row">
+                <div class="position-info">
+                  <span>Vocal</span>
+                </div>
+                <div class="position-slots">
+                  <div class="position-slot filled">MS</div>
+                  <div class="position-slot filled">CF</div>
+                  <div class="position-slot available" onclick="claimSlot(this)">+</div>
+                  <div class="position-slot available" onclick="claimSlot(this)">+</div>
+                </div>
+              </div>
+              <div class="position-row">
+                <div class="position-info">
+                  <span>Instrumento</span>
+                </div>
+                <div class="position-slots">
+                  <div class="position-slot filled">RG</div>
+                  <div class="position-slot available" onclick="claimSlot(this)">+</div>
+                  <div class="position-slot available" onclick="claimSlot(this)">+</div>
+                  <div class="position-slot available" onclick="claimSlot(this)">+</div>
+                  <div class="position-slot available" onclick="claimSlot(this)">+</div>
+                  <div class="position-slot available" onclick="claimSlot(this)">+</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Prayers Wall Page -->
+    <div class="page" id="page-prayers">
+      <div class="page-header">
+        <h1>🙏 Mural de Intercessão</h1>
+        <p>Compartilhe seus pedidos de oração e reze pelos outros</p>
+      </div>
+
+      <div class="card">
+        <div class="post-composer-top" style="margin-bottom:16px;">
+          <div class="avatar" style="width:40px;height:40px;font-size:14px;">MS</div>
+          <textarea id="prayerInput" placeholder="Compartilhe seu pedido de oração..." style="flex:1; border:2px solid var(--border); border-radius:var(--radius); padding:12px; font-family:inherit; font-size:14px; min-height:60px; resize:none; outline:none; background:var(--surface); color:var(--text);"></textarea>
+        </div>
+        <div style="text-align:right;">
+          <button class="btn btn-sm btn-gold" onclick="postPrayer()"><i class="fas fa-hands-praying"></i> Publicar Pedido</button>
+        </div>
+      </div>
+
+      <div class="prayer-wall" id="prayerWall">
+        <div class="prayer-card">
+          <button class="pray-btn" onclick="prayOnWall(this)">
+            <i class="fas fa-hands-praying"></i>
+            <span>12</span>
+          </button>
+          <div class="prayer-content">
+            <h4>Pela saúde do meu pai</h4>
+            <p>Meu pai fará uma cirurgia cardíaca na próxima terça-feira. Peço as orações de todos pela equipe médica e pela recuperação dele.</p>
+            <div class="prayer-meta">Maria Silva · há 3 horas</div>
+          </div>
+        </div>
+
+        <div class="prayer-card">
+          <button class="pray-btn" onclick="prayOnWall(this)">
+            <i class="fas fa-hands-praying"></i>
+            <span>25</span>
+          </button>
+          <div class="prayer-content">
+            <h4>Pela paz na Ucrânia e no mundo</h4>
+            <p>Que o Senhor conceda a paz aos povos que sofrem com a guerra. Que a intercessão de Nossa Senhora de Fátima toque os corações dos governantes.</p>
+            <div class="prayer-meta">Pe. Antônio · há 6 horas</div>
+          </div>
+        </div>
+
+        <div class="prayer-card">
+          <button class="pray-btn" onclick="prayOnWall(this)">
+            <i class="fas fa-hands-praying"></i>
+            <span>8</span>
+          </button>
+          <div class="prayer-content">
+            <h4>Pela conversão de meu filho</h4>
+            <p>Rezem para que meu filho redescubra o caminho da fé. Ele está afastado da Igreja há 2 anos e sinto no coração que ele voltará.</p>
+            <div class="prayer-meta">Teresa Lima · há 12 horas</div>
+          </div>
+        </div>
+
+        <div class="prayer-card">
+          <button class="pray-btn prayed" onclick="prayOnWall(this)">
+            <i class="fas fa-hands-praying"></i>
+            <span>34</span>
+          </button>
+          <div class="prayer-content">
+            <h4>Pelas vocações sacerdotais e religiosas</h4>
+            <p>Que o Senhor suscite vocações generosas para servir Sua Igreja. Rezemos pelos seminaristas e religiosos que se dedicam ao serviço do Reino.</p>
+            <div class="prayer-meta">Comunidade Shalom · há 1 dia</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Profile Page -->
+    <div class="page" id="page-profile">
+      <div class="page-header">
+        <h1>Meu Perfil</h1>
+        <p>Gerencie seu CatholicID</p>
+      </div>
+
+      <div class="profile-header-card">
+        <div class="profile-avatar-lg" id="profileAvatar">MS</div>
+        <h2 id="profileName">Maria Silva</h2>
+        <p>CatholicID: CAT-2024-004521</p>
+      </div>
+
+      <div class="streak-display">
+        <i class="fas fa-fire"></i>
+        <div>
+          <div class="streak-num" id="profileStreak">7</div>
+          <div class="streak-label">dias de ofensiva</div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-header">
+          <h3><i class="fas fa-medal"></i> Conquistas</h3>
+        </div>
+        <div class="badges-grid">
+          <div class="badge-item">
+            <div class="badge-icon">🔥</div>
+            <h5>Primeira Ofensiva</h5>
+            <p>7 dias seguidos</p>
+          </div>
+          <div class="badge-item">
+            <div class="badge-icon">📿</div>
+            <h5>Devoto do Rosário</h5>
+            <p>10 terços completos</p>
+          </div>
+          <div class="badge-item">
+            <div class="badge-icon">📖</div>
+            <h5>Leitor Dedicado</h5>
+            <p>30 dias de Bíblia</p>
+          </div>
+          <div class="badge-item">
+            <div class="badge-icon">⛪</div>
+            <h5>Servo Fiel</h5>
+            <p>10 escalas cumpridas</p>
+          </div>
+          <div class="badge-item locked">
+            <div class="badge-icon">⭐</div>
+            <h5>Mestre da Palavra</h5>
+            <p>100 dias de Bíblia</p>
+          </div>
+          <div class="badge-item locked">
+            <div class="badge-icon">🕊️</div>
+            <h5>Intercessor</h5>
+            <p>50 orações por outros</p>
+          </div>
+          <div class="badge-item locked">
+            <div class="badge-icon">🏆</div>
+            <h5>365 Completo</h5>
+            <p>Bíblia em 1 ano</p>
+          </div>
+          <div class="badge-item locked">
+            <div class="badge-icon">💎</div>
+            <h5>Coordenador</h5>
+            <p>Liderar 3 ministérios</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-header">
+          <h3><i class="fas fa-cog"></i> Configurações</h3>
+        </div>
+        <div style="display:grid; gap:12px;">
+          <button class="btn btn-secondary" style="width:100%; justify-content:flex-start;" onclick="openModal('editProfileModal')">
+            <i class="fas fa-user-edit"></i> Editar Perfil
+          </button>
+          <button class="btn btn-secondary" style="width:100%; justify-content:flex-start;">
+            <i class="fas fa-bell"></i> Notificações
+          </button>
+          <button class="btn btn-secondary" style="width:100%; justify-content:flex-start;" onclick="toggleDarkMode()">
+            <i class="fas fa-moon"></i> Modo Escuro
+          </button>
+          <button class="btn btn-secondary" style="width:100%; justify-content:flex-start;">
+            <i class="fas fa-shield-alt"></i> Privacidade
+          </button>
+          <button class="btn btn-danger" style="width:100%; justify-content:flex-start;" onclick="handleLogout()">
+            <i class="fas fa-sign-out-alt"></i> Sair
+          </button>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <!-- Mobile Bottom Nav -->
+  <nav class="mobile-nav">
+    <div class="mobile-nav-inner">
+      <button class="mobile-nav-item active" data-page="dashboard" onclick="navigate('dashboard')">
+        <i class="fas fa-home"></i>
+        Início
+      </button>
+      <button class="mobile-nav-item" data-page="rosary" onclick="navigate('rosary')">
+        <i class="fas fa-pray"></i>
+        Rosário
+      </button>
+      <button class="mobile-nav-item" data-page="feed" onclick="navigate('feed')">
+        <i class="fas fa-comments"></i>
+        Feed
+      </button>
+      <button class="mobile-nav-item" data-page="schedule" onclick="navigate('schedule')">
+        <i class="fas fa-calendar-alt"></i>
+        Escalas
+      </button>
+      <button class="mobile-nav-item" data-page="profile" onclick="navigate('profile')">
+        <i class="fas fa-user-circle"></i>
+        Perfil
+      </button>
+    </div>
+  </nav>
+</div>
+
+<!-- Create Ministry Modal -->
+<div class="modal-overlay" id="createMinistryModal">
+  <div class="modal">
+    <div class="modal-header">
+      <h2>Criar Ministério</h2>
+      <button class="modal-close" onclick="closeModal('createMinistryModal')"><i class="fas fa-times"></i></button>
+    </div>
+    <form onsubmit="createMinistryModal(event)">
+      <div class="form-group">
+        <label>Nome do Ministério</label>
+        <input type="text" id="modalMinistryName" placeholder="Ex: Ministério de Música" required>
+      </div>
+      <div class="form-group">
+        <label>Paróquia</label>
+        <input type="text" id="modalMinistryParish" placeholder="Nome da paróquia" required>
+      </div>
+      <div class="form-group">
+        <label>Descrição</label>
+        <input type="text" id="modalMinistryDesc" placeholder="Breve descrição do ministério">
+      </div>
+      <div class="form-group">
+        <label>Tipo</label>
+        <select id="modalMinistryType">
+          <option value="music">🎵 Música</option>
+          <option value="readers">📖 Leitores</option>
+          <option value="eucharist">🍷 Ministros da Eucaristia</option>
+          <option value="acolytes">🕯️ Acólitos / Coroinhas</option>
+          <option value="welcoming">🤝 Acolhida</option>
+          <option value="catechesis">📚 Catequese</option>
+          <option value="other">✨ Outro</option>
+        </select>
+      </div>
+      <button type="submit" class="btn btn-primary">
+        <i class="fas fa-plus-circle"></i> Criar Ministério
+      </button>
+    </form>
+  </div>
+</div>
+
+<!-- Create Event Modal -->
+<div class="modal-overlay" id="createEventModal">
+  <div class="modal">
+    <div class="modal-header">
+      <h2>📅 Criar Novo Evento</h2>
+      <button class="modal-close" onclick="closeModal('createEventModal')"><i class="fas fa-times"></i></button>
+    </div>
+    <form onsubmit="createEvent(event)">
+      <div class="form-group">
+        <label>Título do Evento</label>
+        <input type="text" id="eventTitle" placeholder="Ex: Missa Dominical, Ensaio Geral..." required>
+      </div>
+      <div class="form-group">
+        <label>Data</label>
+        <input type="date" id="eventDate" required>
+      </div>
+      <div class="form-group">
+        <label>Horário</label>
+        <input type="time" id="eventTime" required>
+      </div>
+
+      <div class="template-section">
+        <h4>Templates Pré-Salvos</h4>
+        <div class="templates-row">
+          <button type="button" class="event-template-btn" onclick="loadTemplate('missa')">
+            ⛪ Missa Padrão
+          </button>
+          <button type="button" class="event-template-btn" onclick="loadTemplate('adoracao')">
+            🕯️ Adoração
+          </button>
+          <button type="button" class="event-template-btn" onclick="loadTemplate('ensaio')">
+            🎵 Ensaio
+          </button>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label>Cargos / Funções</label>
+        <div id="positionFields">
+          <div class="position-field" style="display:flex; gap:8px; margin-bottom:8px;">
+            <input type="text" placeholder="Cargo" class="pos-title" style="flex:1;" value="Leitor">
+            <input type="number" placeholder="Vagas" class="pos-capacity" style="width:70px;" value="3" min="1">
+          </div>
+          <div class="position-field" style="display:flex; gap:8px; margin-bottom:8px;">
+            <input type="text" placeholder="Cargo" class="pos-title" style="flex:1;" value="Comentarista">
+            <input type="number" placeholder="Vagas" class="pos-capacity" style="width:70px;" value="2" min="1">
+          </div>
+        </div>
+        <button type="button" class="btn btn-sm btn-secondary" onclick="addPositionField()" style="margin-top:8px;">
+          <i class="fas fa-plus"></i> Adicionar Cargo
+        </button>
+      </div>
+      <button type="submit" class="btn btn-primary" style="margin-top:16px;">
+        <i class="fas fa-calendar-plus"></i> Criar Evento
+      </button>
+    </form>
+  </div>
+</div>
+
+<!-- Edit Profile Modal -->
+<div class="modal-overlay" id="editProfileModal">
+  <div class="modal">
+    <div class="modal-header">
+      <h2>Editar Perfil</h2>
+      <button class="modal-close" onclick="closeModal('editProfileModal')"><i class="fas fa-times"></i></button>
+    </div>
+    <form onsubmit="saveProfile(event)">
+      <div class="form-group">
+        <label>Nome</label>
+        <input type="text" id="editName" value="Maria Silva" required>
+      </div>
+      <div class="form-group">
+        <label>E-mail</label>
+        <input type="email" id="editEmail" value="maria@email.com" required>
+      </div>
+      <div class="form-group">
+        <label>Paróquia</label>
+        <input type="text" id="editParish" value="Nossa Senhora Aparecida">
+      </div>
+      <div class="form-group">
+        <label>Disponibilidade Global</label>
+        <div style="display:flex; flex-wrap:wrap; gap:8px; margin-top:4px;">
+          <label style="display:flex; align-items:center; gap:4px; font-size:13px; cursor:pointer;">
+            <input type="checkbox" checked> Seg
+          </label>
+          <label style="display:flex; align-items:center; gap:4px; font-size:13px; cursor:pointer;">
+            <input type="checkbox" checked> Ter
+          </label>
+          <label style="display:flex; align-items:center; gap:4px; font-size:13px; cursor:pointer;">
+            <input type="checkbox" checked> Qua
+          </label>
+          <label style="display:flex; align-items:center; gap:4px; font-size:13px; cursor:pointer;">
+            <input type="checkbox" checked> Qui
+          </label>
+          <label style="display:flex; align-items:center; gap:4px; font-size:13px; cursor:pointer;">
+            <input type="checkbox" checked> Sex
+          </label>
+          <label style="display:flex; align-items:center; gap:4px; font-size:13px; cursor:pointer;">
+            <input type="checkbox" checked> Sáb
+          </label>
+          <label style="display:flex; align-items:center; gap:4px; font-size:13px; cursor:pointer;">
+            <input type="checkbox" checked> Dom
+          </label>
+        </div>
+      </div>
+      <button type="submit" class="btn btn-primary">
+        <i class="fas fa-save"></i> Salvar Alterações
+      </button>
+    </form>
+  </div>
+</div>
+
+<!-- Toast -->
+<div class="toast" id="toast">
+  <i class="fas fa-check-circle"></i>
+  <span id="toastMsg">Ação realizada com sucesso!</span>
+</div>
+
+<script>
+// ==================== STATE ====================
+const state = {
+  currentUser: null,
+  currentPage: 'dashboard',
+  rosary: {
+    active: false,
+    currentBead: 0,
+    currentMystery: 'gozosos',
+    completedBeads: [],
+    totalBeads: 63
+  },
+  bible: {
+    currentDay: 42,
+    read: false,
+    audioPlaying: false,
+    audioProgress: 0
+  },
+  ministries: [
+    { name: 'Ministério de Música', parish: 'Paróquia Nossa Senhora Aparecida', type: 'music', members: 24 },
+    { name: 'Ministério de Leitores', parish: 'Paróquia Nossa Senhora Aparecida', type: 'readers', members: 18 },
+    { name: 'Ministros da Eucaristia', parish: 'Paróquia São José Operário', type: 'eucharist', members: 15 }
+  ],
+  posts: [],
+  events: [],
+  prayers: [],
+  scheduleMonth: new Date().getMonth(),
+  scheduleYear: new Date().getFullYear()
+};
+
+const mysteries = {
+  gozosos: {
+    name: 'Mistérios Gozosos',
+    days: 'Segunda e Sábado',
+    prayers: [
+      { text: 'Em nome do Pai, e do Filho, e do Espírito Santo. Amém.', type: 'sign' },
+      { text: 'Oferecimento: Senhor Jesus, eu Vos ofereço este Terço em honra de Vossa Mãe Santíssima...', type: 'offering' },
+      { text: 'Pai Nosso, que estais nos céus, santificado seja o vosso nome...', type: 'pai-nosso' },
+      { text: 'Ave Maria, cheia de graça, o Senhor é convosco...', type: 'ave-maria' },
+      { text: 'Ave Maria, cheia de graça, o Senhor é convosco...', type: 'ave-maria' },
+      { text: 'Ave Maria, cheia de graça, o Senhor é convosco...', type: 'ave-maria' },
+      { text: 'Glória ao Pai, ao Filho e ao Espírito Santo...', type: 'gloria' },
+      { text: '1º Mistério Gozoso: A Anunciação do Anjo a Maria.', type: 'mystery' },
+      { text: 'Pai Nosso, que estais nos céus...', type: 'pai-nosso' },
+      { text: 'Ave Maria, cheia de graça...', type: 'ave-maria' },
+      { text: 'Ave Maria, cheia de graça...', type: 'ave-maria' },
+      { text: 'Ave Maria, cheia de graça...', type: 'ave-maria' },
+      { text: 'Ave Maria, cheia de graça...', type: 'ave-maria' },
+      { text: 'Ave Maria, cheia de graça...', type: 'ave-maria' },
+      { text: 'Ave Maria, cheia de graça...', type: 'ave-maria' },
+      { text: 'Ave Maria, cheia de graça...', type: 'ave-maria' },
+      { text: 'Ave Maria, cheia de graça...', type: 'ave-maria' },
+      { text: 'Ave Maria, cheia de graça...', type: 'ave-maria' },
+      { text: 'Ave Maria, cheia de graça...', type: 'ave-maria' },
+      { text: 'Glória ao Pai, ao Filho e ao Espírito Santo...', type: 'gloria' },
+      { text: 'Ó meu Jesus, perdoai-nos, livrai-nos do fogo do inferno...', type: 'fatima' },
+      { text: '2º Mistério Gozoso: A Visitação de Maria a Isabel.', type: 'mystery' },
+      { text: 'Pai Nosso, que estais nos céus...', type: 'pai-nosso' },
+      { text: 'Ave Maria, cheia de graça...', type: 'ave-maria' },
+      { text: 'Ave Maria, cheia de graça...', type: 'ave-maria' },
+      { text: 'Ave Maria, cheia de graça...', type: 'ave-maria' },
+      { text: 'Ave Maria, cheia de graça...', type: 'ave-maria' },
+      { text: 'Ave Maria, cheia de graça...', type: 'ave-maria' },
+      { text: 'Ave Maria, cheia de graça...', type: 'ave-maria' },
+      { text: 'Ave Maria, cheia de graça...', type: 'ave-maria' },
+      { text: 'Ave Maria, cheia de graça...', type: 'ave-maria' },
+      { text: 'Ave Maria, cheia de graça...', type: 'ave-maria' },
+      { text: 'Ave Maria, cheia de graça...', type: 'ave-maria' },
+      { text: 'Glória ao Pai, ao Filho e ao Espírito Santo...', type: 'gloria' },
+      { text: 'Ó meu Jesus, perdoai-nos, livrai-nos do fogo do inferno...', type: 'fatima' },
+      { text: '3º Mistério Gozoso: O Nascimento de Jesus em Belém.', type: 'mystery' },
+      { text: 'Pai Nosso, que estais nos céus...', type: 'pai-nosso' },
+      { text: 'Ave Maria, cheia de graça...', type: 'ave-maria' },
+      { text: 'Ave Maria, cheia de graça...', type: 'ave-maria' },
+      { text: 'Ave Maria, cheia de graça...', type: 'ave-maria' },
+      { text: 'Ave Maria, cheia de graça...', type: 'ave-maria' },
+      { text: 'Ave Maria, cheia de graça...', type: 'ave-maria' },
+      { text: 'Ave Maria, cheia de graça...', type: 'ave-maria' },
+      { text: 'Ave Maria, cheia de graça...', type: 'ave-maria' },
+      { text: 'Ave Maria, cheia de graça...', type: 'ave-maria' },
+      { text: 'Ave Maria, cheia de graça...', type: 'ave-maria' },
+      { text: 'Ave Maria, cheia de graça...', type: 'ave-maria' },
+      { text: 'Glória ao Pai, ao Filho e ao Espírito Santo...', type: 'gloria' },
+      { text: 'Ó meu Jesus, perdoai-nos, livrai-nos do fogo do inferno...', type: 'fatima' },
+      { text: '4º Mistério Gozoso: A Apresentação de Jesus no Templo.', type: 'mystery' },
+      { text: 'Pai Nosso, que estais nos céus...', type: 'pai-nosso' },
+      { text: 'Ave Maria, cheia de graça...', type: 'ave-maria' },
+      { text: 'Ave Maria, cheia de graça...', type: 'ave-maria' },
+      { text: 'Ave Maria, cheia de graça...', type: 'ave-maria' },
+      { text: 'Ave Maria, cheia de graça...', type: 'ave-maria' },
+      { text: 'Ave Maria, cheia de graça...', type: 'ave-maria' },
+      { text: 'Ave Maria, cheia de graça...', type: 'ave-maria' },
+      { text: 'Ave Maria, cheia de graça...', type: 'ave-maria' },
+      { text: 'Ave Maria, cheia de graça...', type: 'ave-maria' },
+      { text: 'Ave Maria, cheia de graça...', type: 'ave-maria' },
+      { text: 'Ave Maria, cheia de graça...', type: 'ave-maria' },
+      { text: 'Glória ao Pai, ao Filho e ao Espírito Santo...', type: 'gloria' },
+      { text: 'Ó meu Jesus, perdoai-nos, livrai-nos do fogo do inferno...', type: 'fatima' },
+      { text: '5º Mistério Gozoso: O Encontro de Jesus no Templo.', type: 'mystery' },
+      { text: 'Pai Nosso, que estais nos céus...', type: 'pai-nosso' },
+      { text: 'Ave Maria, cheia de graça...', type: 'ave-maria' },
+      { text: 'Ave Maria, cheia de graça...', type: 'ave-maria' },
+      { text: 'Ave Maria, cheia de graça...', type: 'ave-maria' },
+      { text: 'Ave Maria, cheia de graça...', type: 'ave-maria' },
+      { text: 'Ave Maria, cheia de graça...', type: 'ave-maria' },
+      { text: 'Ave Maria, cheia de graça...', type: 'ave-maria' },
+      { text: 'Ave Maria, cheia de graça...', type: 'ave-maria' },
+      { text: 'Ave Maria, cheia de graça...', type: 'ave-maria' },
+      { text: 'Ave Maria, cheia de graça...', type: 'ave-maria' },
+      { text: 'Ave Maria, cheia de graça...', type: 'ave-maria' },
+      { text: 'Glória ao Pai, ao Filho e ao Espírito Santo...', type: 'gloria' },
+      { text: 'Ó meu Jesus, perdoai-nos, livrai-nos do fogo do inferno...', type: 'fatima' },
+      { text: 'Salve Rainha, Mãe de Misericórdia...', type: 'salve-rainha' },
+      { text: 'Em nome do Pai, e do Filho, e do Espírito Santo. Amém.', type: 'sign' }
+    ]
+  },
+  dolorosos: {
+    name: 'Mistérios Dolorosos',
+    days: 'Terça e Sexta',
+    prayers: [
+      { text: 'Em nome do Pai, e do Filho, e do Espírito Santo. Amém.', type: 'sign' },
+      { text: 'Pai Nosso, que estais nos céus...', type: 'pai-nosso' },
+      { text: 'Ave Maria, cheia de graça...', type: 'ave-maria' },
+      { text: 'Ave Maria, cheia de graça...', type: 'ave-maria' },
+      { text: 'Ave Maria, cheia de graça...', type: 'ave-maria' },
+      { text: 'Glória ao Pai, ao Filho e ao Espírito Santo...', type: 'gloria' },
+      { text: '1º Mistério Doloroso: A Agonia de Jesus no Horto das Oliveiras.', type: 'mystery' },
+      { text: 'Pai Nosso, que estais nos céus...', type: 'pai-nosso' },
+      { text: 'Ave Maria, cheia de graça...', type: 'ave-maria' },
+      { text: 'Ave Maria, cheia de graça...', type: 'ave-maria' },
+      { text: 'Ave Maria, cheia de graça...', type: 'ave-maria' },
+      { text: 'Ave Maria, cheia de graça...', type: 'ave-maria' },
+      { text: 'Ave Maria, cheia de graça...', type: 'ave-maria' },
+      { text: 'Ave Maria, cheia de graça...', type: 'ave-maria' },
+      { text: 'Ave Maria, cheia de graça...', type: 'ave-maria' },
+      { text: 'Ave Maria, cheia de graça...', type: 'ave-maria' },
+      { text: 'Ave Maria, cheia de graça...', type: 'ave-maria' },
+      { text: 'Ave Maria, cheia de graça...', type: 'ave-maria' },
+      { text: 'Glória ao Pai, ao Filho e ao Espírito Santo...', type: 'gloria' },
+      { text: 'Ó meu Jesus, perdoai-nos...', type: 'fatima' },
+      { text: '2º Mistério Doloroso: A Flagelação de Nosso Senhor Jesus Cristo.', type: 'mystery' },
+      { text: 'Pai Nosso, que estais nos céus...', type: 'pai-nosso' },
+      { text: 'Ave Maria, cheia de graça...', type: 'ave-maria' },
+      { text: 'Ave Maria, cheia de graça...', type: 'ave-maria' },
+      { text: 'Ave Maria, cheia de graça...', type: 'ave-maria' },
+      { text: 'Ave Maria, cheia de graça...', type: 'ave-maria' },
+      { text: 'Ave Maria, cheia de graça...', type: 'ave-maria' },
+      { text: 'Ave Maria, cheia de graça...', type: 'ave-maria' },
+      { text: 'Ave Maria, cheia de graça...', type: 'ave-maria' },
+      { text: 'Ave Maria, cheia de graça...', type: 'ave-maria' },
+      { text: 'Ave Maria, cheia de graça...', type: 'ave-maria' },
+      { text: 'Ave Maria, cheia de graça...', type: 'ave-maria' },
+      { text: 'Glória ao Pai, ao Filho e ao Espírito Santo...', type: 'gloria' },
+      { text: 'Ó meu Jesus, perdoai-nos...', type: 'fatima' },
+      { text: '3º Mistério Doloroso: A Coroação de Espinhos.', type: 'mystery' },
+      { text: 'Pai Nosso, que estais nos céus...', type: 'pai-nosso' },
+      { text: 'Ave Maria, cheia de graça...', type: 'ave-maria' },
+      { text: 'Ave Maria, cheia de graça...', type: 'ave-maria' },
+      { text: 'Ave Maria, cheia de graça...', type: 'ave-maria' },
+      { text: 'Ave Maria, cheia de graça...', type: 'ave-maria' },
+      { text: 'Ave Maria, cheia de graça...', type: 'ave-maria' },
+      { text: 'Ave Maria, cheia de graça...', type: 'ave-maria' },
+      { text: 'Ave Maria, cheia de graça...', type: 'ave-maria' },
+      { text: 'Ave Maria, cheia de graça...', type: 'ave-maria' },
+      { text: 'Ave Maria, cheia de graça...', type: 'ave-maria' },
+      { text: 'Ave Maria, cheia de graça...', type: 'ave-maria' },
+      { text: 'Glória ao Pai, ao Filho e ao Espírito Santo...', type: 'gloria' },
+      { text: 'Ó meu Jesus, perdoai-nos...', type: 'fatima' },
+      { text: '4º Mistério Doloroso: Jesus carrega a Cruz ao Calvário.', type: 'mystery' },
+      { text: 'Pai Nosso, que estais nos céus...', type: 'pai-nosso' },
+      { text: 'Ave Maria, cheia de graça...', type: 'ave-maria' },
+      { text: 'Ave Maria, cheia de graça...', type: 'ave-maria' },
+      { text: 'Ave Maria, cheia de graça...', type: 'ave-maria' },
+      { text: 'Ave Maria, cheia de graça...', type: 'ave-maria' },
+      { text: 'Ave Maria, cheia de graça...', type: 'ave-maria' },
+      { text: 'Ave Maria, cheia de graça...', type: 'ave-maria' },
+      { text: 'Ave Maria, cheia de graça...', type: 'ave-maria' },
+      { text: 'Ave Maria, cheia de graça...', type: 'ave-maria' },
+      { text: 'Ave Maria, cheia de graça...', type: 'ave-maria' },
+      { text: 'Ave Maria, cheia de graça...', type: 'ave-maria' },
+      { text: 'Glória ao Pai, ao Filho e ao Espírito Santo...', type: 'gloria' },
+      { text: 'Ó meu Jesus, perdoai-nos...', type: 'fatima' },
+      { text: '5º Mistério Doloroso: A Crucificação e Morte de Nosso Senhor.', type: 'mystery' },
+      { text: 'Pai Nosso, que estais nos céus...', type: 'pai-nosso' },
+      { text: 'Ave Maria, cheia de graça...', type: 'ave-maria' },
+      { text: 'Ave Maria, cheia de graça...', type: 'ave-maria' },
+      { text: 'Ave Maria, cheia de graça...', type: 'ave-maria' },
+      { text: 'Ave Maria, cheia de graça...', type: 'ave-maria' },
+      { text: 'Ave Maria, cheia de graça...', type: 'ave-maria' },
+      { text: 'Ave Maria, cheia de graça...', type: 'ave-maria' },
+      { text: 'Ave Maria, cheia de graça...', type: 'ave-maria' },
+      { text: 'Ave Maria, cheia de graça...', type: 'ave-maria' },
+      { text: 'Ave Maria, cheia de graça...', type: 'ave-maria' },
+      { text: 'Ave Maria, cheia de graça...', type: 'ave-maria' },
+      { text: 'Glória ao Pai, ao Filho e ao Espírito Santo...', type: 'gloria' },
+      { text: 'Ó meu Jesus, perdoai-nos...', type: 'fatima' },
+      { text: 'Salve Rainha, Mãe de Misericórdia...', type: 'salve-rainha' },
+      { text: 'Em nome do Pai, e do Filho, e do Espírito Santo. Amém.', type: 'sign' }
+    ]
+  },
+  gloriosos: {
+    name: 'Mistérios Gloriosos',
+    days: 'Quarta e Domingo',
+    prayers: [
+      { text: 'Em nome do Pai, e do Filho, e do Espírito Santo. Amém.', type: 'sign' },
+      { text: 'Pai Nosso, que estais nos céus...', type: 'pai-nosso' },
+      { text: 'Ave Maria, cheia de graça...', type: 'ave-maria' },
+      { text: 'Ave Maria, cheia de graça...', type: 'ave-maria' },
+      { text: 'Ave Maria, cheia de graça...', type: 'ave-maria' },
+      { text: 'Glória ao Pai, ao Filho e ao Espírito Santo...', type: 'gloria' },
+      { text: '1º Mistério Glorioso: A Ressurreição de Jesus.', type: 'mystery' },
+      { text: 'Pai Nosso, que estais nos céus...', type: 'pai-nosso' },
+      { text: 'Ave Maria, cheia de graça...', type: 'ave-maria' },
+      { text: 'Ave Maria, cheia de graça...', type: 'ave-maria' },
+      { text: 'Ave Maria, cheia de graça...', type: 'ave-maria' },
+      { text: 'Ave Maria, cheia de graça...', type: 'ave-maria' },
+      { text: 'Ave Maria, cheia de graça...', type: 'ave-maria' },
+      { text: 'Ave Maria, cheia de graça...', type: 'ave-maria' },
+      { text: 'Ave Maria, cheia de graça...', type: 'ave-maria' },
+      { text: 'Ave Maria, cheia de graça...', type: 'ave-maria' },
+      { text: 'Ave Maria, cheia de graça...', type: 'ave-maria' },
+      { text: 'Ave Maria, cheia de graça...', type: 'ave-maria' },
+      { text: 'Glória ao Pai, ao Filho e ao Espírito Santo...', type: 'gloria' },
+      { text: 'Ó meu Jesus, perdoai-nos...', type: 'fatima' },
+      { text: '2º Mistério Glorioso: A Ascensão de Jesus ao Céu.', type: 'mystery' },
+      { text: 'Pai Nosso, que estais nos céus...', type: 'pai-nosso' },
+      { text: 'Ave Maria, cheia de graça...', type: 'ave-maria' },
+      { text: 'Ave Maria, cheia de graça...', type: 'ave-maria' },
+      { text: 'Ave Maria, cheia de graça...', type: 'ave-maria' },
+      { text: 'Ave Maria, cheia de graça...', type: 'ave-maria' },
+      { text: 'Ave Maria, cheia de graça...', type: 'ave-maria' },
+      { text: 'Ave Maria, cheia de graça...', type: 'ave-maria' },
+      { text: 'Ave Maria, cheia de graça...', type: 'ave-maria' },
+      { text: 'Ave Maria, cheia de graça...', type: 'ave-maria' },
+      { text: 'Ave Maria, cheia de graça...', type: 'ave-maria' },
+      { text: 'Ave Maria, cheia de graça...', type: 'ave-maria' },
+      { text: 'Glória ao Pai, ao Filho e ao Espírito Santo...', type: 'gloria' },
+      { text: 'Ó meu Jesus, perdoai-nos...', type: 'fatima' },
+      { text: '3º Mistério Glorioso: A Descida do Espírito Santo.', type: 'mystery' },
+      { text: 'Pai Nosso, que estais nos céus...', type: 'pai-nosso' },
+      { text: 'Ave Maria, cheia de graça...', type: 'ave-maria' },
+      { text: 'Ave Maria, cheia de graça...', type: 'ave-maria' },
+      { text: 'Ave Maria, cheia de graça...', type: 'ave-maria' },
+      { text: 'Ave Maria, cheia de graça...', type: 'ave-maria' },
+      { text: 'Ave Maria, cheia de graça...', type: 'ave-maria' },
+      { text: 'Ave Maria, cheia de graça...', type: 'ave-maria' },
+      { text: 'Ave Maria, cheia de graça...', type: 'ave-maria' },
+      { text: 'Ave Maria, cheia de graça...', type: 'ave-maria' },
+      { text: 'Ave Maria, cheia de graça...', type: 'ave-maria' },
+      { text: 'Ave Maria, cheia de graça...', type: 'ave-maria' },
+      { text: 'Glória ao Pai, ao Filho e ao Espírito Santo...', type: 'gloria' },
+      { text: 'Ó meu Jesus, perdoai-nos...', type: 'fatima' },
+      { text: '4º Mistério Glorioso: A Assunção de Maria ao Céu.', type: 'mystery' },
+      { text: 'Pai Nosso, que estais nos céus...', type: 'pai-nosso' },
+      { text: 'Ave Maria, cheia de graça...', type: 'ave-maria' },
+      { text: 'Ave Maria, cheia de graça...', type: 'ave-maria' },
+      { text: 'Ave Maria, cheia de graça...', type: 'ave-maria' },
+      { text: 'Ave Maria, cheia de graça...', type: 'ave-maria' },
+      { text: 'Ave Maria, cheia de graça...', type: 'ave-maria' },
+      { text: 'Ave Maria, cheia de graça...', type: 'ave-maria' },
+      { text: 'Ave Maria, cheia de graça...', type: 'ave-maria' },
+      { text: 'Ave Maria, cheia de graça...', type: 'ave-maria' },
+      { text: 'Ave Maria, cheia de graça...', type: 'ave-maria' },
+      { text: 'Ave Maria, cheia de graça...', type: 'ave-maria' },
+      { text: 'Glória ao Pai, ao Filho e ao Espírito Santo...', type: 'gloria' },
+      { text: 'Ó meu Jesus, perdoai-nos...', type: 'fatima' },
+      { text: '5º Mistério Glorioso: A Coroação de Maria no Céu.', type: 'mystery' },
+      { text: 'Pai Nosso, que estais nos céus...', type: 'pai-nosso' },
+      { text: 'Ave Maria, cheia de graça...', type: 'ave-maria' },
+      { text: 'Ave Maria, cheia de graça...', type: 'ave-maria' },
+      { text: 'Ave Maria, cheia de graça...', type: 'ave-maria' },
+      { text: 'Ave Maria, cheia de graça...', type: 'ave-maria' },
+      { text: 'Ave Maria, cheia de graça...', type: 'ave-maria' },
+      { text: 'Ave Maria, cheia de graça...', type: 'ave-maria' },
+      { text: 'Ave Maria, cheia de graça...', type: 'ave-maria' },
+      { text: 'Ave Maria, cheia de graça...', type: 'ave-maria' },
+      { text: 'Ave Maria, cheia de graça...', type: 'ave-maria' },
+      { text: 'Ave Maria, cheia de graça...', type: 'ave-maria' },
+      { text: 'Glória ao Pai, ao Filho e ao Espírito Santo...', type: 'gloria' },
+      { text: 'Ó meu Jesus, perdoai-nos...', type: 'fatima' },
+      { text: 'Salve Rainha, Mãe de Misericórdia...', type: 'salve-rainha' },
+      { text: 'Em nome do Pai, e do Filho, e do Espírito Santo. Amém.', type: 'sign' }
+    ]
+  },
+  luminosos: {
+    name: 'Mistérios Luminosos',
+    days: 'Quinta',
+    prayers: [
+      { text: 'Em nome do Pai, e do Filho, e do Espírito Santo. Amém.', type: 'sign' },
+      { text: 'Pai Nosso, que estais nos céus...', type: 'pai-nosso' },
+      { text: 'Ave Maria, cheia de graça...', type: 'ave-maria' },
+      { text: 'Ave Maria, cheia de graça...', type: 'ave-maria' },
+      { text: 'Ave Maria, cheia de graça...', type: 'ave-maria' },
+      { text: 'Glória ao Pai, ao Filho e ao Espírito Santo...', type: 'gloria' },
+      { text: '1º Mistério Luminoso: O Batismo de Jesus no Jordão.', type: 'mystery' },
+      { text: 'Pai Nosso, que estais nos céus...', type: 'pai-nosso' },
+      { text: 'Ave Maria, cheia de graça...', type: 'ave-maria' },
+      { text: 'Ave Maria, cheia de graça...', type: 'ave-maria' },
+      { text: 'Ave Maria, cheia de graça...', type: 'ave-maria' },
+      { text: 'Ave Maria, cheia de graça...', type: 'ave-maria' },
+      { text: 'Ave Maria, cheia de graça...', type: 'ave-maria' },
+      { text: 'Ave Maria, cheia de graça...', type: 'ave-maria' },
+      { text: 'Ave Maria, cheia de graça...', type: 'ave-maria' },
+      { text: 'Ave Maria, cheia de graça...', type: 'ave-maria' },
+      { text: 'Ave Maria, cheia de graça...', type: 'ave-maria' },
+      { text: 'Ave Maria, cheia de graça...', type: 'ave-maria' },
+      { text: 'Glória ao Pai, ao Filho e ao Espírito Santo...', type: 'gloria' },
+      { text: 'Ó meu Jesus, perdoai-nos...', type: 'fatima' },
+      { text: '2º Mistério Luminoso: As Bodas de Caná.', type: 'mystery' },
+      { text: 'Pai Nosso, que estais nos céus...', type: 'pai-nosso' },
+      { text: 'Ave Maria, cheia de graça...', type: 'ave-maria' },
+      { text: 'Ave Maria, cheia de graça...', type: 'ave-maria' },
+      { text: 'Ave Maria, cheia de graça...', type: 'ave-maria' },
+      { text: 'Ave Maria, cheia de graça...', type: 'ave-maria' },
+      { text: 'Ave Maria, cheia de graça...', type: 'ave-maria' },
+      { text: 'Ave Maria, cheia de graça...', type: 'ave-maria' },
+      { text: 'Ave Maria, cheia de graça...', type: 'ave-maria' },
+      { text: 'Ave Maria, cheia de graça...', type: 'ave-maria' },
+      { text: 'Ave Maria, cheia de graça...', type: 'ave-maria' },
+      { text: 'Ave Maria, cheia de graça...', type: 'ave-maria' },
+      { text: 'Glória ao Pai, ao Filho e ao Espírito Santo...', type: 'gloria' },
+      { text: 'Ó meu Jesus, perdoai-nos...', type: 'fatima' },
+      { text: '3º Mistério Luminoso: O Anúncio do Reino de Deus.', type: 'mystery' },
+      { text: 'Pai Nosso, que estais nos céus...', type: 'pai-nosso' },
+      { text: 'Ave Maria, cheia de graça...', type: 'ave-maria' },
+      { text: 'Ave Maria, cheia de graça...', type: 'ave-maria' },
+      { text: 'Ave Maria, cheia de graça...', type: 'ave-maria' },
+      { text: 'Ave Maria, cheia de graça...', type: 'ave-maria' },
+      { text: 'Ave Maria, cheia de graça...', type: 'ave-maria' },
+      { text: 'Ave Maria, cheia de graça...', type: 'ave-maria' },
+      { text: 'Ave Maria, cheia de graça...', type: 'ave-maria' },
+      { text: 'Ave Maria, cheia de graça...', type: 'ave-maria' },
+      { text: 'Ave Maria, cheia de graça...', type: 'ave-maria' },
+      { text: 'Ave Maria, cheia de graça...', type: 'ave-maria' },
+      { text: 'Glória ao Pai, ao Filho e ao Espírito Santo...', type: 'gloria' },
+      { text: 'Ó meu Jesus, perdoai-nos...', type: 'fatima' },
+      { text: '4º Mistério Luminoso: A Transfiguração de Jesus.', type: 'mystery' },
+      { text: 'Pai Nosso, que estais nos céus...', type: 'pai-nosso' },
+      { text: 'Ave Maria, cheia de graça...', type: 'ave-maria' },
+      { text: 'Ave Maria, cheia de graça...', type: 'ave-maria' },
+      { text: 'Ave Maria, cheia de graça...', type: 'ave-maria' },
+      { text: 'Ave Maria, cheia de graça...', type: 'ave-maria' },
+      { text: 'Ave Maria, cheia de graça...', type: 'ave-maria' },
+      { text: 'Ave Maria, cheia de graça...', type: 'ave-maria' },
+      { text: 'Ave Maria, cheia de graça...', type: 'ave-maria' },
+      { text: 'Ave Maria, cheia de graça...', type: 'ave-maria' },
+      { text: 'Ave Maria, cheia de graça...', type: 'ave-maria' },
+      { text: 'Ave Maria, cheia de graça...', type: 'ave-maria' },
+      { text: 'Glória ao Pai, ao Filho e ao Espírito Santo...', type: 'gloria' },
+      { text: 'Ó meu Jesus, perdoai-nos...', type: 'fatima' },
+      { text: '5º Mistério Luminoso: A Instituição da Eucaristia.', type: 'mystery' },
+      { text: 'Pai Nosso, que estais nos céus...', type: 'pai-nosso' },
+      { text: 'Ave Maria, cheia de graça...', type: 'ave-maria' },
+      { text: 'Ave Maria, cheia de graça...', type: 'ave-maria' },
+      { text: 'Ave Maria, cheia de graça...', type: 'ave-maria' },
+      { text: 'Ave Maria, cheia de graça...', type: 'ave-maria' },
+      { text: 'Ave Maria, cheia de graça...', type: 'ave-maria' },
+      { text: 'Ave Maria, cheia de graça...', type: 'ave-maria' },
+      { text: 'Ave Maria, cheia de graça...', type: 'ave-maria' },
+      { text: 'Ave Maria, cheia de graça...', type: 'ave-maria' },
+      { text: 'Ave Maria, cheia de graça...', type: 'ave-maria' },
+      { text: 'Ave Maria, cheia de graça...', type: 'ave-maria' },
+      { text: 'Glória ao Pai, ao Filho e ao Espírito Santo...', type: 'gloria' },
+      { text: 'Ó meu Jesus, perdoai-nos...', type: 'fatima' },
+      { text: 'Salve Rainha, Mãe de Misericórdia...', type: 'salve-rainha' },
+      { text: 'Em nome do Pai, e do Filho, e do Espírito Santo. Amém.', type: 'sign' }
+    ]
+  }
+};
+
+// ==================== AUTH ====================
+function switchAuthTab(tab) {
+  document.querySelectorAll('.auth-tab').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('.auth-form').forEach(f => f.classList.remove('active'));
+  
+  if (tab === 'login') {
+    document.querySelectorAll('.auth-tab')[0].classList.add('active');
+    document.getElementById('loginForm').classList.add('active');
+  } else {
+    document.querySelectorAll('.auth-tab')[1].classList.add('active');
+    document.getElementById('registerForm').classList.add('active');
+  }
+}
+
+function handleLogin(e) {
+  e.preventDefault();
+  const email = document.getElementById('loginEmail').value;
+  const name = email.split('@')[0].replace(/[._]/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
+  loginUser(name, email);
+}
+
+function handleRegister(e) {
+  e.preventDefault();
+  const name = document.getElementById('regName').value;
+  const email = document.getElementById('regEmail').value;
+  loginUser(name, email);
+}
+
+function handleSSO(provider) {
+  loginUser('Usuário ' + provider.charAt(0).toUpperCase() + provider.slice(1), 'user@' + provider + '.com');
+}
+
+function loginUser(name, email) {
+  state.currentUser = { name, email, initials: name.split(' ').map(n => n[0]).join('').substring(0,2).toUpperCase() };
+  document.getElementById('authScreen').style.display = 'none';
+  document.getElementById('appContainer').classList.add('active');
+  updateUI();
+  showToast('Bem-vindo(a), ' + name.split(' ')[0] + '! 🙏');
+}
+
+function handleLogout() {
+  state.currentUser = null;
+  document.getElementById('authScreen').style.display = 'flex';
+  document.getElementById('appContainer').classList.remove('active');
+}
+
+// ==================== NAVIGATION ====================
+function navigate(page) {
+  state.currentPage = page;
+  
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  const targetPage = document.getElementById('page-' + page);
+  if (targetPage) targetPage.classList.add('active');
+  
+  document.querySelectorAll('.nav-item').forEach(n => {
+    n.classList.toggle('active', n.dataset.page === page);
+  });
+  
+  document.querySelectorAll('.mobile-nav-item').forEach(n => {
+    n.classList.toggle('active', n.dataset.page === page);
+  });
+}
+
+// ==================== UI UPDATE ====================
+function updateUI() {
+  if (!state.currentUser) return;
+  
+  const name = state.currentUser.name;
+  const initials = state.currentUser.initials;
+  const firstName = name.split(' ')[0];
+  
+  document.getElementById('sidebarName').textContent = name;
+  document.getElementById('sidebarAvatar').textContent = initials;
+  document.getElementById('dashUserName').textContent = firstName;
+  document.getElementById('profileName').textContent = name;
+  document.getElementById('profileAvatar').textContent = initials;
+  
+  // Set date
+  const now = new Date();
+  const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+  document.getElementById('dashDate').textContent = now.toLocaleDateString('pt-BR', options);
+  document.getElementById('liturgyDate').textContent = now.toLocaleDateString('pt-BR', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
+  
+  // Set daily mystery
+  setDailyMystery();
+  renderBeads();
+  renderCalendar();
+  renderDashEvents();
+}
+
+// ==================== ROSARY ====================
+function setDailyMystery() {
+  const day = new Date().getDay();
+  const mysteryMap = { 0: 'gloriosos', 1: 'gozosos', 2: 'dolorosos', 3: 'gloriosos', 4: 'luminosos', 5: 'dolorosos', 6: 'gozosos' };
+  state.rosary.currentMystery = mysteryMap[day];
+  updateMysteryDisplay();
+}
+
+function updateMysteryDisplay() {
+  const m = mysteries[state.rosary.currentMystery];
+  document.getElementById('mysteryName').textContent = m.name;
+  document.getElementById('mysteryDesc').textContent = m.days;
+}
+
+function selectMystery(type) {
+  state.rosary.currentMystery = type;
+  state.rosary.currentBead = 0;
+  state.rosary.completedBeads = [];
+  document.querySelectorAll('.mystery-btn').forEach(b => b.classList.remove('active'));
+  event.target.classList.add('active');
+  updateMysteryDisplay();
+  renderBeads();
+  updatePrayerText();
+  updateRosaryProgress();
+}
+
+function toggleMysteryOverride() {
+  const sel = document.getElementById('mysterySelector');
+  sel.style.display = sel.style.display === 'none' ? 'flex' : 'none';
+}
+
+function renderBeads() {
+  const prayers = mysteries[state.rosary.currentMystery].prayers;
+  const container = document.getElementById('beadVisual');
+  container.innerHTML = '';
+  
+  prayers.forEach((p, i) => {
+    const bead = document.createElement('div');
+    bead.className = 'bead';
+    if (state.rosary.completedBeads.includes(i)) bead.classList.add('completed');
+    if (i === state.rosary.currentBead && !state.rosary.completedBeads.includes(i)) bead.classList.add('current');
+    if (p.type === 'mystery') {
+      bead.style.width = '36px';
+      bead.style.height = '36px';
+    }
+    bead.onclick = () => {
+      state.rosary.currentBead = i;
+      renderBeads();
+      updatePrayerText();
+      updateRosaryProgress();
+    };
+    container.appendChild(bead);
+  });
+}
+
+function updatePrayerText() {
+  const prayers = mysteries[state.rosary.currentMystery].prayers;
+  if (state.rosary.currentBead < prayers.length) {
+    const el = document.getElementById('prayerText');
+    el.textContent = prayers[state.rosary.currentBead].text;
+    el.classList.add('highlight');
+    setTimeout(() => el.classList.remove('highlight'), 500);
+  }
+}
+
+function updateRosaryProgress() {
+  const prayers = mysteries[state.rosary.currentMystery].prayers;
+  document.getElementById('rosaryProgress').textContent = 
+    `${state.rosary.completedBeads.length} de ${prayers.length} orações`;
+}
+
+function advanceBead() {
+  const prayers = mysteries[state.rosary.currentMystery].prayers;
+  if (state.rosary.currentBead < prayers.length - 1) {
+    state.rosary.completedBeads.push(state.rosary.currentBead);
+    state.rosary.currentBead++;
+    renderBeads();
+    updatePrayerText();
+    updateRosaryProgress();
+    
+    if (state.rosary.completedBeads.length === prayers.length) {
+      showToast('🙏 Santo Rosário completado! Glória a Deus!');
+      incrementRosaryCount();
+    }
+  }
+}
+
+function toggleRosary() {
+  const btn = document.getElementById('rosaryStartBtn');
+  if (!state.rosary.active) {
+    state.rosary.active = true;
+    btn.innerHTML = '<i class="fas fa-pause"></i> Pausar';
+    btn.classList.remove('btn-primary');
+    btn.classList.add('btn-gold');
+    autoAdvanceRosary();
+  } else {
+    state.rosary.active = false;
+    btn.innerHTML = '<i class="fas fa-play"></i> Continuar';
+    btn.classList.remove('btn-gold');
+    btn.classList.add('btn-primary');
+  }
+}
+
+let rosaryInterval;
+function autoAdvanceRosary() {
+  clearInterval(rosaryInterval);
+  rosaryInterval = setInterval(() => {
+    if (state.rosary.active) {
+      const prayers = mysteries[state.rosary.currentMystery].prayers;
+      if (state.rosary.currentBead < prayers.length - 1) {
+        advanceBead();
+      } else {
+        clearInterval(rosaryInterval);
+        state.rosary.active = false;
+        document.getElementById('rosaryStartBtn').innerHTML = '<i class="fas fa-redo"></i> Recomeçar';
+      }
+    }
+  }, 4000);
+}
+
+function resetRosary() {
+  state.rosary.currentBead = 0;
+  state.rosary.completedBeads = [];
+  state.rosary.active = false;
+  clearInterval(rosaryInterval);
+  
+  const btn = document.getElementById('rosaryStartBtn');
+  btn.innerHTML = '<i class="fas fa-play"></i> Iniciar Terço';
+  btn.classList.remove('btn-gold');
+  btn.classList.add('btn-primary');
+  
+  renderBeads();
+  updatePrayerText();
+  updateRosaryProgress();
+  document.getElementById('prayerText').textContent = 'Toque no botão abaixo para começar o Santo Rosário';
+}
+
+function toggleAudioSync() {
+  const label = document.getElementById('audioSyncLabel');
+  if (label.textContent === 'Ouvir Áudio Guiado') {
+    label.textContent = 'Áudio Ativado';
+    showToast('🎧 Áudio guiado iniciado');
+  } else {
+    label.textContent = 'Ouvir Áudio Guiado';
+    showToast('Áudio pausado');
+  }
+}
+
+function incrementRosaryCount() {
+  const el = document.getElementById('rosaryCount');
+  el.textContent = parseInt(el.textContent) + 1;
+}
+
+// ==================== BIBLE ====================
+function switchBibleTab(tab, btn) {
+  if (btn) {
+    btn.parentElement.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+  }
+  document.getElementById('bibleReadTab').style.display = tab === 'read' ? 'block' : 'none';
+  document.getElementById('bibleListenTab').style.display = tab === 'listen' ? 'block' : 'none';
+}
+
+function markBibleRead() {
+  state.bible.read = true;
+  document.getElementById('markReadBtn').innerHTML = '<i class="fas fa-check"></i> Lido Hoje!';
+  document.getElementById('markReadBtn').classList.remove('btn-success');
+  document.getElementById('markReadBtn').classList.add('btn-secondary');
+  
+  const streak = document.getElementById('streakCount');
+  const profileStreak = document.getElementById('profileStreak');
+  const newStreak = parseInt(streak.textContent) + 1;
+  streak.textContent = newStreak;
+  profileStreak.textContent = newStreak;
+  
+  showToast('📖 Leitura marcada! Ofensiva: ' + newStreak + ' dias 🔥');
+}
+
+function prevBibleDay() {
+  if (state.bible.currentDay > 1) {
+    state.bible.currentDay--;
+    updateBibleDay();
+  }
+}
+
+function nextBibleDay() {
+  if (state.bible.currentDay < 365) {
+    state.bible.currentDay++;
+    updateBibleDay();
+  }
+}
+
+function updateBibleDay() {
+  document.getElementById('currentBibleDay').textContent = state.bible.currentDay;
+  const percent = ((state.bible.currentDay / 365) * 100).toFixed(1);
+  document.getElementById('biblePercent').textContent = percent + '%';
+  document.getElementById('bibleProgressFill').style.width = percent + '%';
+  document.getElementById('bibleDayNum').textContent = state.bible.currentDay;
+  state.bible.read = false;
+  document.getElementById('markReadBtn').innerHTML = '<i class="fas fa-check-circle"></i> Marcar como Lido';
+  document.getElementById('markReadBtn').classList.remove('btn-secondary');
+  document.getElementById('markReadBtn').classList.add('btn-success');
+}
+
+let bibleAudioInterval;
+function toggleBibleAudio() {
+  const btn = document.getElementById('biblePlayBtn');
+  const icon = btn.querySelector('i');
+  
+  if (state.bible.audioPlaying) {
+    state.bible.audioPlaying = false;
+    clearInterval(bibleAudioInterval);
+    icon.className = 'fas fa-play';
+  } else {
+    state.bible.audioPlaying = true;
+    icon.className = 'fas fa-pause';
+    bibleAudioInterval = setInterval(() => {
+      state.bible.audioProgress += 0.5;
+      if (state.bible.audioProgress >= 100) {
+        state.bible.audioProgress = 0;
+        state.bible.audioPlaying = false;
+        clearInterval(bibleAudioInterval);
+        icon.className = 'fas fa-play';
+        showToast('🎧 Áudio concluído');
+      }
+      document.getElementById('bibleAudioProgress').style.width = state.bible.audioProgress + '%';
+      
+      const elapsed = Math.floor((state.bible.audioProgress / 100) * 272);
+      const min = Math.floor(elapsed / 60);
+      const sec = (elapsed % 60).toString().padStart(2, '0');
+      document.getElementById('bibleAudioTime').textContent = min + ':' + sec + ' / 4:32';
+    }, 500);
+  }
+}
+
+// ==================== MINISTRIES ====================
+function selectMinistryType(btn, type) {
+  document.querySelectorAll('.ministry-type-option').forEach(b => b.classList.remove('selected'));
+  btn.classList.add('selected');
+  document.getElementById('selectedMinistryType').value = type;
+}
+
+function selectMinistry(index) {
+  const m = state.ministries[index];
+  document.getElementById('myMinistriesList').style.display = 'none';
+  document.getElementById('ministryDetailCard').style.display = 'block';
+  document.getElementById('ministryDetailName').textContent = m.name;
+}
+
+function closeMinistryDetail() {
+  document.getElementById('ministryDetailCard').style.display = 'none';
+  document.getElementById('myMinistriesList').style.display = 'block';
+}
+
+function openModal(id) {
+  document.getElementById(id).classList.add('active');
+}
+
+function closeModal(id) {
+  document.getElementById(id).classList.remove('active');
+}
+
+function createMinistry(e) {
+  e.preventDefault();
+  const name = document.getElementById('ministryName').value;
+  const parish = document.getElementById('ministryParish').value;
+  const type = document.getElementById('selectedMinistryType').value || 'other';
+  
+  state.ministries.push({ name, parish, type, members: 1 });
+  showToast('✅ Ministério "' + name + '" criado com sucesso!');
+  
+  document.getElementById('ministryName').value = '';
+  document.getElementById('ministryParish').value = '';
+  document.getElementById('ministryDesc').value = '';
+  document.querySelectorAll('.ministry-type-option').forEach(b => b.classList.remove('selected'));
+  document.getElementById('selectedMinistryType').value = '';
+}
+
+function createMinistryModal(e) {
+  e.preventDefault();
+  const name = document.getElementById('modalMinistryName').value;
+  const parish = document.getElementById('modalMinistryParish').value;
+  const type = document.getElementById('modalMinistryType').value;
+  
+  state.ministries.push({ name, parish, type, members: 1 });
+  closeModal('createMinistryModal');
+  showToast('✅ Ministério "' + name + '" criado com sucesso!');
+  
+  document.getElementById('modalMinistryName').value = '';
+  document.getElementById('modalMinistryParish').value = '';
+  document.getElementById('modalMinistryDesc').value = '';
+}
+
+function approveMember(btn) {
+  const item = btn.closest('.approval-item');
+  const name = item.querySelector('h5').textContent;
+  item.style.background = 'rgba(39,174,96,0.1)';
+  item.style.borderRadius = '8px';
+  setTimeout(() => {
+    item.remove();
+    showToast('✅ ' + name + ' aprovado(a) como membro!');
+  }, 500);
+}
+
+function rejectMember(btn) {
+  const item = btn.closest('.approval-item');
+  const name = item.querySelector('h5').textContent;
+  item.style.background = 'rgba(231,76,60,0.1)';
+  item.style.borderRadius = '8px';
+  setTimeout(() => {
+    item.remove();
+    showToast('❌ Solicitação de ' + name + ' rejeitada');
+  }, 500);
+}
+
+function copyInviteLink() {
+  const input = document.getElementById('inviteLink');
+  input.select();
+  document.execCommand('copy');
+  showToast('📋 Link de convite copiado!');
+}
+
+// ==================== FEED ====================
+let isPrayerTag = false;
+
+function addPrayerTag() {
+  isPrayerTag = !isPrayerTag;
+  const btn = event.target.closest('.prayer-request-btn');
+  if (isPrayerTag) {
+    btn.style.background = 'var(--gold)';
+    btn.style.color = 'white';
+    document.getElementById('postInput').placeholder = '🙏 Compartilhe seu pedido de oração...';
+  } else {
+    btn.style.background = 'rgba(212,160,23,0.1)';
+    btn.style.color = 'var(--gold)';
+    document.getElementById('postInput').placeholder = 'O que está acontecendo no seu ministério?';
+  }
+}
+
+function createPost() {
+  const input = document.getElementById('postInput');
+  const content = input.value.trim();
+  if (!content) return;
+  
+  const feedPosts = document.getElementById('feedPosts');
+  const post = document.createElement('div');
+  post.className = 'feed-post';
+  
+  const now = new Date();
+  const timeStr = 'agora mesmo';
+  
+  if (isPrayerTag) {
+    post.dataset.type = 'prayer';
+    post.innerHTML = `
+      <div class="post-header">
+        <div class="avatar" style="width:40px;height:40px;font-size:14px;">MS</div>
+        <div class="post-meta">
+          <h4>Maria Silva</h4>
+          <span>${timeStr}</span>
+        </div>
+      </div>
+      <div class="post-content prayer-request">
+        🙏 <strong>Pedido de Oração</strong><br><br>${content.replace(/\n/g, '<br>')}
+      </div>
+      <div class="post-actions">
+        <button class="post-action prayed" onclick="prayFor(this)"><i class="fas fa-hands-praying"></i> <span>Eu rezei · 1</span></button>
+        <button class="post-action" onclick="toggleThread(this)"><i class="far fa-comment"></i> <span>0</span></button>
+      </div>
+      <div class="post-thread">
+        <div class="reply-input-row">
+          <input type="text" placeholder="Escreva uma resposta...">
+          <button onclick="addReply(this)">Responder</button>
+        </div>
+      </div>
+    `;
+  } else {
+    post.dataset.type = 'normal';
+    post.innerHTML = `
+      <div class="post-header">
+        <div class="avatar" style="width:40px;height:40px;font-size:14px;">MS</div>
+        <div class="post-meta">
+          <h4>Maria Silva</h4>
+          <span>${timeStr}</span>
+        </div>
+      </div>
+      <div class="post-content">${content.replace(/\n/g, '<br>')}</div>
+      <div class="post-actions">
+        <button class="post-action" onclick="likePost(this)"><i class="far fa-heart"></i> <span>0</span></button>
+        <button class="post-action" onclick="toggleThread(this)"><i class="far fa-comment"></i> <span>0</span></button>
+        <button class="post-action" onclick="repostPost(this)"><i class="fas fa-retweet"></i> <span>0</span></button>
+      </div>
+      <div class="post-thread">
+        <div class="reply-input-row">
+          <input type="text" placeholder="Escreva uma resposta...">
+          <button onclick="addReply(this)">Responder</button>
+        </div>
+      </div>
+    `;
+  }
+  
+  feedPosts.insertBefore(post, feedPosts.firstChild);
+  input.value = '';
+  isPrayerTag = false;
+  document.getElementById('postInput').placeholder = 'O que está acontecendo no seu ministério?';
+  document.querySelector('.prayer-request-btn').style.background = 'rgba(212,160,23,0.1)';
+  document.querySelector('.prayer-request-btn').style.color = 'var(--gold)';
+  
+  showToast('✅ Postagem publicada!');
+}
+
+function likePost(btn) {
+  const icon = btn.querySelector('i');
+  const count = btn.querySelector('span');
+  
+  if (btn.classList.contains('liked')) {
+    btn.classList.remove('liked');
+    icon.className = 'far fa-heart';
+    count.textContent = parseInt(count.textContent) - 1;
+  } else {
+    btn.classList.add('liked');
+    icon.className = 'fas fa-heart';
+    count.textContent = parseInt(count.textContent) + 1;
+    
+    if (navigator.vibrate) navigator.vibrate(50);
+  }
+}
+
+function repostPost(btn) {
+  const icon = btn.querySelector('i');
+  const count = btn.querySelector('span');
+  
+  if (btn.classList.contains('reposted')) {
+    btn.classList.remove('reposted');
+    icon.className = 'fas fa-retweet';
+    count.textContent = parseInt(count.textContent) - 1;
+  } else {
+    btn.classList.add('reposted');
+    count.textContent = parseInt(count.textContent) + 1;
+    showToast('🔄 Compartilhado no seu perfil!');
+  }
+}
+
+function prayFor(btn) {
+  const span = btn.querySelector('span');
+  const parts = span.textContent.split(' · ');
+  const count = parseInt(parts[1]) + 1;
+  span.textContent = 'Eu rezei · ' + count;
+  showToast('🙏 Você rezou por esta intenção');
+}
+
+function filterFeedTab(btn, type) {
+  btn.parentElement.querySelectorAll('.feed-header-tab').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  
+  const posts = document.querySelectorAll('.feed-post');
+  posts.forEach(p => {
+    if (type === 'all') {
+      p.style.display = 'block';
+    } else {
+      p.style.display = p.dataset.type === type ? 'block' : 'none';
+    }
+  });
+}
+
+function selectFeedMinistry(btn) {
+  document.querySelectorAll('.feed-ministry-chip').forEach(c => c.classList.remove('active'));
+  btn.classList.add('active');
+}
+
+function toggleThread(btn) {
+  const post = btn.closest('.feed-post');
+  const thread = post.querySelector('.post-thread');
+  thread.classList.toggle('open');
+}
+
+function addReply(btn) {
+  const input = btn.parentElement.querySelector('input');
+  const content = input.value.trim();
+  if (!content) return;
+  
+  const thread = btn.closest('.post-thread');
+  const replyItem = document.createElement('div');
+  replyItem.className = 'reply-item';
+  replyItem.innerHTML = `
+    <div class="reply-avatar" style="background:linear-gradient(135deg,#5B2C6F,#7D3C98);">MS</div>
+    <div class="reply-content">
+      <h5>Maria Silva <span>· agora</span></h5>
+      <p>${content}</p>
+    </div>
+  `;
+  thread.insertBefore(replyItem, thread.querySelector('.reply-input-row'));
+  input.value = '';
+  showToast('💬 Resposta publicada!');
+}
+
+// ==================== SCHEDULE ====================
+function renderCalendar() {
+  const cal = document.getElementById('scheduleCalendar');
+  cal.innerHTML = '';
+  
+  const days = ['Dom', 'Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb'];
+  days.forEach(d => {
+    cal.innerHTML += `<div class="calendar-day-header">${d}</div>`;
+  });
+  
+  const now = new Date();
+  const firstDay = new Date(state.scheduleYear, state.scheduleMonth, 1).getDay();
+  const daysInMonth = new Date(state.scheduleYear, state.scheduleMonth + 1, 0).getDate();
+  
+  const monthNames = ['Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho', 'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro'];
+  document.querySelector('.schedule-calendar').previousElementSibling.querySelector('h3').innerHTML = `<i class="fas fa-calendar-alt" style="color:var(--primary);"></i> ${monthNames[state.scheduleMonth]} ${state.scheduleYear}`;
+  
+  const eventDays = [5, 12, 16, 19, 26];
+  
+  for (let i = 0; i < firstDay; i++) {
+    cal.innerHTML += '<div class="calendar-day other-month"></div>';
+  }
+  
+  for (let d = 1; d <= daysInMonth; d++) {
+    const isToday = d === now.getDate() && state.scheduleMonth === now.getMonth();
+    const hasEvent = eventDays.includes(d);
+    cal.innerHTML += `<div class="calendar-day${isToday ? ' today' : ''}${hasEvent ? ' has-event' : ''}" onclick="selectCalendarDay(${d})">${d}</div>`;
+  }
+}
+
+function selectCalendarDay(day) {
+  document.querySelectorAll('.calendar-day').forEach(d => d.classList.remove('selected'));
+  event.target.classList.add('selected');
+  showToast('📅 Dia ' + day + ' selecionado');
+}
+
+function renderDashEvents() {
+  const container = document.getElementById('dashEvents');
+  container.innerHTML = `
+    <div class="event-card">
+      <div class="event-card-header">
+        <h4>🎵 Ensaio - Ministério de Música</h4>
+        <span class="event-time">Sáb, 11 Abr · 15h</span>
+      </div>
+      <div style="display:flex; gap:6px;">
+        <div class="position-slot filled">MS</div>
+        <div class="position-slot filled">CF</div>
+        <div class="position-slot filled">AC</div>
+      </div>
+    </div>
+    <div class="event-card">
+      <div class="event-card-header">
+        <h4>📖 Missa Dominical - Leitor</h4>
+        <span class="event-time">Dom, 12 Abr · 19h</span>
+      </div>
+      <div style="display:flex; gap:6px;">
+        <div class="position-slot my-slot">MS</div>
+        <div class="position-slot available" onclick="claimSlot(this)">+</div>
+      </div>
+    </div>
+  `;
+}
+
+function claimSlot(slot) {
+  const user = state.currentUser?.initials || 'MS';
+  slot.textContent = user;
+  slot.classList.remove('available');
+  slot.classList.add('my-slot');
+  slot.setAttribute('title', 'Clique para desocupar');
+  slot.onclick = function() { dropSlot(this); };
+  
+  const count = document.getElementById('scheduleCount');
+  count.textContent = parseInt(count.textContent) + 1;
+  
+  showToast('✅ Vaga assumida com sucesso!');
+  
+  setTimeout(() => {
+    showToast('ℹ️ Verificação de conflitos: sem conflitos detectados');
+  }, 1500);
+}
+
+function dropSlot(slot) {
+  slot.textContent = '+';
+  slot.classList.remove('my-slot');
+  slot.classList.add('available');
+  slot.setAttribute('title', 'Vaga disponível — clique para assumir');
+  slot.onclick = function() { claimSlot(this); };
+  
+  const count = document.getElementById('scheduleCount');
+  count.textContent = Math.max(0, parseInt(count.textContent) - 1);
+  
+  showToast('⚠️ Vaga liberada. Notificando outros membros...');
+}
+
+function createEvent(e) {
+  e.preventDefault();
+  const title = document.getElementById('eventTitle').value;
+  const date = document.getElementById('eventDate').value;
+  const time = document.getElementById('eventTime').value;
+  
+  closeModal('createEventModal');
+  showToast('✅ Evento "' + title + '" criado para ' + date + ' às ' + time + '!');
+  
+  document.getElementById('eventTitle').value = '';
+  document.getElementById('eventDate').value = '';
+  document.getElementById('eventTime').value = '';
+}
+
+function loadTemplate(templateName) {
+  const container = document.getElementById('positionFields');
+  
+  const templates = {
+    missa: [
+      { title: 'Comentarista', cap: 2 },
+      { title: 'Leitor', cap: 3 },
+      { title: 'Recepção', cap: 5 }
+    ],
+    adoracao: [
+      { title: 'Ministro da Eucaristia', cap: 2 },
+      { title: 'Leitor', cap: 2 }
+    ],
+    ensaio: [
+      { title: 'Vocal', cap: 4 },
+      { title: 'Instrumento', cap: 6 }
+    ]
+  };
+  
+  if (templates[templateName]) {
+    container.innerHTML = templates[templateName].map(t => `
+      <div class="position-field" style="display:flex; gap:8px; margin-bottom:8px;">
+        <input type="text" placeholder="Cargo" class="pos-title" style="flex:1;" value="${t.title}">
+        <input type="number" placeholder="Vagas" class="pos-capacity" style="width:70px;" value="${t.cap}" min="1">
+      </div>
+    `).join('');
+    showToast('📋 Template "' + templateName + '" carregado!');
+  }
+}
+
+function addPositionField() {
+  const container = document.getElementById('positionFields');
+  const div = document.createElement('div');
+  div.className = 'position-field';
+  div.style.cssText = 'display:flex; gap:8px; margin-bottom:8px;';
+  div.innerHTML = `
+    <input type="text" placeholder="Cargo" class="pos-title" style="flex:1;">
+    <input type="number" placeholder="Vagas" class="pos-capacity" style="width:70px;" value="1" min="1">
+  `;
+  container.appendChild(div);
+}
+
+// ==================== PRAYERS ====================
+function postPrayer() {
+  const input = document.getElementById('prayerInput');
+  const content = input.value.trim();
+  if (!content) return;
+  
+  const wall = document.getElementById('prayerWall');
+  const card = document.createElement('div');
+  card.className = 'prayer-card';
+  card.innerHTML = `
+    <button class="pray-btn" onclick="prayOnWall(this)">
+      <i class="fas fa-hands-praying"></i>
+      <span>1</span>
+    </button>
+    <div class="prayer-content">
+      <h4>Pedido de Oração</h4>
+      <p>${content.replace(/\n/g, '<br>')}</p>
+      <div class="prayer-meta">Maria Silva · agora mesmo</div>
+    </div>
+  `;
+  wall.insertBefore(card, wall.firstChild);
+  input.value = '';
+  showToast('🙏 Pedido de oração publicado');
+}
+
+function prayOnWall(btn) {
+  const countEl = btn.querySelector('span');
+  let count = parseInt(countEl.textContent);
+  
+  if (btn.classList.contains('prayed')) {
+    btn.classList.remove('prayed');
+    count--;
+  } else {
+    btn.classList.add('prayed');
+    count++;
+    showToast('🙏 Você rezou por esta intenção');
+  }
+  countEl.textContent = count;
+}
+
+// ==================== PROFILE ====================
+function saveProfile(e) {
+  e.preventDefault();
+  const name = document.getElementById('editName').value;
+  state.currentUser.name = name;
+  state.currentUser.initials = name.split(' ').map(n => n[0]).join('').substring(0,2).toUpperCase();
+  updateUI();
+  closeModal('editProfileModal');
+  showToast('✅ Perfil atualizado com sucesso!');
+}
+
+// ==================== THEME ====================
+function toggleDarkMode() {
+  document.body.classList.toggle('dark');
+  const isDark = document.body.classList.contains('dark');
+  showToast(isDark ? '🌙 Modo escuro ativado' : '☀️ Modo claro ativado');
+}
+
+// ==================== TOAST ====================
+function showToast(msg) {
+  const toast = document.getElementById('toast');
+  document.getElementById('toastMsg').textContent = msg;
+  toast.classList.add('show');
+  setTimeout(() => toast.classList.remove('show'), 3000);
+}
+
+// ==================== INIT ====================
+document.addEventListener('DOMContentLoaded', () => {
+  if (localStorage.getItem('darkMode') === 'true') {
+    document.body.classList.add('dark');
+  }
+});
+
+document.querySelectorAll('.modal-overlay').forEach(overlay => {
+  overlay.addEventListener('click', (e) => {
+    if (e.target === overlay) overlay.classList.remove('active');
+  });
+});
+</script>
+</body>
+</html>
+
+

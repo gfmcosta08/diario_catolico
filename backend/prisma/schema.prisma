@@ -1,0 +1,172 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum MembershipRole {
+  owner
+  sub_admin
+  member
+}
+
+enum JoinRequestStatus {
+  pending
+  approved
+  rejected
+}
+
+model User {
+  id           String   @id @default(uuid())
+  email        String   @unique
+  passwordHash String
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  profile               Profile?
+  bibleProgress         BibleReadingProgress[]
+  rosaryProgress        RosaryProgress[]
+  ownedMinistries       Ministry[]              @relation("MinistryOwner")
+  memberships           MinistryMember[]
+  joinRequests          MinistryJoinRequest[]
+  posts                 MinistryPost[]
+  eventAssignments      MinistryEventAssignment[]
+  passwordResetTokens   PasswordResetToken[]
+}
+
+model Profile {
+  id          String   @id
+  displayName String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  user User @relation(fields: [id], references: [id], onDelete: Cascade)
+}
+
+model BibleReadingProgress {
+  id          String   @id @default(uuid())
+  userId      String
+  dayIndex    Int
+  completedAt DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, dayIndex])
+}
+
+model RosaryProgress {
+  id        String   @id @default(uuid())
+  userId    String
+  mode      String
+  payload   Json
+  updatedAt DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, mode])
+}
+
+model Ministry {
+  id          String   @id @default(uuid())
+  slug        String   @unique
+  name        String
+  description String?
+  createdBy   String
+  createdAt   DateTime @default(now())
+
+  owner        User                   @relation("MinistryOwner", fields: [createdBy], references: [id], onDelete: Cascade)
+  members      MinistryMember[]
+  joinRequests MinistryJoinRequest[]
+  posts        MinistryPost[]
+  events       MinistryEvent[]
+}
+
+model MinistryMember {
+  id         String         @id @default(uuid())
+  ministryId String
+  userId     String
+  role       MembershipRole @default(member)
+  createdAt  DateTime       @default(now())
+
+  ministry Ministry @relation(fields: [ministryId], references: [id], onDelete: Cascade)
+  user     User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([ministryId, userId])
+}
+
+model MinistryJoinRequest {
+  id         String            @id @default(uuid())
+  ministryId String
+  userId     String
+  status     JoinRequestStatus @default(pending)
+  createdAt  DateTime          @default(now())
+
+  ministry Ministry @relation(fields: [ministryId], references: [id], onDelete: Cascade)
+  user     User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([ministryId, userId])
+}
+
+model MinistryPost {
+  id         String   @id @default(uuid())
+  ministryId String
+  authorId   String
+  content    String
+  parentId   String?
+  createdAt  DateTime @default(now())
+
+  ministry Ministry      @relation(fields: [ministryId], references: [id], onDelete: Cascade)
+  author   User          @relation(fields: [authorId], references: [id], onDelete: Cascade)
+  parent   MinistryPost? @relation("PostReplies", fields: [parentId], references: [id], onDelete: Cascade)
+  replies  MinistryPost[] @relation("PostReplies")
+}
+
+model MinistryEvent {
+  id         String   @id @default(uuid())
+  ministryId String
+  title      String
+  startsAt   DateTime
+  notes      String?
+  createdBy  String
+  createdAt  DateTime @default(now())
+
+  ministry    Ministry               @relation(fields: [ministryId], references: [id], onDelete: Cascade)
+  roles       MinistryEventRole[]
+}
+
+model MinistryEventRole {
+  id        String   @id @default(uuid())
+  eventId   String
+  title     String
+  capacity  Int
+  createdAt DateTime @default(now())
+
+  event       MinistryEvent            @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  assignments MinistryEventAssignment[]
+}
+
+model MinistryEventAssignment {
+  id        String   @id @default(uuid())
+  roleId    String
+  userId    String
+  createdAt DateTime @default(now())
+
+  role MinistryEventRole @relation(fields: [roleId], references: [id], onDelete: Cascade)
+  user User              @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([roleId, userId])
+}
+
+model PasswordResetToken {
+  id         String   @id @default(uuid())
+  userId     String
+  tokenHash  String   @unique
+  expiresAt  DateTime
+  usedAt     DateTime?
+  createdAt  DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
