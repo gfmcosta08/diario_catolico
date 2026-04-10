@@ -1,7 +1,9 @@
-﻿const runningOnRender =
-  Boolean(process.env.RENDER) ||
-  Boolean(process.env.RENDER_SERVICE_ID) ||
-  (Boolean(process.env.DATABASE_URL) && Boolean(process.env.PORT));
+﻿const isServerRuntime = typeof window === 'undefined';
+const runningOnRender =
+  isServerRuntime &&
+  (Boolean(process.env.RENDER) ||
+    Boolean(process.env.RENDER_SERVICE_ID) ||
+    (Boolean(process.env.DATABASE_URL) && Boolean(process.env.PORT)));
 
 async function start() {
   if (runningOnRender) {
@@ -47,4 +49,7 @@ async function start() {
   await import('expo-router/entry');
 }
 
-start();
+start().catch((error) => {
+  console.error(error);
+  process.exit?.(1);
+});
