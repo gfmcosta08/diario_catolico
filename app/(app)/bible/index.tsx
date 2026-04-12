@@ -1,235 +1,202 @@
-import { useBibleProgressMap } from '@/hooks/useBibleProgress';
-import { palette, spacing, touchMin } from '@/constants/theme';
-import { Link } from 'expo-router';
-import { useMemo, useState } from 'react';
-import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
+import React, { useState, useEffect } from 'react';
+import { View, Text, StyleSheet, ScrollView, Pressable, Platform } from 'react-native';
+import { palette, spacing, radii, typography } from '@/constants/theme';
+import { FontAwesome5 } from '@expo/vector-icons';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { api } from '@/lib/api';
+import { useAuth } from '@/context/AuthContext';
 
-export const options = { title: 'Leia a Bíblia em 365 dias' };
+export const options = { title: 'Bíblia', headerShown: false };
 
-const COLS = 7;
-const TOTAL_DAYS = 365;
-const WEEKLY_GOAL = 7;
+export default function BibleScreen() {
+  const insets = useSafeAreaInsets();
+  const { configured, session } = useAuth();
+  const [completedDays, setCompletedDays] = useState<number[]>([]);
+  const [audioPlaying, setAudioPlaying] = useState(false);
+  const currentDay = 1; // Fixo no 1 para o escopo desta versão
 
-type FilterMode = 'all' | 'pending' | 'done' | 'today';
-
-export default function BiblePlanScreen() {
-  const { hydrated, completedCount, completedDays, isDayDone } = useBibleProgressMap();
-  const [filter, setFilter] = useState<FilterMode>('all');
-
-  if (!hydrated) {
-    return (
-      <View style={styles.center}>
-        <Text allowFontScaling>Carregando…</Text>
-      </View>
-    );
-  }
-
-  const percentage = Math.round((completedCount / TOTAL_DAYS) * 100);
-  const dayOfYear = useMemo(() => {
-    const start = new Date(new Date().getFullYear(), 0, 1);
-    const today = new Date();
-    const diff = today.getTime() - start.getTime();
-    return Math.max(1, Math.min(TOTAL_DAYS, Math.floor(diff / 86400000) + 1));
-  }, []);
-
-  const weeklyProgress = Math.min(WEEKLY_GOAL, completedDays.filter((d) => d >= dayOfYear - 6).length);
-  const visibleDays = useMemo(() => {
-    switch (filter) {
-      case 'done':
-        return Array.from({ length: TOTAL_DAYS }, (_, i) => i + 1).filter((d) => isDayDone(d));
-      case 'pending':
-        return Array.from({ length: TOTAL_DAYS }, (_, i) => i + 1).filter((d) => !isDayDone(d));
-      case 'today':
-        return [dayOfYear];
-      default:
-        return Array.from({ length: TOTAL_DAYS }, (_, i) => i + 1);
+  useEffect(() => {
+    if (configured && session) {
+      api.getBibleProgress().then(res => setCompletedDays(res.checkedDays || [])).catch(console.error);
     }
-  }, [dayOfYear, filter, isDayDone]);
+  }, [configured, session]);
 
-  const rows: number[][] = [];
-  for (let r = 0; r < Math.ceil(visibleDays.length / COLS); r++) {
-    rows.push(
-      visibleDays.slice(r * COLS, r * COLS + COLS)
-    );
-  }
+  const toggleDayCompletion = async () => {
+    const isDone = completedDays.includes(currentDay);
+    if (!isDone) {
+      setCompletedDays([...completedDays, currentDay]);
+      if (configured && session) await api.toggleBibleDay(currentDay, true);
+    } else {
+      setCompletedDays(completedDays.filter(d => d !== currentDay));
+      if (configured && session) await api.toggleBibleDay(currentDay, false);
+    }
+  };
+
+  const isCompleted = completedDays.includes(currentDay);
 
   return (
-    <ScrollView contentContainerStyle={styles.container}>
-      <Text style={styles.head} allowFontScaling>
-        Leia a Bíblia em 365 dias
-      </Text>
-      <View style={styles.progressRow}>
-        <View style={styles.progressBar}>
-          <View
-            style={[
-              styles.progressFill,
-              { width: `${(completedCount / TOTAL_DAYS) * 100}%` },
-            ]}
-          />
-        </View>
-        <Text style={styles.progressTxt} allowFontScaling>
-          {completedCount} de {TOTAL_DAYS} dias concluídos ({percentage}%)
-        </Text>
-        <Text style={styles.metaTxt} allowFontScaling>
-          Meta semanal: {weeklyProgress}/{WEEKLY_GOAL} dias
-        </Text>
-      </View>
-      <View style={styles.filters}>
-        <FilterButton title="Todos" active={filter === 'all'} onPress={() => setFilter('all')} />
-        <FilterButton title="Não lidos" active={filter === 'pending'} onPress={() => setFilter('pending')} />
-        <FilterButton title="Lidos" active={filter === 'done'} onPress={() => setFilter('done')} />
-        <FilterButton title="Hoje" active={filter === 'today'} onPress={() => setFilter('today')} />
-      </View>
-      <Text style={styles.sub} allowFontScaling>
-        Toque no dia para ler e marcar. Dias anteriores permanecem acessíveis.
-      </Text>
-      {visibleDays.length === 0 ? (
-        <Text style={styles.emptyState} allowFontScaling>
-          Nenhum dia encontrado para este filtro.
-        </Text>
-      ) : null}
-      {rows.map((row, ri) => (
-        <View key={ri} style={styles.row}>
-          {row.map((day) => {
-            const done = isDayDone(day);
-            return (
-              <Link key={day} href={`/(app)/bible/${day}`} asChild>
-                <Pressable
-                  accessibilityRole="button"
-                  accessibilityLabel={`Dia ${day}${done ? ', concluído' : ''}`}
-                  style={[styles.cell, done && styles.cellDone]}
-                >
-                  <Text
-                    style={[styles.cellTxt, done && styles.cellTxtDone]}
-                    allowFontScaling
-                  >
-                    {day}
-                  </Text>
-                </Pressable>
-              </Link>
-            );
-          })}
-        </View>
-      ))}
-    </ScrollView>
-  );
-}
+    <View style={styles.root}>
+      <ScrollView 
+        showsVerticalScrollIndicator={false}
+        contentContainerStyle={[
+          styles.container,
+          {
+            paddingTop: Math.max(insets.top, spacing.xl),
+            paddingBottom: Math.max(insets.bottom, spacing.xl * 2),
+          }
+        ]}
+      >
+        <Text style={styles.pageTitle}>Bíblia 365</Text>
+        <Text style={styles.pageSubtitle}>Leitura de Hoje — Dia {currentDay}</Text>
 
-function FilterButton({
-  title,
-  active,
-  onPress,
-}: {
-  title: string;
-  active: boolean;
-  onPress: () => void;
-}) {
-  return (
-    <Pressable style={[styles.filterBtn, active && styles.filterBtnActive]} onPress={onPress}>
-      <Text style={[styles.filterTxt, active && styles.filterTxtActive]} allowFontScaling>
-        {title}
-      </Text>
-    </Pressable>
+        <View style={styles.audioPlayer}>
+          <Pressable 
+            style={styles.playBtn} 
+            onPress={() => setAudioPlaying(!audioPlaying)}
+          >
+            <FontAwesome5 name={audioPlaying ? "pause" : "play"} size={20} color={palette.surface} />
+          </Pressable>
+          <View style={styles.audioInfo}>
+            <Text style={styles.audioTitle}>Ouvir a Leitura do Dia 1</Text>
+            <Text style={styles.audioTime}>{audioPlaying ? "Tocando... 1:04 / 15:30" : "15:30"}</Text>
+          </View>
+        </View>
+
+        <View style={styles.readingCard}>
+          <View style={styles.readingHeader}>
+            <Text style={styles.badgeLabel}>ANTIGO TESTAMENTO</Text>
+            <Text style={styles.chapterTitle}>Gênesis 1 a 3</Text>
+          </View>
+          <Text style={styles.verseText}>
+            <Text style={styles.verseNum}>1 </Text>No princípio Deus criou os céus e a terra. 
+            <Text style={styles.verseNum}> 2 </Text>A terra, porém, estava sem forma e vazia; 
+            havia trevas sobre a face do abismo, e o Espírito de Deus pairava por sobre as águas.
+            {"\n\n"}[...]
+          </Text>
+        </View>
+
+        <View style={styles.readingCard}>
+          <View style={styles.readingHeader}>
+            <Text style={styles.badgeLabel}>SALMO</Text>
+            <Text style={styles.chapterTitle}>Salmo 1</Text>
+          </View>
+          <Text style={styles.verseText}>
+            <Text style={styles.verseNum}>1 </Text>Bem-aventurado o homem que não anda no conselho dos ímpios, não se detém no caminho dos pecadores, nem se assenta na roda dos escarnecedores.
+            {"\n\n"}[...]
+          </Text>
+        </View>
+
+        <View style={styles.readingCard}>
+          <View style={styles.readingHeader}>
+            <Text style={styles.badgeLabel}>NOVO TESTAMENTO</Text>
+            <Text style={styles.chapterTitle}>Mateus 1</Text>
+          </View>
+          <Text style={styles.verseText}>
+            <Text style={styles.verseNum}>1 </Text>Livro da genealogia de Jesus Cristo, filho de Davi, filho de Abraão.
+            {"\n\n"}[...]
+          </Text>
+        </View>
+
+        <Pressable 
+          style={[styles.finishBtn, isCompleted && styles.finishBtnDone]} 
+          onPress={toggleDayCompletion}
+        >
+          <FontAwesome5 name={isCompleted ? "check-circle" : "circle"} size={20} color={palette.surface} />
+          <Text style={styles.finishBtnText}>
+            {isCompleted ? "Leitura Concluída!" : "Marcar Dia como Concluído"}
+          </Text>
+        </Pressable>
+
+      </ScrollView>
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
-  container: {
-    padding: spacing.lg,
-    paddingBottom: 80,
-    backgroundColor: palette.background,
-  },
-  center: {
-    flex: 1,
-    justifyContent: 'center',
+  root: { flex: 1, backgroundColor: palette.background },
+  container: { paddingHorizontal: spacing.xl, maxWidth: 920, alignSelf: 'center', width: '100%' },
+  pageTitle: { fontSize: 26, fontWeight: '700', color: palette.primary, marginBottom: 4, fontFamily: typography.fonts.heading },
+  pageSubtitle: { fontSize: 16, color: palette.textSecondary, marginBottom: spacing.xl, fontFamily: typography.fonts.body },
+  
+  audioPlayer: {
+    backgroundColor: palette.surface,
+    borderRadius: radii.md,
+    padding: spacing.md,
+    flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: palette.background,
+    gap: spacing.md,
+    borderWidth: 1,
+    borderColor: palette.border,
+    marginBottom: spacing.xl,
   },
-  head: {
-    fontSize: 22,
-    fontWeight: '800',
-    color: palette.text,
+  playBtn: {
+    width: 48,
+    height: 48,
+    borderRadius: 24,
+    backgroundColor: palette.primary,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  audioInfo: {
+    flex: 1,
+  },
+  audioTitle: { fontSize: 16, fontWeight: '600', color: palette.text },
+  audioTime: { fontSize: 14, color: palette.textSecondary, marginTop: 2 },
+
+  readingCard: {
+    backgroundColor: palette.surface,
+    padding: spacing.xl,
+    borderRadius: radii.lg,
+    marginBottom: spacing.lg,
+    borderWidth: 1,
+    borderColor: palette.border,
+  },
+  readingHeader: {
     marginBottom: spacing.md,
+    borderBottomWidth: 1,
+    borderBottomColor: palette.border,
+    paddingBottom: spacing.sm,
   },
-  progressRow: { marginBottom: spacing.md },
-  progressBar: {
-    height: 10,
-    backgroundColor: palette.border,
-    borderRadius: 5,
-    overflow: 'hidden',
-    marginBottom: 6,
+  badgeLabel: {
+    fontSize: 12,
+    fontWeight: '700',
+    color: palette.gold,
+    letterSpacing: 0.5,
   },
-  progressFill: {
-    height: '100%',
+  chapterTitle: {
+    fontSize: 22,
+    fontWeight: '700',
+    color: palette.text,
+    fontFamily: typography.fonts.heading,
+  },
+  verseText: {
+    fontSize: 18,
+    lineHeight: 28,
+    color: palette.text,
+    fontFamily: typography.fonts.body,
+  },
+  verseNum: {
+    fontSize: 14,
+    fontWeight: '700',
+    color: palette.primary,
+  },
+
+  finishBtn: {
+    backgroundColor: palette.primary,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingVertical: spacing.lg,
+    borderRadius: radii.md,
+    marginTop: spacing.md,
+    gap: spacing.md,
+  },
+  finishBtnDone: {
     backgroundColor: palette.success,
   },
-  progressTxt: { fontSize: 15, color: palette.textSecondary, fontWeight: '600' },
-  metaTxt: {
-    marginTop: spacing.xs,
-    fontSize: 14,
-    color: palette.textSecondary,
-  },
-  filters: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    gap: 8,
-    marginBottom: spacing.sm,
-  },
-  filterBtn: {
-    paddingVertical: 8,
-    paddingHorizontal: 12,
-    backgroundColor: palette.surface,
-    borderWidth: 1,
-    borderColor: palette.border,
-    borderRadius: 999,
-  },
-  filterBtnActive: {
-    backgroundColor: palette.primary,
-    borderColor: palette.primary,
-  },
-  filterTxt: {
-    fontSize: 13,
-    fontWeight: '600',
-    color: palette.text,
-  },
-  filterTxtActive: {
+  finishBtnText: {
     color: palette.surface,
-  },
-  sub: {
-    fontSize: 14,
-    color: palette.textSecondary,
-    lineHeight: 20,
-    marginBottom: spacing.md,
-  },
-  emptyState: {
-    fontSize: 14,
-    color: palette.textSecondary,
-    marginBottom: spacing.md,
-  },
-  row: {
-    flexDirection: 'row',
-    flexWrap: 'nowrap',
-    justifyContent: 'flex-start',
-    marginBottom: 6,
-    gap: 6,
-  },
-  cell: {
-    minWidth: (touchMin * 7) / 8,
-    minHeight: (touchMin * 7) / 8,
-    flex: 1,
-    maxWidth: '14.28%',
-    borderRadius: 8,
-    backgroundColor: palette.surface,
-    borderWidth: 1,
-    borderColor: palette.border,
-    alignItems: 'center',
-    justifyContent: 'center',
-    paddingVertical: 8,
-  },
-  cellDone: {
-    backgroundColor: palette.primary,
-    borderColor: palette.primary,
-  },
-  cellTxt: { fontSize: 13, fontWeight: '600', color: palette.text },
-  cellTxtDone: { color: palette.surface },
+    fontSize: 18,
+    fontWeight: '700',
+  }
 });
