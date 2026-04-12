@@ -1,9 +1,10 @@
+import { CreateMinistryModal } from '@/components/ministry/CreateMinistryModal';
 import { AppButton } from '@/components/ui/AppButton';
 import { AppTextField } from '@/components/ui/AppTextField';
 import { palette, spacing } from '@/constants/theme';
 import { useAuth } from '@/context/AuthContext';
-import { ensureUniqueMinistrySlug } from '@/lib/ministryCreate';
 import { api } from '@/lib/api';
+import { FontAwesome5 } from '@expo/vector-icons';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import * as Clipboard from 'expo-clipboard';
 import { Link, router } from 'expo-router';
@@ -11,7 +12,6 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import {
   ActivityIndicator,
   Alert,
-  Modal,
   Platform,
   Pressable,
   ScrollView,
@@ -33,11 +33,8 @@ export default function SettingsScreen() {
   const uid = session?.user.id;
 
   const [displayName, setDisplayName] = useState('');
-  const [name, setName] = useState('');
-  const [description, setDescription] = useState('');
   const [modalOpen, setModalOpen] = useState(false);
   const [savingProfile, setSavingProfile] = useState(false);
-  const [creating, setCreating] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const profileHydrated = useRef(false);
 
@@ -78,32 +75,6 @@ export default function SettingsScreen() {
       setSavingProfile(false);
     }
   }, [displayName, queryClient, uid]);
-
-  const createMinistry = useCallback(async () => {
-    if (!uid || !name.trim()) {
-      setError('Informe o nome do ministério.');
-      return;
-    }
-    setCreating(true);
-    setError(null);
-    try {
-      const slug = await ensureUniqueMinistrySlug(name.trim());
-      const data = await api.createMinistry({
-        slug,
-        name: name.trim(),
-        description: description.trim(),
-      });
-      setModalOpen(false);
-      setName('');
-      setDescription('');
-      queryClient.invalidateQueries({ queryKey: ['my-ministries', uid] });
-      if (data?.id) router.push(`/(app)/ministry/${data.id}`);
-    } catch (e) {
-      setError(e instanceof Error ? e.message : 'Erro ao criar');
-    } finally {
-      setCreating(false);
-    }
-  }, [description, name, queryClient, uid]);
 
   const confirmDeleteMinistry = useCallback(
     async (id: string, mName: string) => {
@@ -233,26 +204,15 @@ export default function SettingsScreen() {
         </Text>
       ) : null}
 
-      <Modal visible={modalOpen} transparent animationType="fade">
-        <View style={styles.modalBackdrop}>
-          <View style={styles.modalCard}>
-            <Text style={styles.modalTitle} allowFontScaling>
-              Novo ministério
-            </Text>
-            <AppTextField label="Nome (ex.: Liturgia)" value={name} onChangeText={setName} />
-            <AppTextField
-              label="Descrição"
-              value={description}
-              onChangeText={setDescription}
-              multiline
-            />
-            <View style={styles.modalRow}>
-              <AppButton title="Cancelar" variant="outline" onPress={() => setModalOpen(false)} />
-              <AppButton title="Criar" onPress={createMinistry} loading={creating} />
-            </View>
-          </View>
-        </View>
-      </Modal>
+      {uid ? (
+        <CreateMinistryModal
+          visible={modalOpen}
+          onClose={() => setModalOpen(false)}
+          userId={uid}
+          queryClient={queryClient}
+          onCreated={(id) => router.push(`/(app)/ministry/${id}`)}
+        />
+      ) : null}
     </ScrollView>
   );
 }
@@ -304,29 +264,6 @@ const styles = StyleSheet.create({
   },
   deleteBtnTxt: { color: palette.error, fontWeight: '600' },
   err: { color: palette.error, marginTop: spacing.md },
-  modalBackdrop: {
-    flex: 1,
-    backgroundColor: 'rgba(0,0,0,0.4)',
-    justifyContent: 'center',
-    padding: spacing.lg,
-  },
-  modalCard: {
-    backgroundColor: palette.surface,
-    borderRadius: 16,
-    padding: spacing.lg,
-  },
-  modalTitle: {
-    fontSize: 20,
-    fontWeight: '700',
-    color: palette.text,
-    marginBottom: spacing.md,
-  },
-  modalRow: {
-    flexDirection: 'row',
-    justifyContent: 'flex-end',
-    gap: spacing.sm,
-    marginTop: spacing.md,
-  },
   badgeGrid: {
     flexDirection: 'row',
     gap: spacing.md,

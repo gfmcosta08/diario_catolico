@@ -1,11 +1,22 @@
-import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, ScrollView, Pressable, ActivityIndicator, TextInput } from 'react-native';
+import { CreateMinistryModal } from '@/components/ministry/CreateMinistryModal';
+import { AppButton } from '@/components/ui/AppButton';
 import { palette, spacing, radii, typography } from '@/constants/theme';
-import { FontAwesome5 } from '@expo/vector-icons';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { api } from '@/lib/api';
 import { useAuth } from '@/context/AuthContext';
+import { api } from '@/lib/api';
+import { useQueryClient } from '@tanstack/react-query';
+import { FontAwesome5 } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
+import React, { useCallback, useEffect, useState } from 'react';
+import {
+  ActivityIndicator,
+  Pressable,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TextInput,
+  View,
+} from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 export const options = { title: 'Ministérios', headerShown: false };
 
@@ -13,27 +24,36 @@ export default function MinistriesScreen() {
   const insets = useSafeAreaInsets();
   const { configured, session } = useAuth();
   const router = useRouter();
-  
+  const queryClient = useQueryClient();
+  const uid = session?.user.id;
+
   const [myMins, setMyMins] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
-  
+  const [createModalOpen, setCreateModalOpen] = useState(false);
+
   const [slug, setSlug] = useState('');
   const [searching, setSearching] = useState(false);
 
-  useEffect(() => {
-    async function load() {
-      if (!configured || !session) return;
-      try {
-        const fetchMins = await api.myMinistries();
-        setMyMins(fetchMins);
-      } catch (err) {
-        console.error(err);
-      } finally {
-        setLoading(false);
-      }
+  const refreshMyMinistries = useCallback(async () => {
+    if (!configured || !session) {
+      setMyMins([]);
+      setLoading(false);
+      return;
     }
-    load();
+    setLoading(true);
+    try {
+      const fetchMins = await api.myMinistries();
+      setMyMins(fetchMins);
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setLoading(false);
+    }
   }, [configured, session]);
+
+  useEffect(() => {
+    refreshMyMinistries();
+  }, [refreshMyMinistries]);
 
   const handleJoin = async () => {
     if (!slug.trim()) return;
@@ -68,6 +88,24 @@ export default function MinistriesScreen() {
       >
         <Text style={styles.pageTitle}>Ministérios</Text>
         <Text style={styles.pageSubtitle}>Comunidades onde você serve e interage</Text>
+
+        {configured && session && uid ? (
+          <>
+            <View style={styles.createMinistryWrap}>
+              <AppButton title="Criar ministério" onPress={() => setCreateModalOpen(true)} />
+            </View>
+            <CreateMinistryModal
+              visible={createModalOpen}
+              onClose={() => setCreateModalOpen(false)}
+              userId={uid}
+              queryClient={queryClient}
+              onCreated={(id) => {
+                router.push(`/(app)/ministry/${id}` as any);
+                void refreshMyMinistries();
+              }}
+            />
+          </>
+        ) : null}
 
         <View style={styles.joinCard}>
           <Text style={styles.joinTitle}>Entrar em um Ministério</Text>
@@ -125,7 +163,8 @@ const styles = StyleSheet.create({
   container: { paddingHorizontal: spacing.xl, maxWidth: 680, alignSelf: 'center', width: '100%' },
   pageTitle: { fontSize: 26, fontWeight: '700', color: palette.primary, marginBottom: 4, fontFamily: typography.fonts.heading },
   pageSubtitle: { fontSize: 16, color: palette.textSecondary, marginBottom: spacing.xl, fontFamily: typography.fonts.body },
-  
+  createMinistryWrap: { marginBottom: spacing.lg },
+
   joinCard: {
     backgroundColor: palette.surface,
     padding: spacing.xl,
