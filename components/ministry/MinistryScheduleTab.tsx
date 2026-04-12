@@ -4,7 +4,7 @@ import { AppTextField } from '@/components/ui/AppTextField';
 import { palette, spacing } from '@/constants/theme';
 import { api } from '@/lib/api';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
-import { useCallback, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import {
   ActivityIndicator,
   Pressable,
@@ -32,6 +32,26 @@ function dayKey(d: Date) {
   return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
 }
 
+function daysInMonth(year: number, monthIndex: number) {
+  return new Date(year, monthIndex + 1, 0).getDate();
+}
+
+function clampDayInMonth(year: number, monthIndex: number, day: number) {
+  const dim = daysInMonth(year, monthIndex);
+  return Math.min(Math.max(1, day), dim);
+}
+
+/** HH:mm, 00–23 e 00–59 */
+function parseHm(raw: string): { h: number; m: number } | null {
+  const t = raw.trim();
+  const match = /^(\d{1,2}):(\d{2})$/.exec(t);
+  if (!match) return null;
+  const h = parseInt(match[1], 10);
+  const m = parseInt(match[2], 10);
+  if (!Number.isFinite(h) || !Number.isFinite(m) || h < 0 || h > 23 || m < 0 || m > 59) return null;
+  return { h, m };
+}
+
 type Props = {
   ministryId: string;
   userId: string;
@@ -43,7 +63,7 @@ export function MinistryScheduleTab({ ministryId, userId, isAdmin }: Props) {
   const [month, setMonth] = useState(() => new Date());
   const [selectedDay, setSelectedDay] = useState<number | null>(new Date().getDate());
   const [eventTitle, setEventTitle] = useState('');
-  const [eventWhen, setEventWhen] = useState('');
+  const [eventTime, setEventTime] = useState('09:00');
   const [roleTitle, setRoleTitle] = useState('');
   const [roleSlots, setRoleSlots] = useState('1');
   const [forEventId, setForEventId] = useState<string | null>(null);
@@ -102,32 +122,71 @@ export function MinistryScheduleTab({ ministryId, userId, isAdmin }: Props) {
     return map;
   }, [assignsQuery.data]);
 
+  const selectedDateLabel = useMemo(() => {
+    if (selectedDay == null) return null;
+    const d = new Date(month.getFullYear(), month.getMonth(), selectedDay);
+    return d.toLocaleDateString('pt-BR', {
+      weekday: 'long',
+      day: 'numeric',
+      month: 'long',
+      year: 'numeric',
+    });
+  }, [month, selectedDay]);
+
+  useEffect(() => {
+    const y = month.getFullYear();
+    const m = month.getMonth();
+    setSelectedDay((prev) => clampDayInMonth(y, m, prev ?? 1));
+  }, [month]);
+
+  const handleSelectDay = useCallback((day: number) => {
+    setErr(null);
+    setSelectedDay(day);
+  }, []);
+
   const createEvent = useCallback(async () => {
-    if (!eventTitle.trim() || !eventWhen.trim()) {
-      setErr('Preencha nome e data/hora do evento.');
+    if (selectedDay == null) {
+      setErr('Selecione um dia no calendário.');
       return;
     }
-    const iso = new Date(eventWhen);
-    if (Number.isNaN(iso.getTime())) {
-      setErr('Data/hora inválida. Use um formato que o navegador reconheça ou ISO 8601.');
+    if (!eventTitle.trim()) {
+      setErr('Informe o nome do evento.');
+      return;
+    }
+    const hm = parseHm(eventTime);
+    if (!hm) {
+      setErr('Informe a hora no formato HH:mm (ex.: 08:30).');
+      return;
+    }
+    const startsAt = new Date(
+      month.getFullYear(),
+      month.getMonth(),
+      selectedDay,
+      hm.h,
+      hm.m,
+      0,
+      0
+    );
+    if (Number.isNaN(startsAt.getTime())) {
+      setErr('Data ou hora inválida.');
       return;
     }
     setBusy(true);
     setErr(null);
     try {
-      await api.createEvent(ministryId, {
+      const created = await api.createEvent(ministryId, {
         title: eventTitle.trim(),
-        startsAt: iso.toISOString(),
+        startsAt: startsAt.toISOString(),
       });
       setEventTitle('');
-      setEventWhen('');
+      setForEventId(created.id);
       queryClient.invalidateQueries({ queryKey: ['ministry-events', ministryId] });
     } catch (error) {
       setErr(error instanceof Error ? error.message : 'Erro ao criar evento');
     } finally {
       setBusy(false);
     }
-  }, [eventTitle, eventWhen, ministryId, queryClient]);
+  }, [eventTitle, eventTime, ministryId, month, queryClient, selectedDay]);
 
   const addRole = useCallback(async () => {
     if (!forEventId || !roleTitle.trim()) {
@@ -205,7 +264,7 @@ export function MinistryScheduleTab({ ministryId, userId, isAdmin }: Props) {
         month={month}
         onPrevMonth={prevMonth}
         onNextMonth={nextMonth}
-        onSelectDay={setSelectedDay}
+        onSelectDay={handleSelectDay}
         selectedDay={selectedDay}
         countsByDay={countsByDay}
       />
@@ -222,18 +281,23 @@ export function MinistryScheduleTab({ ministryId, userId, isAdmin }: Props) {
             Novo evento
           </Text>
           <AppTextField label="Nome (ex.: Missa dominical)" value={eventTitle} onChangeText={setEventTitle} />
+          {selectedDateLabel ? (
+            <Text style={styles.datePill} allowFontScaling>
+              Data: {selectedDateLabel}
+            </Text>
+          ) : null}
           <AppTextField
-            label="Data e hora"
-            value={eventWhen}
-            onChangeText={setEventWhen}
-            placeholder="ex.: 2026-04-06T08:00:00"
+            label="Hora do evento"
+            value={eventTime}
+            onChangeText={setEventTime}
+            placeholder="08:00"
           />
           <AppButton title="Criar evento" onPress={createEvent} loading={busy} />
           <Text style={[styles.subTitle, styles.mt]} allowFontScaling>
             Cargo no evento
           </Text>
           <Text style={styles.hint} allowFontScaling>
-            Toque em um evento abaixo para definir o evento alvo, depois adicione cargos e vagas.
+            O último evento criado fica selecionado para adicionar cargos. Toque num evento abaixo para mudar o alvo.
           </Text>
           <AppTextField label="Título do cargo" value={roleTitle} onChangeText={setRoleTitle} />
           <AppTextField label="Vagas" value={roleSlots} onChangeText={setRoleSlots} keyboardType="number-pad" />
@@ -325,6 +389,13 @@ const styles = StyleSheet.create({
     borderColor: palette.border,
   },
   subTitle: { fontSize: 17, fontWeight: '700', color: palette.text },
+  datePill: {
+    fontSize: 15,
+    fontWeight: '600',
+    color: palette.primary,
+    marginBottom: spacing.sm,
+    textTransform: 'capitalize',
+  },
   hint: { fontSize: 13, color: palette.textSecondary, marginBottom: spacing.sm },
   mt: { marginTop: spacing.md },
   muted: { fontSize: 14, color: palette.textSecondary },

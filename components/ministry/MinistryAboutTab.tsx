@@ -5,7 +5,16 @@ import { buildMinistryInviteShareText } from '@/lib/ministryInvite';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import * as Clipboard from 'expo-clipboard';
 import { useCallback, useState } from 'react';
-import { ActivityIndicator, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
+import {
+  ActivityIndicator,
+  Platform,
+  Pressable,
+  ScrollView,
+  Share,
+  StyleSheet,
+  Text,
+  View,
+} from 'react-native';
 
 type Props = {
   ministryId: string;
@@ -40,9 +49,37 @@ export function MinistryAboutTab({ ministryId, slug, name, description, myRole }
     return row.displayName || row.email || row.userId || 'Usuário';
   };
 
-  const copyInvite = useCallback(async () => {
-    await Clipboard.setStringAsync(buildMinistryInviteShareText(slug));
-    setMsg('Convite copiado para a área de transferência.');
+  const sendInvite = useCallback(async () => {
+    setMsg(null);
+    const text = buildMinistryInviteShareText(slug);
+    try {
+      if (Platform.OS === 'web') {
+        const nav = typeof navigator !== 'undefined' ? navigator : undefined;
+        if (typeof nav?.share === 'function') {
+          await nav.share({ text, title: 'Convite para o ministério' });
+          setMsg('Convite pronto para enviar pelo sistema.');
+          return;
+        }
+        await Clipboard.setStringAsync(text);
+        setMsg('Link copiado — cole na conversa ou e-mail que preferir.');
+        return;
+      }
+
+      const result = await Share.share({
+        message: text,
+        title: 'Convite para o ministério',
+      });
+      if (result.action === Share.sharedAction) {
+        setMsg('Convite partilhado.');
+      }
+    } catch {
+      try {
+        await Clipboard.setStringAsync(text);
+        setMsg('Link copiado — cole na conversa ou e-mail que preferir.');
+      } catch {
+        setMsg('Não foi possível abrir a partilha. Tente outra vez.');
+      }
+    }
   }, [slug]);
 
   const approve = useCallback(
@@ -94,7 +131,7 @@ export function MinistryAboutTab({ ministryId, slug, name, description, myRole }
         {description || 'Sem descrição.'}
       </Text>
 
-      {isAdmin ? <AppButton title="Enviar convite (copiar link)" onPress={copyInvite} /> : null}
+      {isAdmin ? <AppButton title="Enviar convite" onPress={sendInvite} /> : null}
 
       {msg ? (
         <Text style={styles.msg} allowFontScaling>

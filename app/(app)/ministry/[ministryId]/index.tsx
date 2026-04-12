@@ -1,5 +1,4 @@
 import { MinistryAboutTab } from '@/components/ministry/MinistryAboutTab';
-import { MinistryForumTab } from '@/components/ministry/MinistryForumTab';
 import { MinistryScheduleTab } from '@/components/ministry/MinistryScheduleTab';
 import { palette, spacing } from '@/constants/theme';
 import { useAuth } from '@/context/AuthContext';
@@ -9,7 +8,7 @@ import { router, useLocalSearchParams, useNavigation } from 'expo-router';
 import { useEffect, useLayoutEffect, useState } from 'react';
 import { ActivityIndicator, Pressable, StyleSheet, Text, View } from 'react-native';
 
-type TabKey = 'about' | 'forum' | 'schedule';
+type TabKey = 'about' | 'schedule';
 
 export default function MinistryDetailScreen() {
   const navigation = useNavigation();
@@ -96,7 +95,6 @@ export default function MinistryDetailScreen() {
         {(
           [
             ['about', 'Sobre'],
-            ['forum', 'Fórum'],
             ['schedule', 'Escalas'],
           ] as const
         ).map(([key, label]) => (
@@ -122,11 +120,6 @@ export default function MinistryDetailScreen() {
             description={m.description ?? ''}
             myRole={myRole}
           />
-        ) : null}
-        {tab === 'forum' ? (
-          <View style={styles.flex}>
-            <MinistryForumTab ministryId={m.id} userId={uid} isAdmin={isAdmin} />
-          </View>
         ) : null}
         {tab === 'schedule' ? (
           <MinistryScheduleTab ministryId={m.id} userId={uid} isAdmin={isAdmin} />
