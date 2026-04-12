@@ -35,8 +35,13 @@ async function main() {
   }
 
   try {
-    await runStep('npm', ['--prefix', 'backend', 'run', 'prisma:generate']);
-    await runStep('npm', ['--prefix', 'backend', 'run', 'prisma:migrate']);
+    try {
+      await runStep('npm', ['--prefix', 'backend', 'run', 'prisma:migrate']);
+    } catch (error) {
+      console.warn('[WARN] prisma:migrate falhou; seguindo com prisma:push');
+      console.warn(String(error));
+    }
+    await runStep('npm', ['--prefix', 'backend', 'run', 'prisma:push']);
 
     const child = spawn('npm', ['--prefix', 'backend', 'run', 'start'], {
       stdio: 'inherit',
