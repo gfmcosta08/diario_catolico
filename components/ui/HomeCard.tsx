@@ -19,7 +19,7 @@ export function HomeCard({ title, subtitle, icon, onPress }: Props) {
       style={({ pressed }) => [styles.card, pressed && styles.pressed]}
     >
       <View style={styles.iconWrap}>
-        <FontAwesome name={icon} size={26} color={palette.primary} />
+        <FontAwesome name={icon} size={24} color={palette.primary} />
       </View>
       <View style={styles.textWrap}>
         <Text style={styles.title} allowFontScaling>
@@ -29,7 +29,9 @@ export function HomeCard({ title, subtitle, icon, onPress }: Props) {
           {subtitle}
         </Text>
       </View>
-      <FontAwesome name="chevron-right" size={16} color={palette.textSecondary} />
+      <View style={styles.arrowWrap}>
+        <FontAwesome name="chevron-right" size={14} color={palette.accent} />
+      </View>
     </Pressable>
   );
 }
@@ -38,33 +40,33 @@ const styles = StyleSheet.create({
   card: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: palette.surface,
+    backgroundColor: 'rgba(255, 255, 255, 0.96)', // Quase branco com levíssima transparência
     borderRadius: radii.lg,
-    padding: spacing.md,
+    padding: spacing.lg,
     marginBottom: spacing.md,
     borderWidth: 1,
-    borderColor: palette.border,
+    borderColor: 'rgba(201, 162, 39, 0.25)', // Borda macia dourada
     shadowColor: '#000',
-    shadowOpacity: 0.06,
-    shadowRadius: 8,
-    shadowOffset: { width: 0, height: 2 },
-    elevation: 2,
+    shadowOpacity: 0.12,
+    shadowRadius: 12,
+    shadowOffset: { width: 0, height: 6 },
+    elevation: 6,
   },
-  pressed: { opacity: 0.92 },
+  pressed: { opacity: 0.85, transform: [{ scale: 0.98 }] },
   iconWrap: {
-    width: 52,
-    height: 52,
-    borderRadius: radii.md,
-    backgroundColor: palette.background,
+    width: 50,
+    height: 50,
+    borderRadius: 25,
+    backgroundColor: 'rgba(30, 74, 120, 0.08)', // Azul sutil translúcido
     alignItems: 'center',
     justifyContent: 'center',
     marginRight: spacing.md,
   },
-  textWrap: { flex: 1 },
+  textWrap: { flex: 1, paddingRight: spacing.sm },
   title: {
     fontSize: 18,
-    fontWeight: '700',
-    color: palette.text,
+    fontWeight: '800',
+    color: palette.primary, // Azul Marinho escuro, mais legível na claridade
   },
   sub: {
     marginTop: 4,
@@ -72,4 +74,12 @@ const styles = StyleSheet.create({
     color: palette.textSecondary,
     lineHeight: 20,
   },
+  arrowWrap: {
+    width: 28,
+    height: 28,
+    borderRadius: 14,
+    backgroundColor: 'rgba(201, 162, 39, 0.15)', // Fundo redondinho em tom dourado suave pro chevron
+    alignItems: 'center',
+    justifyContent: 'center',
+  }
 });

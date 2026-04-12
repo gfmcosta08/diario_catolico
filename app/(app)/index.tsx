@@ -1,119 +1,157 @@
-﻿import { HomeCard } from '@/components/ui/HomeCard';
-
-export const options = { title: 'InÃ­cio' };
+import { HomeCard } from '@/components/ui/HomeCard';
 import { useAuth } from '@/context/AuthContext';
 import { palette, spacing } from '@/constants/theme';
 import { Link } from 'expo-router';
 import { ScrollView, StyleSheet, Text, View } from 'react-native';
+import { LinearGradient } from 'expo-linear-gradient';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
+
+export const options = { title: 'Início', headerShown: false };
 
 export default function HomeScreen() {
   const { configured, session } = useAuth();
+  const insets = useSafeAreaInsets();
 
   return (
-    <ScrollView contentContainerStyle={styles.container}>
-      <Text style={styles.greet} allowFontScaling>
-        Paz e bem
-      </Text>
-      <Text style={styles.lead} allowFontScaling>
-        Escolha uma prÃ¡tica para hoje. Seu progresso Ã© salvo na nuvem quando vocÃª
-        estÃ¡ autenticado.
-      </Text>
-      {!configured ? (
-        <Text style={styles.banner} allowFontScaling>
-          Modo local: configure o Supabase para login e sincronizaÃ§Ã£o entre
-          dispositivos.
-        </Text>
-      ) : null}
-      {configured && !session ? (
-        <Link href="/(auth)/login" style={styles.linkBanner}>
-          <Text style={styles.linkTxt} allowFontScaling>
-            Entrar para sincronizar o progresso
+    <LinearGradient
+      colors={['#3A6EA5', '#1E4A78', '#0D2136']}
+      locations={[0, 0.4, 1]}
+      style={styles.gradient}
+    >
+      <ScrollView 
+        showsVerticalScrollIndicator={false}
+        contentContainerStyle={[
+          styles.container,
+          {
+            paddingTop: Math.max(insets.top, spacing.xl),
+            paddingBottom: Math.max(insets.bottom, spacing.xl * 2),
+          }
+        ]}
+      >
+        <View style={styles.header}>
+          <Text style={styles.greet} allowFontScaling>
+            Paz e bem
           </Text>
-        </Link>
-      ) : null}
-      <View style={styles.cards}>
-        <Link href="/(app)/rosary-player-daily" asChild>
-          <HomeCard
-            title="Rezar o Terço Mariano"
-            subtitle="Inicia direto no conjunto do dia (5 mistérios, 50 Ave-Marias)."
-            icon="circle"
-          />
-        </Link>
-        <Link href="/(app)/rosary-player-full" asChild>
-          <HomeCard
-            title="Rezar o Santo Rosário"
-            subtitle="Percorre os 20 mistérios em sequência (200 Ave-Marias)."
-            icon="dot-circle-o"
-          />
-        </Link>
-        <Link href="/(app)/rosary-daily" asChild>
-          <HomeCard
-            title="Terço (Lista)"
-            subtitle="Modo checklist - marque orações já rezadas."
-            icon="list"
-          />
-        </Link>
-        <Link href="/(app)/bible" asChild>
-          <HomeCard
-            title="Leia a BÃ­blia em 365 dias"
-            subtitle="Plano de 365 dias com referÃªncias e progresso."
-            icon="book"
-          />
-        </Link>
-        {configured && session ? (
-          <Link href="/(app)/settings" asChild>
-            <HomeCard
-              title="ConfiguraÃ§Ãµes e ministÃ©rios"
-              subtitle="Seu ID, perfil, criar ministÃ©rio e convites."
-              icon="users"
-            />
+          <Text style={styles.lead} allowFontScaling>
+            Escolha uma prática para hoje. Dê um passo em sua jornada diária com Cristo.
+          </Text>
+        </View>
+
+        {!configured ? (
+          <Text style={styles.banner} allowFontScaling>
+            Aviso: O app está rodando localmente sem sincronização habilitada.
+          </Text>
+        ) : null}
+        
+        {configured && !session ? (
+          <Link href="/(auth)/login" asChild>
+            <View style={styles.linkBanner}>
+              <Text style={styles.linkTxt} allowFontScaling>
+                Acessar minha conta para salvar avanços
+              </Text>
+            </View>
           </Link>
         ) : null}
-      </View>
-    </ScrollView>
+        
+        <View style={styles.cards}>
+          <Link href="/(app)/rosary-player-daily" asChild>
+            <HomeCard
+              title="Terço Mariano"
+              subtitle="Oração imersiva no conjunto do dia (5 mistérios)."
+              icon="circle"
+            />
+          </Link>
+          <Link href="/(app)/rosary-player-full" asChild>
+            <HomeCard
+              title="Santo Rosário"
+              subtitle="Contemplação profunda em sequência (20 mistérios)."
+              icon="dot-circle-o"
+            />
+          </Link>
+          <Link href="/(app)/rosary-daily" asChild>
+            <HomeCard
+              title="Rosário (Lista)"
+              subtitle="Layout simplificado para marcação com checklist."
+              icon="list"
+            />
+          </Link>
+          <Link href="/(app)/bible" asChild>
+            <HomeCard
+              title="A Bíblia em 365 Dias"
+              subtitle="Projeto de leitura unificada da Palavra com progresso."
+              icon="book"
+            />
+          </Link>
+          {configured && session ? (
+            <Link href="/(app)/settings" asChild>
+              <HomeCard
+                title="Sincronização e Ajustes"
+                subtitle="Gerenciamento de perfil, fóruns e ministérios."
+                icon="user"
+              />
+            </Link>
+          ) : null}
+        </View>
+      </ScrollView>
+    </LinearGradient>
   );
 }
 
 const styles = StyleSheet.create({
+  gradient: {
+    flex: 1,
+  },
   container: {
-    padding: spacing.lg,
-    paddingBottom: spacing.xl * 2,
-    backgroundColor: palette.background,
+    paddingHorizontal: spacing.lg,
+    flexGrow: 1,
+  },
+  header: {
+    marginBottom: spacing.xl,
+    paddingTop: spacing.xl,
   },
   greet: {
-    fontSize: 26,
+    fontSize: 32,
     fontWeight: '800',
-    color: palette.text,
-    marginBottom: spacing.sm,
+    color: '#FFFFFF',
+    marginBottom: spacing.xs,
+    letterSpacing: 0.5,
   },
   lead: {
     fontSize: 16,
-    color: palette.textSecondary,
+    color: 'rgba(255, 255, 255, 0.85)',
     lineHeight: 24,
-    marginBottom: spacing.md,
   },
   banner: {
-    backgroundColor: palette.accentSoft,
+    backgroundColor: 'rgba(255, 255, 255, 0.1)',
     padding: spacing.md,
-    borderRadius: 12,
-    marginBottom: spacing.md,
-    color: palette.text,
+    borderRadius: 8,
+    marginBottom: spacing.lg,
+    color: '#E2E8F0',
     fontSize: 14,
     lineHeight: 20,
+    borderWidth: 1,
+    borderColor: 'rgba(255, 255, 255, 0.15)',
   },
   linkBanner: {
-    marginBottom: spacing.md,
+    marginBottom: spacing.xl,
     padding: spacing.md,
-    backgroundColor: palette.surface,
-    borderRadius: 12,
-    borderWidth: 1,
-    borderColor: palette.primary,
+    backgroundColor: palette.accent, // Gold color
+    borderRadius: 8,
+    shadowColor: palette.accent,
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.4,
+    shadowRadius: 8,
+    elevation: 4,
   },
   linkTxt: {
-    color: palette.primary,
-    fontWeight: '700',
-    fontSize: 16,
+    color: palette.primary, // Dark Blue text on Gold background
+    fontWeight: '800',
+    fontSize: 15,
     textAlign: 'center',
+    textTransform: 'uppercase',
   },
-  cards: { marginTop: spacing.sm },
+  cards: { 
+    marginTop: spacing.xs,
+    paddingBottom: spacing.xl,
+  },
 });
