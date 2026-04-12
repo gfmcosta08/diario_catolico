@@ -13,11 +13,12 @@ export default function HomeScreen() {
   const insets = useSafeAreaInsets();
 
   return (
-    <LinearGradient
-      colors={['#3A6EA5', '#1E4A78', '#0D2136']}
-      locations={[0, 0.4, 1]}
-      style={styles.gradient}
-    >
+    <View style={styles.root}>
+      <LinearGradient
+        colors={['#3A6EA5', '#1E4A78', '#0D2136']}
+        locations={[0, 0.4, 1]}
+        style={StyleSheet.absoluteFillObject}
+      />
       <ScrollView 
         showsVerticalScrollIndicator={false}
         contentContainerStyle={[
@@ -93,13 +94,14 @@ export default function HomeScreen() {
           ) : null}
         </View>
       </ScrollView>
-    </LinearGradient>
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
-  gradient: {
+  root: {
     flex: 1,
+    backgroundColor: '#0D2136',
   },
   container: {
     paddingHorizontal: spacing.lg,
@@ -135,7 +137,7 @@ const styles = StyleSheet.create({
   linkBanner: {
     marginBottom: spacing.xl,
     padding: spacing.md,
-    backgroundColor: palette.accent, // Gold color
+    backgroundColor: palette.accent,
     borderRadius: 8,
     shadowColor: palette.accent,
     shadowOffset: { width: 0, height: 4 },
@@ -144,7 +146,7 @@ const styles = StyleSheet.create({
     elevation: 4,
   },
   linkTxt: {
-    color: palette.primary, // Dark Blue text on Gold background
+    color: palette.primary,
     fontWeight: '800',
     fontSize: 15,
     textAlign: 'center',
