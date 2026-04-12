@@ -4,18 +4,7 @@ import { useRouter, usePathname } from 'expo-router';
 import { palette, radii, spacing, typography } from '@/constants/theme';
 import { useAuth } from '@/context/AuthContext';
 import { FontAwesome5 } from '@expo/vector-icons';
-
-const navItems = [
-  { path: '/(app)', label: 'Home', icon: 'home' },
-  { path: '/(app)/rosary', label: 'Rosário', icon: 'pray' },
-  { path: '/(app)/bible', label: 'Bíblia', icon: 'book' },
-  { path: '/(app)/liturgy', label: 'Liturgia', icon: 'cross' },
-  { path: '/(app)/ministries', label: 'Ministérios', icon: 'users' },
-  { path: '/(app)/feed', label: 'Comunidade', icon: 'comments' },
-  { path: '/(app)/schedule', label: 'Escalas', icon: 'calendar-alt' },
-  { path: '/(app)/prayers', label: 'Mural de Oração', icon: 'hands-helping' },
-  { path: '/(app)/settings', label: 'Perfil', icon: 'user' },
-];
+import { APP_NAV_ITEMS, isAppNavItemActive } from '@/components/layout/appNavItems';
 
 export function AppSidebar() {
   const router = useRouter();
@@ -34,9 +23,8 @@ export function AppSidebar() {
       </View>
 
       <ScrollView contentContainerStyle={styles.navMenu} showsVerticalScrollIndicator={false}>
-        {navItems.map((item) => {
-          // Ajuste de matching para rotas do expo
-          const isActive = pathname === item.path || (item.path !== '/(app)' && pathname.startsWith(item.path));
+        {APP_NAV_ITEMS.map((item) => {
+          const isActive = isAppNavItemActive(pathname, item.path);
           
           return (
             <Pressable
@@ -44,10 +32,10 @@ export function AppSidebar() {
               style={[styles.navItem, isActive && styles.navItemActive]}
               onPress={() => router.push(item.path as any)}
             >
-              <FontAwesome5 
-                name={item.icon} 
-                size={20} 
-                color={isActive ? palette.primary : palette.textSecondary} 
+              <FontAwesome5
+                name={item.icon as never}
+                size={20}
+                color={isActive ? palette.primary : palette.textSecondary}
                 style={styles.navIcon}
               />
               <Text style={[styles.navText, isActive && styles.navTextActive]}>

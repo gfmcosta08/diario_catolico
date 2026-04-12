@@ -1,14 +1,15 @@
-import React from 'react';
-import { View, Text, StyleSheet, Pressable, Platform } from 'react-native';
-import { useRouter, usePathname } from 'expo-router';
+import { isAppNavItemActive } from '@/components/layout/appNavItems';
 import { palette, spacing, typography } from '@/constants/theme';
 import { FontAwesome5 } from '@expo/vector-icons';
+import { usePathname, useRouter } from 'expo-router';
+import React from 'react';
+import { Platform, Pressable, StyleSheet, Text, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 const mobileNavItems = [
   { path: '/(app)', label: 'Home', icon: 'home' },
   { path: '/(app)/bible', label: 'Bíblia', icon: 'book' },
-  { path: '/(app)/rosary', label: 'Rosário', icon: 'pray' },
+  { path: '/(app)/rosary', label: 'O Rosário', icon: 'pray' },
   { path: '/(app)/feed', label: 'Feed', icon: 'comments' },
   { path: '/(app)/settings', label: 'Perfil', icon: 'user' },
 ];
@@ -21,7 +22,7 @@ export function AppMobileNav() {
   return (
     <View style={[styles.mobileNav, { paddingBottom: Math.max(insets.bottom, spacing.md) }]}>
       {mobileNavItems.map((item) => {
-        const isActive = pathname === item.path || (item.path !== '/(app)' && pathname.startsWith(item.path));
+        const isActive = isAppNavItemActive(pathname, item.path);
         
         return (
           <Pressable

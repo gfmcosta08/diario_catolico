@@ -1,7 +1,7 @@
 import { useAuth } from '@/context/AuthContext';
 import { palette, spacing, radii } from '@/constants/theme';
 import { Link } from 'expo-router';
-import { ScrollView, StyleSheet, Text, View, Pressable } from 'react-native';
+import { Pressable, ScrollView, StyleSheet, Text, useWindowDimensions, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { FontAwesome5 } from '@expo/vector-icons';
 import { useState, useEffect } from 'react';
@@ -12,6 +12,8 @@ export const options = { title: 'Início', headerShown: false };
 export default function HomeScreen() {
   const { configured, session } = useAuth();
   const insets = useSafeAreaInsets();
+  const { width } = useWindowDimensions();
+  const isDesktop = width >= 768;
   
   // Real data state
   const userName = session?.user?.name?.split(' ')[0] || 'Maria';
@@ -41,9 +43,9 @@ export default function HomeScreen() {
         contentContainerStyle={[
           styles.container,
           {
-            paddingTop: Math.max(insets.top, spacing.xl),
+            paddingTop: isDesktop ? Math.max(insets.top, spacing.xl) : spacing.lg,
             paddingBottom: Math.max(insets.bottom, spacing.xl * 2),
-          }
+          },
         ]}
       >
         <View style={styles.pageHeader}>
@@ -62,8 +64,8 @@ export default function HomeScreen() {
         ) : null}
 
         <View style={styles.quickActions}>
-          <Link href="/(app)/rosary" asChild>
-            <Pressable style={({pressed}) => [styles.quickActionBtn, pressed && styles.pressed]}>
+          <Link href="/(app)/terco-mariano" asChild>
+            <Pressable style={({ pressed }) => [styles.quickActionBtn, pressed && styles.pressed]}>
               <FontAwesome5 name="pray" size={22} color={palette.primary} />
               <Text style={styles.quickActionText}>Rezar o Terço</Text>
             </Pressable>
@@ -127,9 +129,9 @@ export default function HomeScreen() {
             <Text style={styles.statLabel}>Escalas assumidas</Text>
           </View>
 
-          <Link href="/(app)/rosary" asChild>
+          <Link href="/(app)/terco-mariano" asChild>
             <Pressable style={styles.statCard}>
-              <View style={[styles.iconWrap, {backgroundColor: 'rgba(231,76,60,0.1)'}]}>
+              <View style={[styles.iconWrap, { backgroundColor: 'rgba(231,76,60,0.1)' }]}>
                 <FontAwesome5 name="cross" size={18} color={palette.danger} />
               </View>
               <Text style={styles.statValue}>{stats.rosaryCount}</Text>
