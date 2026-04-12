@@ -1,3 +1,8 @@
+import {
+  collectRosaryProgressIds,
+  createDailyRosaryBeads,
+  createFullRosaryBeads,
+} from '@/data/rosary-beads';
 import type { MysterySet } from '@/types/progress';
 
 export const FULL_ROSARY_ORDER: MysterySet[] = [
@@ -9,7 +14,7 @@ export const FULL_ROSARY_ORDER: MysterySet[] = [
 
 export const MYSTERY_TITLES: Record<MysterySet, string[]> = {
   joyful: [
-    'Anunciação do anjo a Maria',
+    'A Anunciação a Maria',
     'Visitação de Maria a Santa Isabel',
     'Nascimento do Menino Jesus em Belém',
     'Apresentação do Menino Jesus no templo',
@@ -70,33 +75,64 @@ export const MYSTERY_BIBLICAL_READINGS: Record<MysterySet, string[]> = {
 };
 
 export const MYSTERY_FRUITS: Record<MysterySet, string[]> = {
+   joyful: [
+     'Humildade e submissão à vontade de Deus',
+     'Amor ao próximo e caridade ativa',
+     'Desapego às riquezas',
+     'Obediência e pureza de intenção',
+     'Busca por Jesus e zelo pelas coisas de Deus',
+   ],
+   luminous: [
+     'Filiação divina e promessas batismais',
+     'Intercessão de Maria para salvar famílias',
+     'Contrição sincera e desejo de mudança',
+     'Força para enfrentar as provas da vida',
+     'Amor eucarístico e devoção',
+   ],
+   sorrowful: [
+     'Arrependimento dos pecados',
+     'Mortificação dos sentidos e pureza do corpo',
+     'Humildade e mortificação intelectual',
+     'Aceitação paciente das tribulações',
+     'Perdão aos inimigos e esperança na salvação',
+   ],
+   glorious: [
+     'Fé inabalável na ressurreição',
+     'Esperança e desejo do céu',
+     'Zelo evangelizador e dons do Espírito Santo',
+     'Devoção mariana filial',
+     'Esperança na recompensa eterna',
+   ],
+};
+
+export const MYSTERY_BIBLICAL_TEXTS: Record<MysterySet, string[]> = {
   joyful: [
-    'Humildade e submissão à vontade de Deus',
-    'Amor ao próximo e caridade ativa',
-    'Desapego às riquezas',
-    'Obediência e pureza de intenção',
-    'Busca por Jesus e zelo pelas coisas de Deus',
+    '«No sexto mês, o anjo Gabriel foi enviado por Deus a uma cidade da Galiléia, chamada Nazaré, a uma virgem desposada com um homem que se chamava José, da casa de Davi e o nome da virgem era Maria» (Lc 1, 26-27)',
+    '«Naqueles dias, Maria levantou-se e foi com pressa para a região montanhosa, para uma cidade de Judá» (Lc 1, 39)',
+    '«E aconteceu que, naquele tempo, saiu um decreto de César Augusto, mandando fazer o recenseamento de toda a terra» (Lc 2, 1)',
+    '«E quando se cumpriram os dias da purificação deles, segundo a lei de Moisés, levaram-no a Jerusalem para o apresentar ao Senhor» (Lc 2, 22)',
+    '«E aconteceu que, depois de três dias, o encontraram no templo, sentado no meio dos doutores, ouvindo-os e fazendo-lhes perguntas» (Lc 2, 46)',
   ],
   luminous: [
-    'Filiação divina e promessas batismais',
-    'Intercessão de Maria para salvar famílias',
-    'Contrição sincera e desejo de mudança',
-    'Força para enfrentar as provas da vida',
-    'Amor eucarístico e devoção',
+    '«E Jesus, tendo sido batizado, subiu imediatamente da água; e eis que se abriram os céus, e viu o Espírito de Deus descendo como uma pomba e vindo sobre ele» (Mt 3, 16)',
+    '«E no terceiro dia houve um casório em Caná da Galiléia, e a mãe de Jesus estava lá» (Jo 2, 1)',
+    '«E Jesus veio à Galiléia, pregando o evangelho do reino de Deus» (Mc 1, 14)',
+    '«E, passando seis dias depois, Jesus tomou consigo a Pedro, a Tiago e a João, o seu irmão, e levou-os a um alto monte à parte» (Mt 17, 1)',
+    '«E, enquanto eles comiam, Jesus tomou o pão, e, tendo-o abençoado, o partiu e o deu aos seus discípulos, dizendo: Tomai, comei, isto é o meu corpo» (Mt 26, 26)',
   ],
   sorrowful: [
-    'Arrependimento dos pecados',
-    'Mortificação dos sentidos e pureza do corpo',
-    'Humildade e mortificação intelectual',
-    'Aceitação paciente das tribulações',
-    'Perdão aos inimigos e esperança na salvação',
+    '«E, saindo, foi, segundo o seu costume, para o monte das Oliveiras; e os seus discípulos também o seguiram» (Lc 22, 39)',
+    '«Então Pilatos tomou a Jesus e o flagelou» (Jo 19, 1)',
+    '«E os soldados, tecendo uma coroa de espinhos, puseram-na na sua cabeça, e lhe deram uma cana na mão direita; e, dobrando-se os joelhos diante dele, o zombavam» (Mt 27, 29)',
+    '«Então, então, ele lhes entregou o Jesus para que fosse crucificado» (Jo 19, 16)',
+    '«E, chegando ao lugar chamado Calvário, o crucificaram ali, bem como aos criminosos, um à direita e outro à esquerda» (Lc 23, 33)',
   ],
   glorious: [
-    'Fé inabalável na ressurreição',
-    'Esperança e desejo do céu',
-    'Zelo evangelizador e dons do Espírito Santo',
-    'Devoção mariana filial',
-    'Esperança na recompensa eterna',
+    '«E, no primeiro dia da semana, Maria Madalena foi ao sepulcro de madrugada, sendo ainda escuro, e viu que a pedra já tinha sido removida do sepulcro» (Jo 20, 1)',
+    '«E, tendo dito-lhes isto, mostrou-lhes as mãos e o lado. E os discípulos se alegraram vendo o Senhor» (Jo 20, 20)',
+    '«E, tendo dito isto, enquanto eles o olhavam, foi elevado; e uma nuvem o recebeu, tirando-o dos seus olhos» (At 1, 9)',
+    '«E, de repente, veio do céu um som como de um vento impetuoso que encheu toda a casa onde eles estavam sentados» (At 2, 2)',
+    '«E apareceu um grande sinal no céu: uma mulher vestida com o sol, tendo a lua debaixo dos pés, e sobre a cabeça uma coroa de doze estrelas» (Ap 12, 1)',
   ],
 };
 
@@ -188,13 +224,57 @@ export function getMysterySetForWeekday(date: Date): MysterySet {
 }
 
 export function getMysterySetLabel(set: MysterySet): string {
-  const labels: Record<MysterySet, string> = {
-    joyful: 'Mistérios Gozosos',
-    luminous: 'Mistérios Luminosos',
-    sorrowful: 'Mistérios Dolorosos',
-    glorious: 'Mistérios Gloriosos',
-  };
-  return labels[set];
+   const labels: Record<MysterySet, string> = {
+     joyful: 'Mistérios Gozosos',
+     luminous: 'Mistérios Luminosos',
+     sorrowful: 'Mistérios Dolorosos',
+     glorious: 'Mistérios Gloriosos',
+   };
+   return labels[set];
+ }
+
+const ORDINAIS = ['Primeiro', 'Segundo', 'Terceiro', 'Quarto', 'Quinto'] as const;
+
+const SET_KIND_ADJECTIVE: Record<MysterySet, string> = {
+  joyful: 'Gozoso',
+  luminous: 'Luminoso',
+  sorrowful: 'Doloroso',
+  glorious: 'Glorioso',
+};
+
+/** Converte índice global 0..19 (rosário completo) em conjunto e posição dentro do conjunto. */
+export function getFullDecadeContext(globalDecade: number): { set: MysterySet; decadeInSet: number } {
+  const setIndex = Math.floor(globalDecade / 5);
+  const decadeInSet = globalDecade % 5;
+  return { set: FULL_ROSARY_ORDER[setIndex], decadeInSet };
+}
+
+/** Ex.: "Primeiro Mistério Gozoso - A Anunciação a Maria" */
+export function formatMysteryHeading(set: MysterySet, decadeInSet: number): string {
+  const ord = ORDINAIS[decadeInSet] ?? `${decadeInSet + 1}º`;
+  const kind = SET_KIND_ADJECTIVE[set];
+  const title = MYSTERY_TITLES[set][decadeInSet];
+  return `${ord} Mistério ${kind} - ${title}`;
+}
+
+export function getDailyMysterySet(date: Date = new Date()): MysterySet {
+  const dayOfWeek = date.getDay();
+
+  switch (dayOfWeek) {
+     case 1: // Segunda-feira
+     case 6: // Sábado
+       return 'joyful';
+     case 2: // Terça-feira
+     case 5: // Sexta-feira
+       return 'sorrowful';
+     case 0: // Domingo
+     case 3: // Quarta-feira
+       return 'glorious';
+     case 4: // Quinta-feira
+       return 'luminous';
+    default:
+      return 'glorious';
+  }
 }
 
 export const INTRO_TEXT = {
@@ -225,56 +305,19 @@ Para que sejamos dignos das promessas de Cristo. Amém.`,
   oracaoFinal: `Ó Deus, cujo Filho Unigênito, por Sua vida, morte e ressurreição, nos obteve o prêmio da salvação eterna, concedei-nos, nós Vos pedimos, que, meditando estes mistérios do Sacratíssimo Rosário da Bem-Aventurada Virgem Maria, imitemos o que contêm e consigamos o que prometem. Por Cristo, Senhor Nosso. Amém.`,
 };
 
-function introIds(): string[] {
-  return [
-    'intro:cross',
-    'intro:offering',
-    'intro:pai',
-    'intro:ave:1',
-    'intro:ave:2',
-    'intro:ave:3',
-    'intro:gloria',
-  ];
-}
-
-function decadeIds(set: MysterySet, decadeIndex: number): string[] {
-  const base = `${set}:d${decadeIndex}`;
-  return [
-    `${base}:mystery`,
-    `${base}:pai`,
-    ...Array.from({ length: 10 }, (_, i) => `${base}:ave:${i + 1}`),
-    `${base}:gloria`,
-  ];
-}
-
 export function getDailyRosaryIds(mysterySet: MysterySet): string[] {
-  const ids: string[] = [...introIds()];
-  for (let i = 0; i < 5; i++) {
-    ids.push(...decadeIds(mysterySet, i));
-  }
-  ids.push('outro:closing');
-  return ids;
+  return collectRosaryProgressIds(createDailyRosaryBeads(mysterySet));
 }
 
 export function getFullRosaryIds(): string[] {
-  const ids: string[] = [...introIds()];
-  let globalDecade = 0;
-  for (const set of FULL_ROSARY_ORDER) {
-    for (let i = 0; i < 5; i++) {
-      ids.push(...decadeIds(set, i).map((id) => `full:${globalDecade}:${id}`));
-      globalDecade++;
-    }
-  }
-  ids.push('outro:closing');
-  return ids;
+  return collectRosaryProgressIds(createFullRosaryBeads(FULL_ROSARY_ORDER));
 }
 
 export function labelForId(
   id: string,
   context: { mode: 'daily' | 'full'; mysterySet?: MysterySet }
 ): string {
-  if (id === 'intro:cross') return 'Sinal da Cruz e Credo';
-  if (id === 'intro:offering') return 'Oferecimento do Terço';
+  if (id === 'intro:sign-offering') return 'Sinal da Cruz e Oferecimento';
   if (id === 'intro:pai') return 'Pai Nosso';
   if (id.startsWith('intro:ave:')) {
     const n = id.split(':')[2];
@@ -283,28 +326,30 @@ export function labelForId(
   if (id === 'intro:gloria') return 'Glória ao Pai';
   if (id === 'outro:closing') return 'Agradecimento e Encerramento';
 
-  const parseDecade = (): { set: MysterySet; decadeInSet: number } | null => {
-    if (context.mode === 'daily') {
-      const m = id.match(/^(\w+):d(\d+):/);
-      if (!m) return null;
-      return { set: m[1] as MysterySet, decadeInSet: parseInt(m[2], 10) };
+  if (context.mode === 'daily') {
+    const m = id.match(/^(joyful|luminous|sorrowful|glorious):d(\d+):(open|gloria|ave:(\d+))$/);
+    if (m) {
+      const set = m[1] as MysterySet;
+      const d = parseInt(m[2], 10);
+      const tail = m[3];
+      const title = MYSTERY_TITLES[set][d];
+      if (tail === 'open') return `Mistério e Pai-Nosso (${title})`;
+      if (tail === 'gloria') return 'Glória ao Pai';
+      return `Ave Maria (${m[4]}/10)`;
     }
-    if (context.mode === 'full') {
-      const m = id.match(/^full:(\d+):(\w+):d(\d+):/);
-      if (!m) return null;
-      const set = m[2] as MysterySet;
-      return { set, decadeInSet: parseInt(m[3], 10) };
-    }
-    return null;
-  };
+  }
 
-  const dec = parseDecade();
-  if (dec) {
-    const title = MYSTERY_TITLES[dec.set][dec.decadeInSet];
-    if (id.endsWith(':mystery')) return `Mistério: ${title}`;
-    if (id.endsWith(':pai')) return 'Pai Nosso';
-    if (id.includes(':ave:')) return `Ave Maria (${id.split(':ave:')[1]}/10)`;
-    if (id.endsWith(':gloria')) return 'Glória ao Pai';
+  if (context.mode === 'full') {
+    const m = id.match(/^full:(\d+):(open|gloria|ave:(\d+))$/);
+    if (m) {
+      const g = parseInt(m[1], 10);
+      const { set, decadeInSet } = getFullDecadeContext(g);
+      const tail = m[2];
+      const title = MYSTERY_TITLES[set][decadeInSet];
+      if (tail === 'open') return `Mistério e Pai-Nosso (${title})`;
+      if (tail === 'gloria') return 'Glória ao Pai';
+      return `Ave Maria (${m[3]}/10)`;
+    }
   }
 
   return id;
@@ -315,21 +360,16 @@ export function getDecadeMeta(
   context: { mode: 'daily' | 'full'; mysterySet?: MysterySet }
 ): { set: MysterySet; decadeInSet: number; globalDecade?: number } | null {
   if (context.mode === 'daily') {
-    const m = id.match(/^(\w+):d(\d+):/);
+    const m = id.match(/^(joyful|luminous|sorrowful|glorious):d(\d+):/);
     if (!m) return null;
     return {
       set: m[1] as MysterySet,
       decadeInSet: parseInt(m[2], 10),
     };
   }
-  if (context.mode === 'full') {
-    const m = id.match(/^full:(\d+):(\w+):d(\d+):/);
-    if (!m) return null;
-    return {
-      set: m[2] as MysterySet,
-      decadeInSet: parseInt(m[3], 10),
-      globalDecade: parseInt(m[1], 10),
-    };
-  }
-  return null;
+  const mFull = id.match(/^full:(\d+):/);
+  if (!mFull) return null;
+  const globalDecade = parseInt(mFull[1], 10);
+  const { set, decadeInSet } = getFullDecadeContext(globalDecade);
+  return { set, decadeInSet, globalDecade };
 }

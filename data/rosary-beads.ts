@@ -18,6 +18,8 @@ export interface RosaryBead {
   phase: RosaryPhase;
   prayerText: string;
   displayLabel: string;
+  /** ID estável para progresso na API (1:1 com cada conta interativa). */
+  progressId: string;
   mysteryIndex?: number;
   mysterySet?: MysterySet;
   decadeInSet?: number;
@@ -32,7 +34,7 @@ export interface DecadeInfo {
 
 const MYSTERY_TITLES: Record<MysterySet, string[]> = {
   joyful: [
-    'Anunciação do anjo a Maria',
+    'A Anunciação a Maria',
     'Visitação de Maria a Santa Isabel',
     'Nascimento do Menino Jesus em Belém',
     'Apresentação do Menino Jesus no templo',
@@ -192,6 +194,7 @@ function createIntroBeads(): RosaryBead[] {
       phase: 'intro',
       prayerText: `✝ ${PRAYER_TEXTS.sinalDaCruz}\n\n${PRAYER_TEXTS.credito}`,
       displayLabel: 'Sinal da Cruz e Oferecimento',
+      progressId: 'intro:sign-offering',
     },
     {
       index: 1,
@@ -199,6 +202,7 @@ function createIntroBeads(): RosaryBead[] {
       phase: 'intro',
       prayerText: PRAYER_TEXTS.paiNosso,
       displayLabel: 'Pai-Nosso',
+      progressId: 'intro:pai',
     },
     {
       index: 2,
@@ -206,6 +210,7 @@ function createIntroBeads(): RosaryBead[] {
       phase: 'intro',
       prayerText: `${PRAYER_TEXTS.aveMaria}\n\nIntenção: Fé`,
       displayLabel: 'Ave-Maria 1/3',
+      progressId: 'intro:ave:1',
     },
     {
       index: 3,
@@ -213,6 +218,7 @@ function createIntroBeads(): RosaryBead[] {
       phase: 'intro',
       prayerText: `${PRAYER_TEXTS.aveMaria}\n\nIntenção: Esperança`,
       displayLabel: 'Ave-Maria 2/3',
+      progressId: 'intro:ave:2',
     },
     {
       index: 4,
@@ -220,6 +226,7 @@ function createIntroBeads(): RosaryBead[] {
       phase: 'intro',
       prayerText: `${PRAYER_TEXTS.aveMaria}\n\nIntenção: Caridade`,
       displayLabel: 'Ave-Maria 3/3',
+      progressId: 'intro:ave:3',
     },
     {
       index: 5,
@@ -227,6 +234,7 @@ function createIntroBeads(): RosaryBead[] {
       phase: 'intro',
       prayerText: `${PRAYER_TEXTS.gloriaAoPai}\n\n${PRAYER_TEXTS.oracaoDeFatima}`,
       displayLabel: 'Glória ao Pai',
+      progressId: 'intro:gloria',
     },
   ];
 }
@@ -234,7 +242,8 @@ function createIntroBeads(): RosaryBead[] {
 function createDecadeBeads(
   mysterySet: MysterySet,
   mysteryIndex: number,
-  startIndex: number
+  startIndex: number,
+  progressIdPrefix: string
 ): RosaryBead[] {
   const mysteryTitle = getMysteryTitle(mysterySet, mysteryIndex);
   const beads: RosaryBead[] = [];
@@ -245,6 +254,7 @@ function createDecadeBeads(
     phase: 'decade',
     prayerText: `Mistério: ${mysteryTitle}\n\n${PRAYER_TEXTS.paiNosso}`,
     displayLabel: `Mistério ${mysteryIndex + 1}: ${mysteryTitle}`,
+    progressId: `${progressIdPrefix}:open`,
     mysteryIndex,
     mysterySet,
     decadeInSet: mysteryIndex,
@@ -257,6 +267,7 @@ function createDecadeBeads(
       phase: 'decade',
       prayerText: `${PRAYER_TEXTS.aveMaria}\n\n(${i}/10)`,
       displayLabel: `Ave-Maria ${i}/10`,
+      progressId: `${progressIdPrefix}:ave:${i}`,
       mysteryIndex,
       mysterySet,
       decadeInSet: mysteryIndex,
@@ -268,86 +279,84 @@ function createDecadeBeads(
 
 function createClosingBead(): RosaryBead {
   return {
-    index: 58,
+    index: 0,
     beadType: 'closing',
     phase: 'closing',
     prayerText: PRAYER_TEXTS.agradecimiento,
     displayLabel: 'Agradecimento',
-  };
-}
-
-function createGloriaBead(decadeIndex: number): RosaryBead {
-  return {
-    index: 6 + (decadeIndex * 11) + 10,
-    beadType: 'medallion',
-    phase: 'decade',
-    prayerText: `${PRAYER_TEXTS.gloriaAoPai}\n\n${PRAYER_TEXTS.oracaoDeFatima}`,
-    displayLabel: 'Glória ao Pai',
-    mysteryIndex: decadeIndex,
+    progressId: 'outro:closing',
   };
 }
 
 export function createDailyRosaryBeads(mysterySet: MysterySet): RosaryBead[] {
   const beads: RosaryBead[] = [];
-  
-  for (const bead of createIntroBeads()) {
-    beads.push({ ...bead });
-  }
-  
-  let decadeIndex = 0;
-  for (let i = 0; i < 5; i++) {
-    const decadeBeads = createDecadeBeads(mysterySet, i, beads.length);
-    for (const bead of decadeBeads) {
-      beads.push({ ...bead });
-    }
-    
-    if (i < 4) {
-      beads.push({
-        ...createGloriaBead(decadeIndex),
-        index: beads.length,
-      });
-    }
-    decadeIndex++;
-  }
-  
-  beads.push({ ...createClosingBead(), index: beads.length });
-  
-  return beads;
-}
 
-export function createFullRosaryBeads(mysterySets: MysterySet[]): RosaryBead[] {
-  const beads: RosaryBead[] = [];
-  
   for (const bead of createIntroBeads()) {
-    beads.push({ ...bead });
+    beads.push({ ...bead, index: beads.length });
   }
-  
-  let globalDecadeIndex = 0;
-  
-  for (const mysterySet of mysterySets) {
-    for (let i = 0; i < 5; i++) {
-      const decadeBeads = createDecadeBeads(mysterySet, i, beads.length);
-      for (const bead of decadeBeads) {
-        beads.push({ ...bead });
-      }
-      
+
+  for (let i = 0; i < 5; i++) {
+    const prefix = `${mysterySet}:d${i}`;
+    const decadeBeads = createDecadeBeads(mysterySet, i, beads.length, prefix);
+    for (const bead of decadeBeads) {
+      beads.push({ ...bead, index: beads.length });
+    }
+
+    if (i < 4) {
       beads.push({
         index: beads.length,
         beadType: 'medallion',
         phase: 'decade',
         prayerText: `${PRAYER_TEXTS.gloriaAoPai}\n\n${PRAYER_TEXTS.oracaoDeFatima}`,
         displayLabel: 'Glória ao Pai',
-        mysteryIndex: globalDecadeIndex,
+        progressId: `${mysterySet}:d${i}:gloria`,
+        mysterySet,
+        mysteryIndex: i,
+        decadeInSet: i,
+      });
+    }
+  }
+
+  beads.push({ ...createClosingBead(), index: beads.length });
+
+  return beads;
+}
+
+export function createFullRosaryBeads(mysterySets: MysterySet[]): RosaryBead[] {
+  const beads: RosaryBead[] = [];
+
+  for (const bead of createIntroBeads()) {
+    beads.push({ ...bead, index: beads.length });
+  }
+
+  let globalDecadeIndex = 0;
+
+  for (const mysterySet of mysterySets) {
+    for (let i = 0; i < 5; i++) {
+      const prefix = `full:${globalDecadeIndex}`;
+      const decadeBeads = createDecadeBeads(mysterySet, i, beads.length, prefix);
+      for (const bead of decadeBeads) {
+        beads.push({ ...bead, index: beads.length });
+      }
+
+      beads.push({
+        index: beads.length,
+        beadType: 'medallion',
+        phase: 'decade',
+        prayerText: `${PRAYER_TEXTS.gloriaAoPai}\n\n${PRAYER_TEXTS.oracaoDeFatima}`,
+        displayLabel: 'Glória ao Pai',
+        progressId: `full:${globalDecadeIndex}:gloria`,
+        mysteryIndex: i,
         mysterySet,
         decadeInSet: i,
       });
-      
+
       globalDecadeIndex++;
     }
   }
-  
+
   beads.push({ ...createClosingBead(), index: beads.length });
-  
+
   return beads;
 }
 
@@ -363,5 +372,11 @@ export function getDecadeInfoForBead(bead: RosaryBead): DecadeInfo | null {
   return null;
 }
 
-export const TOTAL_BEADS_DAILY = 59;
-export const TOTAL_BEADS_FULL = 206;
+/** 6 intro + 5×11 dezenas + 4 glórias + 1 encerramento */
+export const TOTAL_BEADS_DAILY = 66;
+/** 6 intro + 20×(11+1) + 1 encerramento */
+export const TOTAL_BEADS_FULL = 247;
+
+export function collectRosaryProgressIds(beads: RosaryBead[]): string[] {
+  return beads.map((b) => b.progressId);
+}

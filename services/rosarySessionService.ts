@@ -3,7 +3,7 @@ import {
   createFullRosaryBeads,
   type RosaryBead,
 } from '@/data/rosary-beads';
-import { FULL_ROSARY_ORDER, getMysterySetLabel } from '@/data/rosary';
+import { FULL_ROSARY_ORDER, getDailyMysterySet, getMysterySetLabel } from '@/data/rosary';
 import type { MysterySet, RosarySessionMeta, RosaryStartMode } from '@/types/progress';
 
 export type RosarySession = {
@@ -12,21 +12,7 @@ export type RosarySession = {
 };
 
 function getTercoMarianoMysterySet(now: Date): MysterySet {
-  switch (now.getDay()) {
-    case 1:
-    case 6:
-      return 'joyful';
-    case 2:
-    case 5:
-      return 'sorrowful';
-    case 3:
-    case 0:
-      return 'glorious';
-    case 4:
-      return 'luminous';
-    default:
-      return 'glorious';
-  }
+  return getDailyMysterySet(now);
 }
 
 function resolveMysterySets(startMode: RosaryStartMode, now: Date): MysterySet[] {
