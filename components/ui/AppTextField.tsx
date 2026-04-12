@@ -82,30 +82,32 @@ export function AppTextField({
 }
 
 const styles = StyleSheet.create({
-  wrap: { marginBottom: 18 },
+  wrap: { marginBottom: 20 },
   label: {
-    fontSize: 15,
-    fontWeight: '600',
+    fontSize: 14,
+    fontWeight: '700',
     color: palette.text,
-    marginBottom: 8,
-    letterSpacing: 0.2, // Elegância extra na tipografia
+    marginBottom: 6,
+    letterSpacing: 1.0, // Uppercase e clean architecture
+    textTransform: 'uppercase', // Mantém coerência modular de UI corporativa
   },
   fieldRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    minHeight: touchMin * 1.1,
+    minHeight: touchMin * 1.2,
     borderWidth: 1,
-    borderColor: palette.border,
-    borderRadius: radii.md,
-    backgroundColor: '#F7F9FC', // Um fundo muito suave de contraste com o branco puro do card
+    borderColor: 'transparent',
+    borderBottomColor: palette.border, // Suporta a textura em um contorno minimalista
+    borderRadius: radii.sm, // zero
+    backgroundColor: 'rgba(30, 74, 120, 0.04)', // Translúcido sobree fundo branco
     paddingHorizontal: 16,
   },
   fieldFocused: {
-    borderColor: palette.primaryMuted,
-    backgroundColor: palette.surface, // Clareia quando foca
+    borderBottomColor: palette.primary,
+    backgroundColor: 'rgba(30, 74, 120, 0.08)', // Mais denso
   },
   fieldError: { 
-    borderColor: palette.error,
+    borderBottomColor: palette.error,
     backgroundColor: '#FFF5F5',
   },
   input: {

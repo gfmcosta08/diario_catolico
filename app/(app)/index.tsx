@@ -126,24 +126,28 @@ const styles = StyleSheet.create({
   banner: {
     backgroundColor: 'rgba(255, 255, 255, 0.1)',
     padding: spacing.md,
-    borderRadius: 8,
+    borderRadius: 0, // Sharp edges
     marginBottom: spacing.lg,
     color: '#E2E8F0',
     fontSize: 14,
     lineHeight: 20,
     borderWidth: 1,
+    borderLeftWidth: 4, // Estilo clássico de painel
     borderColor: 'rgba(255, 255, 255, 0.15)',
+    borderLeftColor: palette.error, // Sinaliza aviso de form forma brutalista
   },
   linkBanner: {
     marginBottom: spacing.xl,
     padding: spacing.md,
     backgroundColor: palette.accent,
-    borderRadius: 8,
+    borderRadius: 0, // Sharp vitral
     shadowColor: palette.accent,
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.4,
-    shadowRadius: 8,
+    shadowRadius: 0, // Sombra reta/blocky
     elevation: 4,
+    borderWidth: 1,
+    borderColor: 'rgba(255,255,255,0.4)',
   },
   linkTxt: {
     color: palette.primary,

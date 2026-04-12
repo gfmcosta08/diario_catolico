@@ -66,22 +66,24 @@ export function AppButton({
 
 const styles = StyleSheet.create({
   base: {
-    minHeight: touchMin * 1.1, // Ligeiramente mais alto para dar aparência premium
-    paddingHorizontal: 20,
-    borderRadius: radii.md,
+    minHeight: touchMin * 1.2, // Um bloco arquitetônico maior
+    paddingHorizontal: 24,
+    borderRadius: radii.sm, // Agora 0
     alignItems: 'center',
     justifyContent: 'center',
   },
   primaryBg: {
-    backgroundColor: palette.accent, // Dourado
-    shadowColor: '#C9A227',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.3,
-    shadowRadius: 8,
+    backgroundColor: palette.accent, // Bloco de Ouro Dourado Sólido
+    borderWidth: 2, // Fio de luz
+    borderColor: 'rgba(255, 255, 255, 0.4)', // Efeito vitral frontal
+    shadowColor: palette.accent,
+    shadowOffset: { width: 0, height: 6 },
+    shadowOpacity: 0.15,
+    shadowRadius: 0, // Sombra dura
     elevation: 4,
   },
   outlineBg: {
-    backgroundColor: 'transparent',
+    backgroundColor: palette.glassWhite,
     borderWidth: 2,
     borderColor: palette.primary,
   },
@@ -89,12 +91,13 @@ const styles = StyleSheet.create({
     backgroundColor: 'transparent',
   },
   disabled: { opacity: 0.5 },
-  pressed: { opacity: 0.88, transform: [{ scale: 0.98 }] },
+  pressed: { opacity: 0.9, transform: [{ scale: 0.99 }] }, // Movimento afiado e curto
   label: {
-    fontSize: 17,
-    fontWeight: '700',
-    letterSpacing: 0.2, // Espaçamento maior transmite elegância
+    fontSize: 15,
+    fontWeight: '800',
+    letterSpacing: 2.0, // Altamente minimalista e espaçado
+    textTransform: 'uppercase', // Brutalista
   },
-  labelOnPrimary: { color: palette.primary }, // Azul Escuro sobre fundo Dourado
+  labelOnPrimary: { color: palette.primary },
   labelMuted: { color: palette.primary },
 });

@@ -56,11 +56,13 @@ const styles = StyleSheet.create({
   iconWrap: {
     width: 50,
     height: 50,
-    borderRadius: 25,
+    borderRadius: 0, // Quadrado Brutalista
     backgroundColor: 'rgba(30, 74, 120, 0.08)', // Azul sutil translúcido
     alignItems: 'center',
     justifyContent: 'center',
     marginRight: spacing.md,
+    borderWidth: 1,
+    borderColor: 'rgba(30, 74, 120, 0.15)', // Contorno duro
   },
   textWrap: { flex: 1, paddingRight: spacing.sm },
   title: {
@@ -77,9 +79,11 @@ const styles = StyleSheet.create({
   arrowWrap: {
     width: 28,
     height: 28,
-    borderRadius: 14,
+    borderRadius: 0, // Bloco
     backgroundColor: 'rgba(201, 162, 39, 0.15)', // Fundo redondinho em tom dourado suave pro chevron
     alignItems: 'center',
     justifyContent: 'center',
+    borderWidth: 1,
+    borderColor: 'rgba(201, 162, 39, 0.3)',
   }
 });
