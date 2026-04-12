@@ -1,29 +1,38 @@
 export const palette = {
-  // Cores de Fundo (Modo Escuro / Vitral Neon)
-  background: '#040b14', // Fundo principal extremamente escuro
-  surface: '#0a192f', // Superfícies e paneis sólidos escuros
+  // Main Theme Colors
+  primary: '#5B2C6F',
+  primaryLight: '#7D3C98',
+  primaryDark: '#4A235A',
   
-  // Cores de Ação (Vibrantes e Brilhantes)
-  primary: '#64ffda', // Um cyan neon que brilha no fundo escuro (como na imagem gerada)
-  primaryMuted: '#1E4A78', // O tom clássico para blocos profundos não focados
-  accent: '#FFD700', // Dourado forte
-  accentSoft: '#B8860B', // Dourado secundário
-  
-  // Tinta
-  text: '#ccd6f6', // Branco levemente prateado brilhante
-  textSecondary: '#8892b0', // Cinza azulado para legendas
-  
-  // Estrutura
-  border: '#233554', // Bordas padrões
-  error: '#ff5555',
-  success: '#50fa7b',
-  
-  // Texturas de Vidro (Vitral Geométrico Translúcido)
-  glassWhite: 'rgba(255, 255, 255, 0.03)',
-  glassDark: 'rgba(10, 25, 47, 0.75)',
-  glassGold: 'rgba(255, 215, 0, 0.15)',
-  glassBorder: 'rgba(100, 255, 218, 0.25)', // Borda cyan suave
-  glassBorderDark: 'rgba(10, 25, 47, 0.6)',
+  // Accents
+  gold: '#D4A017',
+  goldLight: '#F4D03F',
+
+  // Background and Surfaces
+  background: '#F8F5F0',
+  surface: '#FFFFFF',
+
+  // Typography
+  text: '#2C3E50',
+  textSecondary: '#7F8C8D',
+
+  // Status and Structure
+  success: '#27AE60',
+  danger: '#E74C3C',
+  warning: '#F39C12',
+  border: '#E8E0D8',
+
+  // Preserving legacy fallbacks needed by existing code
+  primaryMuted: 'rgba(91,44,111,0.1)',
+  error: '#E74C3C',
+  accent: '#D4A017',
+  accentSoft: '#F4D03F',
+
+  glassWhite: 'rgba(255, 255, 255, 0.97)',
+  glassDark: 'rgba(0,0,0,0.5)',
+  glassGold: 'rgba(212,160,23,0.1)',
+  glassBorder: '#E8E0D8',
+  glassBorderDark: '#2A2A3E',
 } as const;
 
 export const spacing = {
@@ -34,11 +43,12 @@ export const spacing = {
   xl: 32,
 } as const;
 
-export const radii = { // ZERADO (Arestas afiadas)
-  sm: 0,
-  md: 0,
-  lg: 0,
+export const radii = {
+  sm: 8,
+  md: 12,
+  lg: 20,
   full: 9999,
 } as const;
 
 export const touchMin = 44;
+

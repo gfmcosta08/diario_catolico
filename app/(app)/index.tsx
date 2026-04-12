@@ -1,25 +1,28 @@
-import { HomeCard } from '@/components/ui/HomeCard';
 import { useAuth } from '@/context/AuthContext';
-import { palette, spacing } from '@/constants/theme';
+import { palette, spacing, radii } from '@/constants/theme';
 import { Link } from 'expo-router';
-import { ScrollView, StyleSheet, Text, View } from 'react-native';
-import { LinearGradient } from 'expo-linear-gradient';
+import { ScrollView, StyleSheet, Text, View, Pressable } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { FontAwesome5 } from '@expo/vector-icons';
+import { useState, useEffect } from 'react';
 
 export const options = { title: 'Início', headerShown: false };
 
 export default function HomeScreen() {
   const { configured, session } = useAuth();
   const insets = useSafeAreaInsets();
+  
+  // Real data state
+  const userName = session?.user?.name?.split(' ')[0] || 'Maria';
+  
+  const [currentDateString, setCurrentDateString] = useState('');
+  useEffect(() => {
+    const now = new Date();
+    setCurrentDateString(now.toLocaleDateString('pt-BR', {weekday:'long', year:'numeric', month:'long', day:'numeric'}));
+  }, []);
 
   return (
     <View style={styles.root}>
-      {/* Dark Architectural Gradient */}
-      <LinearGradient
-        colors={['#040b14', '#07152b', '#0a192f']}
-        locations={[0, 0.5, 1]}
-        style={StyleSheet.absoluteFillObject}
-      />
       <ScrollView 
         showsVerticalScrollIndicator={false}
         contentContainerStyle={[
@@ -30,70 +33,124 @@ export default function HomeScreen() {
           }
         ]}
       >
-        <View style={styles.header}>
+        <View style={styles.pageHeader}>
           <Text style={styles.greet} allowFontScaling>
-            Paz e bem
+            Bom dia, {userName}! ☀️
           </Text>
-          <Text style={styles.lead} allowFontScaling>
-            Escolha uma prática para hoje. Dê um passo em sua jornada diária com Cristo.
+          <Text style={styles.dateText} allowFontScaling>
+            {currentDateString}
           </Text>
         </View>
 
         {!configured ? (
-          <Text style={styles.banner} allowFontScaling>
-            Aviso: O app está rodando localmente sem sincronização habilitada.
-          </Text>
+          <View style={styles.banner}>
+            <Text style={styles.bannerText}>Aviso: Aplicativo local sem sincronização em nuvem.</Text>
+          </View>
         ) : null}
-        
-        {configured && !session ? (
-          <Link href="/(auth)/login" asChild>
-            <View style={styles.linkBanner}>
-              <Text style={styles.linkTxt} allowFontScaling>
-                Acessar minha conta para salvar avanços
-              </Text>
-            </View>
-          </Link>
-        ) : null}
-        
-        <View style={styles.cards}>
+
+        <View style={styles.quickActions}>
           <Link href="/(app)/rosary-player-daily" asChild>
-            <HomeCard
-              title="Terço Mariano"
-              subtitle="Oração imersiva no conjunto do dia (5 mistérios)."
-              icon="circle"
-            />
-          </Link>
-          <Link href="/(app)/rosary-player-full" asChild>
-            <HomeCard
-              title="Santo Rosário"
-              subtitle="Contemplação profunda em sequência (20 mistérios)."
-              icon="dot-circle-o"
-            />
-          </Link>
-          <Link href="/(app)/rosary-daily" asChild>
-            <HomeCard
-              title="Rosário (Lista)"
-              subtitle="Layout simplificado para marcação com checklist."
-              icon="list"
-            />
+            <Pressable style={({pressed}) => [styles.quickActionBtn, pressed && styles.pressed]}>
+              <FontAwesome5 name="pray" size={22} color={palette.primary} />
+              <Text style={styles.quickActionText}>Rezar o Terço</Text>
+            </Pressable>
           </Link>
           <Link href="/(app)/bible" asChild>
-            <HomeCard
-              title="A Bíblia em 365 Dias"
-              subtitle="Projeto de leitura unificada da Palavra com progresso."
-              icon="book"
-            />
+            <Pressable style={({pressed}) => [styles.quickActionBtn, pressed && styles.pressed]}>
+              <FontAwesome5 name="book-open" size={22} color={palette.primary} />
+              <Text style={styles.quickActionText}>Ler a Bíblia</Text>
+            </Pressable>
           </Link>
-          {configured && session ? (
-            <Link href="/(app)/settings" asChild>
-              <HomeCard
-                title="Sincronização e Ajustes"
-                subtitle="Gerenciamento de perfil, fóruns e ministérios."
-                icon="user"
-              />
-            </Link>
-          ) : null}
+          <Link href="/(app)/forum" asChild>
+            <Pressable style={({pressed}) => [styles.quickActionBtn, pressed && styles.pressed]}>
+              <FontAwesome5 name="comments" size={22} color={palette.primary} />
+              <Text style={styles.quickActionText}>Abrir o Feed</Text>
+            </Pressable>
+          </Link>
+          <Pressable style={({pressed}) => [styles.quickActionBtn, pressed && styles.pressed]}>
+            <FontAwesome5 name="calendar-check" size={22} color={palette.primary} />
+            <Text style={styles.quickActionText}>Ver Escalas</Text>
+          </Pressable>
+          <Pressable style={({pressed}) => [styles.quickActionBtn, pressed && styles.pressed]}>
+            <FontAwesome5 name="plus-circle" size={22} color={palette.primary} />
+            <Text style={styles.quickActionText}>Criar Ministério</Text>
+          </Pressable>
+          <Pressable style={({pressed}) => [styles.quickActionBtn, pressed && styles.pressed]}>
+            <FontAwesome5 name="hands-praying" size={22} color={palette.primary} />
+            <Text style={styles.quickActionText}>Mural de Oração</Text>
+          </Pressable>
         </View>
+
+        <View style={styles.statsGrid}>
+          <View style={styles.statCard}>
+            <View style={[styles.iconWrap, {backgroundColor: 'rgba(91,44,111,0.1)'}]}>
+              <FontAwesome5 name="fire" size={18} color={palette.primary} />
+            </View>
+            <Text style={styles.statValue}>0</Text>
+            <Text style={styles.statLabel}>Dias de Ofensiva</Text>
+          </View>
+
+          <Link href="/(app)/bible" asChild>
+            <Pressable style={styles.statCard}>
+              <View style={[styles.iconWrap, {backgroundColor: 'rgba(212,160,23,0.1)'}]}>
+                <FontAwesome5 name="book-open" size={18} color={palette.gold} />
+              </View>
+              <Text style={styles.statValue}>1</Text>
+              <Text style={styles.statLabel}>Dia de 365 na Bíblia</Text>
+            </Pressable>
+          </Link>
+
+          <View style={styles.statCard}>
+            <View style={[styles.iconWrap, {backgroundColor: 'rgba(39,174,96,0.1)'}]}>
+              <FontAwesome5 name="calendar-check" size={18} color={palette.success} />
+            </View>
+            <Text style={styles.statValue}>0</Text>
+            <Text style={styles.statLabel}>Escalas assumidas</Text>
+          </View>
+
+          <Link href="/(app)/rosary-daily" asChild>
+            <Pressable style={styles.statCard}>
+              <View style={[styles.iconWrap, {backgroundColor: 'rgba(231,76,60,0.1)'}]}>
+                <FontAwesome5 name="cross" size={18} color={palette.danger} />
+              </View>
+              <Text style={styles.statValue}>0</Text>
+              <Text style={styles.statLabel}>Terços Rezados</Text>
+            </Pressable>
+          </Link>
+        </View>
+
+        <View style={styles.card}>
+          <View style={styles.cardHeader}>
+            <View style={styles.cardTitleWrap}>
+              <FontAwesome5 name="bible" size={15} color={palette.primary} />
+              <Text style={styles.cardTitle}>Leitura de Hoje</Text>
+            </View>
+            <Link href="/(app)/bible" asChild>
+              <Pressable style={styles.btnSmSecondary}>
+                <Text style={styles.btnSmText}>Ler Agora</Text>
+              </Pressable>
+            </Link>
+          </View>
+          
+          <View style={styles.readingsList}>
+            <View style={styles.readingItem}>
+              <Text style={styles.readingType}>📖 ANTIGO TESTAMENTO</Text>
+              <Text style={styles.readingTitle}>Gênesis 1:1-31</Text>
+              <Text style={styles.readingDesc}>A Criação — No princípio Deus criou os céus e a terra...</Text>
+            </View>
+            <View style={styles.readingItem}>
+              <Text style={styles.readingType}>✝️ NOVO TESTAMENTO</Text>
+              <Text style={styles.readingTitle}>Mateus 1:1-17</Text>
+              <Text style={styles.readingDesc}>Genealogia de Jesus Cristo</Text>
+            </View>
+            <View style={[styles.readingItem, { borderBottomWidth: 0, paddingBottom: 0 }]}>
+              <Text style={styles.readingType}>🙏 SALMO</Text>
+              <Text style={styles.readingTitle}>Salmo 1:1-6</Text>
+              <Text style={styles.readingDesc}>Bem-aventurado o homem que não segue o conselho dos ímpios...</Text>
+            </View>
+          </View>
+        </View>
+
       </ScrollView>
     </View>
   );
@@ -105,60 +162,163 @@ const styles = StyleSheet.create({
     backgroundColor: palette.background,
   },
   container: {
-    paddingHorizontal: spacing.lg,
+    paddingHorizontal: spacing.xl,
     flexGrow: 1,
+    maxWidth: 920,
+    alignSelf: 'center',
+    width: '100%',
   },
-  header: {
+  pageHeader: {
     marginBottom: spacing.xl,
-    paddingTop: spacing.xl,
   },
   greet: {
-    fontSize: 32,
-    fontWeight: '800',
-    color: palette.text,
-    marginBottom: spacing.xs,
-    letterSpacing: 0.5,
+    fontSize: 24,
+    fontWeight: '700',
+    color: palette.primaryDark,
   },
-  lead: {
-    fontSize: 16,
+  dateText: {
+    fontSize: 14,
     color: palette.textSecondary,
-    lineHeight: 24,
+    marginTop: 4,
+    textTransform: 'capitalize',
   },
   banner: {
-    backgroundColor: palette.glassDark,
+    backgroundColor: palette.warning,
     padding: spacing.md,
-    borderRadius: 0, // Sharp edges
+    borderRadius: radii.md,
     marginBottom: spacing.lg,
-    color: palette.text,
+  },
+  bannerText: {
+    color: '#fff',
+    fontWeight: '600',
     fontSize: 14,
-    lineHeight: 20,
-    borderWidth: 1,
-    borderLeftWidth: 4, // Painel Brutalista
-    borderColor: palette.glassBorder,
-    borderLeftColor: palette.error, // Sinal de erro contrastante
   },
-  linkBanner: {
-    marginBottom: spacing.xl,
-    padding: spacing.md,
-    backgroundColor: palette.glassDark,
-    borderRadius: 0, // Sharp vitral
-    shadowColor: palette.primary,
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.8,
-    shadowRadius: 10,
-    elevation: 4,
-    borderWidth: 1,
-    borderColor: palette.primary, 
+  quickActions: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    justifyContent: 'space-between',
+    marginBottom: 22,
   },
-  linkTxt: {
-    color: palette.primary,
-    fontWeight: '800',
-    fontSize: 15,
+  quickActionBtn: {
+    width: '31%',
+    backgroundColor: palette.surface,
+    borderWidth: 2,
+    borderColor: palette.border,
+    borderRadius: radii.md,
+    paddingVertical: 18,
+    paddingHorizontal: 10,
+    alignItems: 'center',
+    marginBottom: 12,
+  },
+  quickActionText: {
+    fontSize: 12,
+    fontWeight: '600',
+    color: palette.text,
+    marginTop: 8,
     textAlign: 'center',
-    textTransform: 'uppercase',
   },
-  cards: { 
-    marginTop: spacing.xs,
-    paddingBottom: spacing.xl,
+  pressed: {
+    borderColor: palette.primary,
+    opacity: 0.8,
+  },
+  statsGrid: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    justifyContent: 'space-between',
+    marginBottom: 22,
+  },
+  statCard: {
+    width: '48%',
+    backgroundColor: palette.surface,
+    borderWidth: 1,
+    borderColor: palette.border,
+    borderRadius: radii.md,
+    padding: 18,
+    marginBottom: 14,
+  },
+  iconWrap: {
+    width: 42,
+    height: 42,
+    borderRadius: 11,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginBottom: 10,
+  },
+  statValue: {
+    fontSize: 22,
+    fontWeight: '700',
+    color: palette.text,
+    marginBottom: 2,
+  },
+  statLabel: {
+    fontSize: 12,
+    color: palette.textSecondary,
+  },
+  card: {
+    backgroundColor: palette.surface,
+    borderRadius: radii.lg,
+    padding: 22,
+    borderWidth: 1,
+    borderColor: palette.border,
+    shadowColor: palette.primary,
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 12,
+    elevation: 2,
+    marginBottom: 24,
+  },
+  cardHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    marginBottom: 14,
+  },
+  cardTitleWrap: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+  },
+  cardTitle: {
+    fontSize: 15,
+    fontWeight: '600',
+    color: palette.text,
+    marginLeft: 6,
+  },
+  btnSmSecondary: {
+    backgroundColor: palette.background,
+    paddingVertical: 8,
+    paddingHorizontal: 16,
+    borderRadius: radii.sm,
+  },
+  btnSmText: {
+    fontSize: 13,
+    color: palette.text,
+    fontWeight: '600',
+  },
+  readingsList: {
+    marginTop: 8,
+  },
+  readingItem: {
+    paddingVertical: 14,
+    borderBottomWidth: 1,
+    borderBottomColor: palette.border,
+  },
+  readingType: {
+    fontSize: 11,
+    fontWeight: '700',
+    color: palette.primary,
+    letterSpacing: 0.5,
+    marginBottom: 6,
+  },
+  readingTitle: {
+    fontSize: 17,
+    fontWeight: '700',
+    color: palette.text,
+    marginBottom: 4,
+  },
+  readingDesc: {
+    fontSize: 13,
+    color: palette.textSecondary,
   },
 });
+
