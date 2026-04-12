@@ -1,4 +1,4 @@
-﻿# Continuidade do Projeto
+# Continuidade do Projeto
 
 Data de atualização: 2026-04-05
 
@@ -70,7 +70,7 @@ Itens levantados em auditoria para endurecimento futuro:
 1. **Bíblia 365 — texto integral:** `READING_PLAN_BODY_DATA` segue vazio até haver JSON licenciado **ou** decisão de produto alternativa (links externos com revisão de ToS; ou texto em domínio público com aviso honesto; ou parceria/licença futura).
 2. **Supabase:** aplicar `002_ministries.sql` no projeto (SQL Editor ou CLI) se ainda não aplicado; revisar triggers em `auth.users` por conflito com templates existentes.
 3. **Vercel:** configurar projeto com root `agenda-catolica`, variáveis de ambiente e domínio final de `EXPO_PUBLIC_SITE_URL`.
-4. **Correções recomendadas:** scheme de reset de senha; endurecimento RLS/views conforme tabela acima (priorizar conforme risco).
+4. **Correções recomendadas:** (Resolvido: scheme corrigido para leiabiblia365) endurecimento RLS/views conforme tabela acima (priorizar conforme risco).
 
 ## Sugestões para a Próxima Interação
 

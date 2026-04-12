@@ -1,10 +1,11 @@
 import { AppButton } from '@/components/ui/AppButton';
 import { AppTextField } from '@/components/ui/AppTextField';
+import { AuthBackground } from '@/components/ui/AuthBackground';
 import { useAuth } from '@/context/AuthContext';
 import { palette, spacing } from '@/constants/theme';
 import { router } from 'expo-router';
 import { useState } from 'react';
-import { ScrollView, StyleSheet, Text, View } from 'react-native';
+import { StyleSheet, Text, View } from 'react-native';
 
 export default function RegisterScreen() {
   const { signUp } = useAuth();
@@ -12,6 +13,7 @@ export default function RegisterScreen() {
   const [password, setPassword] = useState('');
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
+
   async function onSubmit() {
     setError(null);
     if (password.length < 6) {
@@ -38,11 +40,11 @@ export default function RegisterScreen() {
   }
 
   return (
-    <View style={styles.container}>
-      <ScrollView contentContainerStyle={styles.content} keyboardShouldPersistTaps="handled">
-        <Text style={styles.title}>Criar Conta</Text>
-        <Text style={styles.subtitle}>Digite seu e-mail e senha para se cadastrar.</Text>
-        
+    <AuthBackground 
+      title="Criar Conta" 
+      subtitle="Inicie sua jornada litúrgica em um ambiente guiado."
+    >
+      <View style={styles.formSpace}>
         <AppTextField
           label="E-mail"
           value={email}
@@ -63,46 +65,35 @@ export default function RegisterScreen() {
         
         {error ? <Text style={styles.error}>{error}</Text> : null}
         
-        <AppButton title="Cadastrar" onPress={onSubmit} loading={loading} />
-        
-        <AppButton 
-          title="Já tenho conta - Fazer Login" 
-          variant="outline" 
-          style={styles.loginBtn} 
-          onPress={goToLogin}
-        />
-      </ScrollView>
-    </View>
+        <View style={styles.buttonGroup}>
+          <AppButton title="Cadastrar" onPress={onSubmit} loading={loading} />
+          
+          <AppButton 
+            title="Já tenho conta - Fazer Login" 
+            variant="outline" 
+            style={styles.loginBtn} 
+            onPress={goToLogin}
+          />
+        </View>
+      </View>
+    </AuthBackground>
   );
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: palette.background,
+  formSpace: {
+    paddingTop: spacing.sm,
   },
-  content: {
-    padding: spacing.lg,
-    paddingTop: spacing.xl * 2,
-  },
-  title: {
-    fontSize: 28,
-    fontWeight: '800',
-    color: palette.text,
-    marginBottom: spacing.sm,
-  },
-  subtitle: {
-    fontSize: 16,
-    color: palette.textSecondary,
-    marginBottom: spacing.lg,
-    lineHeight: 24,
+  buttonGroup: {
+    marginTop: spacing.md,
   },
   error: {
     color: palette.error,
     marginBottom: spacing.md,
     fontSize: 14,
+    textAlign: 'center',
   },
   loginBtn: {
-    marginTop: spacing.lg,
+    marginTop: spacing.sm,
   },
 });

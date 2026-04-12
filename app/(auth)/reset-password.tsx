@@ -1,10 +1,11 @@
-﻿import { AppButton } from '@/components/ui/AppButton';
+import { AppButton } from '@/components/ui/AppButton';
 import { AppTextField } from '@/components/ui/AppTextField';
+import { AuthBackground } from '@/components/ui/AuthBackground';
 import { palette, spacing } from '@/constants/theme';
 import { api } from '@/lib/api';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { useMemo, useState } from 'react';
-import { ScrollView, StyleSheet, Text } from 'react-native';
+import { StyleSheet, Text, View } from 'react-native';
 
 export default function ResetPasswordScreen() {
   const params = useLocalSearchParams<{ token?: string }>();
@@ -42,45 +43,58 @@ export default function ResetPasswordScreen() {
   }
 
   return (
-    <ScrollView contentContainerStyle={styles.scroll} keyboardShouldPersistTaps="handled">
-      <Text style={styles.sub} allowFontScaling>
-        Informe o token e a nova senha para concluir a redefinição.
-      </Text>
+    <AuthBackground 
+      title="Nova Senha" 
+      subtitle="Defina sua nova credencial de acesso seguro."
+    >
+      <View style={styles.formSpace}>
+        <AppTextField label="Token Numérico" value={token} onChangeText={setToken} autoCapitalize="none" />
+        
+        <AppTextField
+          label="Nova Senha"
+          value={password}
+          onChangeText={setPassword}
+          secureTextEntry
+          showPasswordToggle
+          autoComplete="new-password"
+        />
 
-      <AppTextField label="Token" value={token} onChangeText={setToken} autoCapitalize="none" />
-      <AppTextField
-        label="Nova senha"
-        value={password}
-        onChangeText={setPassword}
-        secureTextEntry
-        showPasswordToggle
-        autoComplete="new-password"
-      />
+        {error ? (
+          <Text style={styles.err} allowFontScaling>
+            {error}
+          </Text>
+        ) : null}
+        
+        {done ? (
+          <Text style={styles.ok} allowFontScaling>
+            Senha redefinida com sucesso. Retornando ao início...
+          </Text>
+        ) : null}
 
-      {error ? (
-        <Text style={styles.err} allowFontScaling>
-          {error}
-        </Text>
-      ) : null}
-      {done ? (
-        <Text style={styles.ok} allowFontScaling>
-          Senha redefinida com sucesso. Redirecionando para login...
-        </Text>
-      ) : null}
-
-      <AppButton title="Redefinir senha" onPress={onSubmit} loading={loading} />
-    </ScrollView>
+        <View style={styles.buttonGroup}>
+          <AppButton title="Confirmar Alteração" onPress={onSubmit} loading={loading} />
+        </View>
+      </View>
+    </AuthBackground>
   );
 }
 
 const styles = StyleSheet.create({
-  scroll: { padding: spacing.lg, backgroundColor: palette.background, flexGrow: 1 },
-  sub: {
-    fontSize: 16,
-    color: palette.textSecondary,
-    marginBottom: spacing.lg,
-    lineHeight: 22,
+  formSpace: {
+    paddingTop: spacing.sm,
   },
-  err: { color: palette.error, marginBottom: spacing.md },
-  ok: { color: palette.success, marginBottom: spacing.md, lineHeight: 22 },
+  buttonGroup: {
+    marginTop: spacing.md,
+  },
+  err: { 
+    color: palette.error, 
+    marginBottom: spacing.md,
+    textAlign: 'center',
+  },
+  ok: { 
+    color: palette.success, 
+    marginBottom: spacing.md, 
+    lineHeight: 22,
+    textAlign: 'center',
+  },
 });

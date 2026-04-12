@@ -1,10 +1,11 @@
 import { AppButton } from '@/components/ui/AppButton';
 import { AppTextField } from '@/components/ui/AppTextField';
+import { AuthBackground } from '@/components/ui/AuthBackground';
 import { useAuth } from '@/context/AuthContext';
 import { palette, spacing } from '@/constants/theme';
 import { router } from 'expo-router';
 import { useState } from 'react';
-import { ScrollView, StyleSheet, Text, View } from 'react-native';
+import { StyleSheet, Text, View } from 'react-native';
 
 export default function LoginScreen() {
   const { signIn } = useAuth();
@@ -34,12 +35,16 @@ export default function LoginScreen() {
     router.push('/(auth)/register');
   }
 
+  function goToForgot() {
+    router.push('/(auth)/forgot-password');
+  }
+
   return (
-    <View style={styles.container}>
-      <ScrollView contentContainerStyle={styles.content} keyboardShouldPersistTaps="handled">
-        <Text style={styles.title}>Entrar</Text>
-        <Text style={styles.subtitle}>Entre para sincronizar seu progresso espiritual.</Text>
-        
+    <AuthBackground 
+      title="Entrar" 
+      subtitle="Continue sua jornada de sincronização espiritual diária."
+    >
+      <View style={styles.formSpace}>
         <AppTextField
           label="E-mail"
           value={email}
@@ -57,54 +62,43 @@ export default function LoginScreen() {
           showPasswordToggle
           autoComplete="password"
         />
-        
+
         {error ? <Text style={styles.error}>{error}</Text> : null}
-        
-        <AppButton title="Entrar" onPress={onSubmit} loading={loading} />
-        
-        <AppButton 
-          title="Criar nova conta" 
-          variant="outline" 
-          style={styles.registerBtn} 
-          onPress={goToRegister}
-        />
-        
-        <AppButton 
-          title="Esqueci minha senha" 
-          variant="ghost" 
-          style={styles.forgotBtn} 
-          onPress={() => router.push('/(auth)/forgot-password')}
-        />
-      </ScrollView>
-    </View>
+
+        <View style={styles.buttonGroup}>
+          <AppButton title="Entrar" onPress={onSubmit} loading={loading} />
+          
+          <AppButton 
+            title="Criar nova conta" 
+            variant="outline" 
+            style={styles.registerBtn} 
+            onPress={goToRegister}
+          />
+          
+          <AppButton 
+            title="Esqueci minha senha" 
+            variant="ghost" 
+            style={styles.forgotBtn} 
+            onPress={goToForgot}
+          />
+        </View>
+      </View>
+    </AuthBackground>
   );
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: palette.background,
+  formSpace: {
+    paddingTop: spacing.sm,
   },
-  content: {
-    padding: spacing.lg,
-    paddingTop: spacing.xl * 2,
-  },
-  title: {
-    fontSize: 28,
-    fontWeight: '800',
-    color: palette.text,
-    marginBottom: spacing.sm,
-  },
-  subtitle: {
-    fontSize: 16,
-    color: palette.textSecondary,
-    marginBottom: spacing.lg,
-    lineHeight: 24,
+  buttonGroup: {
+    marginTop: spacing.md,
   },
   error: {
     color: palette.error,
     marginBottom: spacing.md,
     fontSize: 14,
+    textAlign: 'center',
   },
   registerBtn: {
     marginTop: spacing.md,

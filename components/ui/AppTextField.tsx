@@ -25,6 +25,7 @@ export function AppTextField({
   ...rest
 }: Props) {
   const [hidden, setHidden] = useState(!!secureTextEntry);
+  const [isFocused, setIsFocused] = useState(false);
 
   const isPassword = !!secureTextEntry;
   const effectiveSecure = isPassword && hidden;
@@ -34,13 +35,25 @@ export function AppTextField({
       <Text style={styles.label} allowFontScaling>
         {label}
       </Text>
-      <View style={[styles.fieldRow, error && styles.fieldError]}>
+      <View style={[
+        styles.fieldRow, 
+        isFocused && styles.fieldFocused,
+        error && styles.fieldError
+      ]}>
         <TextInput
           style={[styles.input, style]}
           placeholderTextColor={palette.textSecondary}
           secureTextEntry={effectiveSecure}
           accessibilityLabel={label}
           allowFontScaling
+          onFocus={(e) => {
+            setIsFocused(true);
+            rest.onFocus?.(e);
+          }}
+          onBlur={(e) => {
+            setIsFocused(false);
+            rest.onBlur?.(e);
+          }}
           {...rest}
         />
         {isPassword && showPasswordToggle ? (
@@ -69,34 +82,42 @@ export function AppTextField({
 }
 
 const styles = StyleSheet.create({
-  wrap: { marginBottom: 16 },
+  wrap: { marginBottom: 18 },
   label: {
     fontSize: 15,
     fontWeight: '600',
     color: palette.text,
-    marginBottom: 6,
+    marginBottom: 8,
+    letterSpacing: 0.2, // Elegância extra na tipografia
   },
   fieldRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    minHeight: touchMin,
+    minHeight: touchMin * 1.1,
     borderWidth: 1,
     borderColor: palette.border,
     borderRadius: radii.md,
-    backgroundColor: palette.surface,
-    paddingHorizontal: 14,
+    backgroundColor: '#F7F9FC', // Um fundo muito suave de contraste com o branco puro do card
+    paddingHorizontal: 16,
   },
-  fieldError: { borderColor: palette.error },
+  fieldFocused: {
+    borderColor: palette.primaryMuted,
+    backgroundColor: palette.surface, // Clareia quando foca
+  },
+  fieldError: { 
+    borderColor: palette.error,
+    backgroundColor: '#FFF5F5',
+  },
   input: {
     flex: 1,
     fontSize: 17,
     color: palette.text,
-    paddingVertical: 12,
+    paddingVertical: 14,
   },
   eye: { padding: 8 },
   error: {
-    marginTop: 4,
+    marginTop: 6,
     color: palette.error,
-    fontSize: 14,
+    fontSize: 13,
   },
 });

@@ -53,7 +53,7 @@ export function AppButton({
     >
       {loading ? (
         <ActivityIndicator
-          color={variant === 'primary' ? palette.surface : palette.primary}
+          color={variant === 'primary' ? palette.primary : palette.primary}
         />
       ) : (
         <Text style={labelStyle} allowFontScaling>
@@ -66,14 +66,19 @@ export function AppButton({
 
 const styles = StyleSheet.create({
   base: {
-    minHeight: touchMin,
+    minHeight: touchMin * 1.1, // Ligeiramente mais alto para dar aparência premium
     paddingHorizontal: 20,
     borderRadius: radii.md,
     alignItems: 'center',
     justifyContent: 'center',
   },
   primaryBg: {
-    backgroundColor: palette.primary,
+    backgroundColor: palette.accent, // Dourado
+    shadowColor: '#C9A227',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.3,
+    shadowRadius: 8,
+    elevation: 4,
   },
   outlineBg: {
     backgroundColor: 'transparent',
@@ -84,11 +89,12 @@ const styles = StyleSheet.create({
     backgroundColor: 'transparent',
   },
   disabled: { opacity: 0.5 },
-  pressed: { opacity: 0.88 },
+  pressed: { opacity: 0.88, transform: [{ scale: 0.98 }] },
   label: {
     fontSize: 17,
-    fontWeight: '600',
+    fontWeight: '700',
+    letterSpacing: 0.2, // Espaçamento maior transmite elegância
   },
-  labelOnPrimary: { color: palette.surface },
+  labelOnPrimary: { color: palette.primary }, // Azul Escuro sobre fundo Dourado
   labelMuted: { color: palette.primary },
 });
