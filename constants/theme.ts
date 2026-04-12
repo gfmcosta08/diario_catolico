@@ -43,6 +43,14 @@ export const spacing = {
   xl: 32,
 } as const;
 
+export const typography = {
+  fonts: {
+    heading: 'System',
+    body: 'System',
+  }
+} as const;
+
+
 export const radii = {
   sm: 8,
   md: 12,
