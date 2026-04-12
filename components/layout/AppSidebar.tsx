@@ -6,7 +6,7 @@ import { useAuth } from '@/context/AuthContext';
 import { FontAwesome5 } from '@expo/vector-icons';
 
 const navItems = [
-  { path: '/(app)', label: 'Início', icon: 'home' },
+  { path: '/(app)', label: 'Home', icon: 'home' },
   { path: '/(app)/rosary', label: 'Rosário', icon: 'pray' },
   { path: '/(app)/bible', label: 'Bíblia', icon: 'book' },
   { path: '/(app)/liturgy', label: 'Liturgia', icon: 'cross' },

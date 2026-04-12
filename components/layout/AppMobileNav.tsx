@@ -6,7 +6,7 @@ import { FontAwesome5 } from '@expo/vector-icons';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 const mobileNavItems = [
-  { path: '/(app)', label: 'Início', icon: 'home' },
+  { path: '/(app)', label: 'Home', icon: 'home' },
   { path: '/(app)/bible', label: 'Bíblia', icon: 'book' },
   { path: '/(app)/rosary', label: 'Rosário', icon: 'pray' },
   { path: '/(app)/feed', label: 'Feed', icon: 'comments' },
