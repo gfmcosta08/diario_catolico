@@ -150,6 +150,8 @@ const styles = StyleSheet.create({
     textAlign: 'center',
   },
   navText: {
+    flex: 1,
+    minWidth: 0,
     fontSize: 16,
     color: palette.textSecondary,
     fontWeight: '500',

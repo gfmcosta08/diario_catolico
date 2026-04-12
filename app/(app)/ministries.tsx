@@ -15,7 +15,13 @@ import {
   Text,
   TextInput,
   View,
+  type TextStyle,
 } from 'react-native';
+
+const createMinistryButtonLabelStyle: TextStyle = {
+  textTransform: 'none',
+  letterSpacing: 0.3,
+};
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 export const options = { title: 'Ministérios', headerShown: false };
@@ -92,7 +98,11 @@ export default function MinistriesScreen() {
         {configured && session && uid ? (
           <>
             <View style={styles.createMinistryWrap}>
-              <AppButton title="Criar ministério" onPress={() => setCreateModalOpen(true)} />
+              <AppButton
+                title="Criar Ministério"
+                onPress={() => setCreateModalOpen(true)}
+                textStyle={createMinistryButtonLabelStyle}
+              />
             </View>
             <CreateMinistryModal
               visible={createModalOpen}

@@ -18,7 +18,13 @@ import {
   StyleSheet,
   Text,
   View,
+  type TextStyle,
 } from 'react-native';
+
+const createMinistryButtonLabelStyle: TextStyle = {
+  textTransform: 'none',
+  letterSpacing: 0.3,
+};
 
 export const options = { title: 'Configurações' };
 
@@ -162,7 +168,11 @@ export default function SettingsScreen() {
       <Text style={[styles.sectionTitle, styles.mt]} allowFontScaling>
         Ministérios
       </Text>
-      <AppButton title="Criar ministério" onPress={() => setModalOpen(true)} />
+      <AppButton
+        title="Criar Ministério"
+        onPress={() => setModalOpen(true)}
+        textStyle={createMinistryButtonLabelStyle}
+      />
 
       {ministriesQuery.isLoading ? (
         <ActivityIndicator style={styles.mt} color={palette.primary} />

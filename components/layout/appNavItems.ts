@@ -11,7 +11,7 @@ export const APP_NAV_ITEMS: AppNavItem[] = [
   { path: '/(app)/terco-mariano', label: 'Terço Mariano', icon: 'hands-praying' },
   { path: '/(app)/bible', label: 'Bíblia', icon: 'book' },
   { path: '/(app)/liturgy', label: 'Liturgia', icon: 'cross' },
-  { path: '/(app)/ministries', label: 'Criar ministério', icon: 'users' },
+  { path: '/(app)/ministries', label: 'Ministério', icon: 'users' },
   { path: '/(app)/ministry-pedidos', label: 'Pedidos pendentes', icon: 'user-plus' },
   { path: '/(app)/feed', label: 'Comunidade', icon: 'comments' },
   { path: '/(app)/schedule', label: 'Escalas', icon: 'calendar-alt' },
