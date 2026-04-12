@@ -85,13 +85,10 @@ async function request<T>(path: string, init: RequestInit = {}, auth = true): Pr
   }
 
   if (!res.ok) {
-    // Demo mode: allow UI testing even if backend auth endpoints are unavailable
-    if (process.env.DEMO_MODE === 'true') {
-      if (path.startsWith('/api/auth/signup')) {
-        const fake = { token: 'demo-token', user: { id: 'demo', email: 'demo@example.com' } };
-        return fake as unknown as T;
-      }
-      if (path.startsWith('/api/auth/login')) {
+    // Demo mode: allow signup/login when backend auth endpoints return 404 (backend not ready)
+    // This lets users test the app without a working backend
+    if (res.status === 404 && !API_URL) {
+      if (path === '/api/auth/signup' || path === '/api/auth/login') {
         const fake = { token: 'demo-token', user: { id: 'demo', email: 'demo@example.com' } };
         return fake as unknown as T;
       }
