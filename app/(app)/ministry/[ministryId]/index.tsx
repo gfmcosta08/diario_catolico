@@ -1,4 +1,4 @@
-﻿import { MinistryAboutTab } from '@/components/ministry/MinistryAboutTab';
+import { MinistryAboutTab } from '@/components/ministry/MinistryAboutTab';
 import { MinistryForumTab } from '@/components/ministry/MinistryForumTab';
 import { MinistryScheduleTab } from '@/components/ministry/MinistryScheduleTab';
 import { palette, spacing } from '@/constants/theme';
@@ -125,7 +125,7 @@ export default function MinistryDetailScreen() {
         ) : null}
         {tab === 'forum' ? (
           <View style={styles.flex}>
-            <MinistryForumTab ministryId={m.id} userId={uid} />
+            <MinistryForumTab ministryId={m.id} userId={uid} isAdmin={isAdmin} />
           </View>
         ) : null}
         {tab === 'schedule' ? (

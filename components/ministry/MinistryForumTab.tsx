@@ -1,4 +1,4 @@
-﻿import { AppButton } from '@/components/ui/AppButton';
+import { AppButton } from '@/components/ui/AppButton';
 import { AppTextField } from '@/components/ui/AppTextField';
 import { palette, spacing } from '@/constants/theme';
 import { api } from '@/lib/api';
@@ -6,7 +6,9 @@ import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { useCallback, useMemo, useState } from 'react';
 import {
   ActivityIndicator,
+  Alert,
   FlatList,
+  Platform,
   Pressable,
   StyleSheet,
   Text,
@@ -26,9 +28,10 @@ type Post = {
 type Props = {
   ministryId: string;
   userId: string;
+  isAdmin?: boolean;
 };
 
-export function MinistryForumTab({ ministryId }: Props) {
+export function MinistryForumTab({ ministryId, userId, isAdmin }: Props) {
   const queryClient = useQueryClient();
   const [body, setBody] = useState('');
   const [replyTo, setReplyTo] = useState<string | null>(null);
@@ -81,6 +84,28 @@ export function MinistryForumTab({ ministryId }: Props) {
   const toggleExpand = useCallback((id: string) => {
     setExpanded((e) => ({ ...e, [id]: !e[id] }));
   }, []);
+
+  const confirmDelete = useCallback(
+    (postId: string) => {
+      const exec = async () => {
+        try {
+          await api.deletePost(ministryId, postId);
+          queryClient.invalidateQueries({ queryKey: ['ministry-posts', ministryId] });
+        } catch (error) {
+          console.error(error);
+        }
+      };
+      if (Platform.OS === 'web') {
+        if (window.confirm('Excluir esta mensagem?')) exec();
+      } else {
+        Alert.alert('Excluir', 'Excluir esta mensagem?', [
+          { text: 'Cancelar', style: 'cancel' },
+          { text: 'Excluir', style: 'destructive', onPress: exec },
+        ]);
+      }
+    },
+    [ministryId, queryClient]
+  );
 
   if (postsQuery.isLoading) {
     return (
@@ -140,6 +165,13 @@ export function MinistryForumTab({ ministryId }: Props) {
                     Responder
                   </Text>
                 </Pressable>
+                {isAdmin || item.authorId === userId ? (
+                  <Pressable onPress={() => confirmDelete(item.id)}>
+                    <Text style={styles.linkDanger} allowFontScaling>
+                      Excluir
+                    </Text>
+                  </Pressable>
+                ) : null}
               </View>
               {replyTo === item.id ? (
                 <View style={styles.replyBox}>
@@ -160,6 +192,13 @@ export function MinistryForumTab({ ministryId }: Props) {
                       <Text style={styles.bodySmall} allowFontScaling>
                         {r.content}
                       </Text>
+                      {isAdmin || r.authorId === userId ? (
+                        <Pressable onPress={() => confirmDelete(r.id)} style={{ marginTop: 4 }}>
+                          <Text style={styles.linkDangerSmall} allowFontScaling>
+                            Excluir
+                          </Text>
+                        </Pressable>
+                      ) : null}
                     </View>
                   ))
                 : null}
@@ -188,6 +227,7 @@ const styles = StyleSheet.create({
   body: { fontSize: 16, color: palette.text, lineHeight: 22 },
   cardActions: { flexDirection: 'row', gap: spacing.md, marginTop: spacing.sm },
   link: { color: palette.primary, fontWeight: '700', fontSize: 14 },
+  linkDanger: { color: palette.error, fontWeight: '700', fontSize: 14 },
   replyBox: { marginTop: spacing.sm, paddingTop: spacing.sm, borderTopWidth: 1, borderTopColor: palette.border },
   reply: {
     marginTop: spacing.sm,
@@ -197,4 +237,5 @@ const styles = StyleSheet.create({
   },
   metaSmall: { fontSize: 12, color: palette.textSecondary },
   bodySmall: { fontSize: 15, color: palette.text, marginTop: 4 },
+  linkDangerSmall: { color: palette.error, fontWeight: '700', fontSize: 13 },
 });

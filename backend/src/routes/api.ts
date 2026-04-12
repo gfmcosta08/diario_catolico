@@ -1,4 +1,4 @@
-﻿import { MembershipRole } from '@prisma/client';
+import { MembershipRole } from '@prisma/client';
 import bcrypt from 'bcryptjs';
 import crypto from 'node:crypto';
 import { Router } from 'express';
@@ -273,6 +273,21 @@ apiRouter.get('/ministries/:id', requireAuth, async (req, res) => {
   return res.json(m);
 });
 
+apiRouter.delete('/ministries/:id', requireAuth, async (req, res) => {
+  const ministryId = routeParam(req, 'id');
+  const role = await getMembershipRole(ministryId, req.auth!.userId);
+  if (role !== MembershipRole.owner) {
+    return res.status(403).json({ error: 'Apenas o dono pode excluir o ministério' });
+  }
+
+  try {
+    await prisma.ministry.delete({ where: { id: ministryId } });
+    return res.json({ ok: true });
+  } catch (error) {
+    return badRequest(res, error);
+  }
+});
+
 apiRouter.get('/ministries/:id/membership', requireAuth, async (req, res) => {
   const ministryId = routeParam(req, 'id');
   const row = await prisma.ministryMember.findUnique({
@@ -416,6 +431,30 @@ apiRouter.post('/ministries/:id/posts', requireAuth, async (req, res) => {
       select: { id: true },
     });
     return res.status(201).json(post);
+  } catch (error) {
+    return badRequest(res, error);
+  }
+});
+
+apiRouter.delete('/ministries/:id/posts/:postId', requireAuth, async (req, res) => {
+  const ministryId = routeParam(req, 'id');
+  const postId = routeParam(req, 'postId');
+  const role = await getMembershipRole(ministryId, req.auth!.userId);
+  if (!role) return res.status(403).json({ error: 'Sem acesso' });
+
+  const post = await prisma.ministryPost.findUnique({ where: { id: postId } });
+  if (!post || post.ministryId !== ministryId) {
+    return res.status(404).json({ error: 'Post não encontrado' });
+  }
+
+  const isAdmin = role === MembershipRole.owner || role === MembershipRole.sub_admin;
+  if (!isAdmin && post.authorId !== req.auth!.userId) {
+    return res.status(403).json({ error: 'Sem permissão para excluir esta postagem' });
+  }
+
+  try {
+    await prisma.ministryPost.delete({ where: { id: postId } });
+    return res.json({ ok: true });
   } catch (error) {
     return badRequest(res, error);
   }

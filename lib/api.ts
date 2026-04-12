@@ -1,4 +1,4 @@
-﻿import AsyncStorage from '@react-native-async-storage/async-storage';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import Constants from 'expo-constants';
 
 const extra = Constants.expoConfig?.extra as { apiUrl?: string } | undefined;
@@ -183,6 +183,10 @@ export const api = {
     return request<{ id: string; slug: string; name: string; description: string | null } | null>(`/api/ministries/${id}`);
   },
 
+  async deleteMinistry(id: string) {
+    return request(`/api/ministries/${id}`, { method: 'DELETE' });
+  },
+
   async getMinistryBySlug(slug: string) {
     return request<{ id: string; slug: string; name: string; description: string | null } | null>(`/api/ministries/by-slug/${slug}`, { method: 'GET' }, false);
   },
@@ -225,6 +229,10 @@ export const api = {
 
   async createPost(ministryId: string, payload: { content: string; parentId?: string | null }) {
     return request(`/api/ministries/${ministryId}/posts`, { method: 'POST', body: JSON.stringify(payload) });
+  },
+
+  async deletePost(ministryId: string, postId: string) {
+    return request(`/api/ministries/${ministryId}/posts/${postId}`, { method: 'DELETE' });
   },
 
   async getEvents(ministryId: string) {

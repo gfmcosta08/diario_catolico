@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react';
 import { ActivityIndicator, View } from 'react-native';
 
 export default function Index() {
-  const { loading, configured, session } = useAuth();
+  const { loading, session } = useAuth();
   const [forceResolve, setForceResolve] = useState(false);
 
   useEffect(() => {

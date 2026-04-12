@@ -1,4 +1,4 @@
-﻿import { AppButton } from '@/components/ui/AppButton';
+import { AppButton } from '@/components/ui/AppButton';
 import { AppTextField } from '@/components/ui/AppTextField';
 import { palette, spacing } from '@/constants/theme';
 import { useAuth } from '@/context/AuthContext';
@@ -10,7 +10,9 @@ import { Link, router } from 'expo-router';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import {
   ActivityIndicator,
+  Alert,
   Modal,
+  Platform,
   Pressable,
   ScrollView,
   StyleSheet,
@@ -103,6 +105,31 @@ export default function SettingsScreen() {
     }
   }, [description, name, queryClient, uid]);
 
+  const confirmDeleteMinistry = useCallback(
+    async (id: string, mName: string) => {
+      const exec = async () => {
+        try {
+          await api.deleteMinistry(id);
+          queryClient.invalidateQueries({ queryKey: ['my-ministries', uid] });
+        } catch (e) {
+          setError(e instanceof Error ? e.message : 'Erro ao excluir ministério');
+        }
+      };
+
+      if (Platform.OS === 'web') {
+        if (window.confirm(`Tem certeza que deseja excluir o ministério "${mName}" permanentemente?`)) {
+          exec();
+        }
+      } else {
+        Alert.alert('Excluir Ministério', `Tem certeza que deseja excluir "${mName}"?`, [
+          { text: 'Cancelar', style: 'cancel' },
+          { text: 'Excluir', style: 'destructive', onPress: exec },
+        ]);
+      }
+    },
+    [queryClient, uid]
+  );
+
   if (!configured || !session) {
     return (
       <ScrollView contentContainerStyle={styles.container}>
@@ -149,19 +176,27 @@ export default function SettingsScreen() {
             const m = row.ministry;
             if (!m) return null;
             return (
-              <Pressable
-                key={m.id}
-                style={styles.card}
-                onPress={() => router.push(`/(app)/ministry/${m.id}`)}
-                accessibilityRole="button"
-              >
-                <Text style={styles.cardTitle} allowFontScaling>
-                  {m.name}
-                </Text>
-                <Text style={styles.cardSub} allowFontScaling>
-                  {row.role === 'owner' ? 'Dono' : row.role === 'sub_admin' ? 'Sub-admin' : 'Membro'}
-                </Text>
-              </Pressable>
+              <View key={m.id} style={styles.cardContainer}>
+                <Pressable
+                  style={styles.card}
+                  onPress={() => router.push(`/(app)/ministry/${m.id}`)}
+                  accessibilityRole="button"
+                >
+                  <View style={{ flex: 1 }}>
+                    <Text style={styles.cardTitle} allowFontScaling>
+                      {m.name}
+                    </Text>
+                    <Text style={styles.cardSub} allowFontScaling>
+                      {row.role === 'owner' ? 'Dono' : row.role === 'sub_admin' ? 'Sub-admin' : 'Membro'}
+                    </Text>
+                  </View>
+                </Pressable>
+                {row.role === 'owner' && (
+                  <Pressable onPress={() => confirmDeleteMinistry(m.id, m.name)} style={styles.deleteBtn}>
+                    <Text style={styles.deleteBtnTxt}>Excluir</Text>
+                  </Pressable>
+                )}
+              </View>
             );
           })}
         </View>
@@ -232,6 +267,17 @@ const styles = StyleSheet.create({
   },
   cardTitle: { fontSize: 17, fontWeight: '600', color: palette.text },
   cardSub: { fontSize: 14, color: palette.textSecondary, marginTop: 4 },
+  cardContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: spacing.sm,
+  },
+  deleteBtn: {
+    padding: spacing.md,
+    backgroundColor: palette.error + '1A',
+    borderRadius: 8,
+  },
+  deleteBtnTxt: { color: palette.error, fontWeight: '600' },
   err: { color: palette.error, marginTop: spacing.md },
   modalBackdrop: {
     flex: 1,
