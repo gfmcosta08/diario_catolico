@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, Text, StyleSheet, Pressable, Platform, ScrollView } from 'react-native';
+import { View, Text, StyleSheet, Pressable, ScrollView } from 'react-native';
 import { useRouter, usePathname } from 'expo-router';
 import { palette, radii, spacing, typography } from '@/constants/theme';
 import { useAuth } from '@/context/AuthContext';
@@ -25,8 +25,12 @@ export function AppSidebar() {
   return (
     <View style={styles.sidebar}>
       <View style={styles.logoContainer}>
-        <FontAwesome5 name="cross" size={28} color={palette.primary} />
-        <Text style={styles.logoText}>CatholicApp</Text>
+        <Text style={styles.logoCross} allowFontScaling maxFontSizeMultiplier={1.5}>
+          ✝
+        </Text>
+        <Text style={styles.logoText} allowFontScaling maxFontSizeMultiplier={1.3}>
+          Diário Católico
+        </Text>
       </View>
 
       <ScrollView contentContainerStyle={styles.navMenu} showsVerticalScrollIndicator={false}>
@@ -86,8 +90,16 @@ const styles = StyleSheet.create({
     marginBottom: spacing.xl,
     gap: spacing.sm,
   },
+  logoCross: {
+    fontSize: 26,
+    fontWeight: '600',
+    color: palette.primary,
+    fontFamily: typography.fonts.heading,
+    lineHeight: 30,
+  },
   logoText: {
-    fontSize: 22,
+    flex: 1,
+    fontSize: 20,
     fontWeight: '700',
     color: palette.primary,
     fontFamily: typography.fonts.heading,
