@@ -85,6 +85,17 @@ async function request<T>(path: string, init: RequestInit = {}, auth = true): Pr
   }
 
   if (!res.ok) {
+    // Demo mode: allow UI testing even if backend auth endpoints are unavailable
+    if (process.env.DEMO_MODE === 'true') {
+      if (path.startsWith('/api/auth/signup')) {
+        const fake = { token: 'demo-token', user: { id: 'demo', email: 'demo@example.com' } };
+        return fake as unknown as T;
+      }
+      if (path.startsWith('/api/auth/login')) {
+        const fake = { token: 'demo-token', user: { id: 'demo', email: 'demo@example.com' } };
+        return fake as unknown as T;
+      }
+    }
     const o = data && typeof data === 'object' ? (data as { error?: string; message?: string }) : null;
     const fromBody = o?.error ?? o?.message;
     throw new Error(
