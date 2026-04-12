@@ -1,21 +1,29 @@
 export const palette = {
-  background: '#F4F7FB',
-  surface: '#FFFFFF',
-  primary: '#1E4A78',
-  primaryMuted: '#3A6EA5',
-  accent: '#C9A227',
-  accentSoft: '#E8D89A',
-  text: '#1A2B3D',
-  textSecondary: '#4A5F73',
-  border: '#D4DDE8',
-  error: '#B3261E',
-  success: '#2E6F40',
-  // Novos tokens translúcidos para o estilo "vitral" em painéis finos
-  glassWhite: 'rgba(255, 255, 255, 0.08)',
-  glassDark: 'rgba(13, 33, 54, 0.25)',
-  glassGold: 'rgba(201, 162, 39, 0.25)',
-  glassBorder: 'rgba(255, 255, 255, 0.2)',
-  glassBorderDark: 'rgba(30, 74, 120, 0.2)',
+  // Cores de Fundo (Modo Escuro / Vitral Neon)
+  background: '#040b14', // Fundo principal extremamente escuro
+  surface: '#0a192f', // Superfícies e paneis sólidos escuros
+  
+  // Cores de Ação (Vibrantes e Brilhantes)
+  primary: '#64ffda', // Um cyan neon que brilha no fundo escuro (como na imagem gerada)
+  primaryMuted: '#1E4A78', // O tom clássico para blocos profundos não focados
+  accent: '#FFD700', // Dourado forte
+  accentSoft: '#B8860B', // Dourado secundário
+  
+  // Tinta
+  text: '#ccd6f6', // Branco levemente prateado brilhante
+  textSecondary: '#8892b0', // Cinza azulado para legendas
+  
+  // Estrutura
+  border: '#233554', // Bordas padrões
+  error: '#ff5555',
+  success: '#50fa7b',
+  
+  // Texturas de Vidro (Vitral Geométrico Translúcido)
+  glassWhite: 'rgba(255, 255, 255, 0.03)',
+  glassDark: 'rgba(10, 25, 47, 0.75)',
+  glassGold: 'rgba(255, 215, 0, 0.15)',
+  glassBorder: 'rgba(100, 255, 218, 0.25)', // Borda cyan suave
+  glassBorderDark: 'rgba(10, 25, 47, 0.6)',
 } as const;
 
 export const spacing = {
@@ -26,11 +34,11 @@ export const spacing = {
   xl: 32,
 } as const;
 
-export const radii = {
+export const radii = { // ZERADO (Arestas afiadas)
   sm: 0,
   md: 0,
   lg: 0,
-  full: 9999, // Para casos onde um círculo é estritamente necessário (ex: beads do rosário)
+  full: 9999,
 } as const;
 
 export const touchMin = 44;

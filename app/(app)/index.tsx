@@ -14,9 +14,10 @@ export default function HomeScreen() {
 
   return (
     <View style={styles.root}>
+      {/* Dark Architectural Gradient */}
       <LinearGradient
-        colors={['#3A6EA5', '#1E4A78', '#0D2136']}
-        locations={[0, 0.4, 1]}
+        colors={['#040b14', '#07152b', '#0a192f']}
+        locations={[0, 0.5, 1]}
         style={StyleSheet.absoluteFillObject}
       />
       <ScrollView 
@@ -101,7 +102,7 @@ export default function HomeScreen() {
 const styles = StyleSheet.create({
   root: {
     flex: 1,
-    backgroundColor: '#0D2136',
+    backgroundColor: palette.background,
   },
   container: {
     paddingHorizontal: spacing.lg,
@@ -114,40 +115,40 @@ const styles = StyleSheet.create({
   greet: {
     fontSize: 32,
     fontWeight: '800',
-    color: '#FFFFFF',
+    color: palette.text,
     marginBottom: spacing.xs,
     letterSpacing: 0.5,
   },
   lead: {
     fontSize: 16,
-    color: 'rgba(255, 255, 255, 0.85)',
+    color: palette.textSecondary,
     lineHeight: 24,
   },
   banner: {
-    backgroundColor: 'rgba(255, 255, 255, 0.1)',
+    backgroundColor: palette.glassDark,
     padding: spacing.md,
     borderRadius: 0, // Sharp edges
     marginBottom: spacing.lg,
-    color: '#E2E8F0',
+    color: palette.text,
     fontSize: 14,
     lineHeight: 20,
     borderWidth: 1,
-    borderLeftWidth: 4, // Estilo clássico de painel
-    borderColor: 'rgba(255, 255, 255, 0.15)',
-    borderLeftColor: palette.error, // Sinaliza aviso de form forma brutalista
+    borderLeftWidth: 4, // Painel Brutalista
+    borderColor: palette.glassBorder,
+    borderLeftColor: palette.error, // Sinal de erro contrastante
   },
   linkBanner: {
     marginBottom: spacing.xl,
     padding: spacing.md,
-    backgroundColor: palette.accent,
+    backgroundColor: palette.glassDark,
     borderRadius: 0, // Sharp vitral
-    shadowColor: palette.accent,
+    shadowColor: palette.primary,
     shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.4,
-    shadowRadius: 0, // Sombra reta/blocky
+    shadowOpacity: 0.8,
+    shadowRadius: 10,
     elevation: 4,
     borderWidth: 1,
-    borderColor: 'rgba(255,255,255,0.4)',
+    borderColor: palette.primary, 
   },
   linkTxt: {
     color: palette.primary,

@@ -30,7 +30,7 @@ export function HomeCard({ title, subtitle, icon, onPress }: Props) {
         </Text>
       </View>
       <View style={styles.arrowWrap}>
-        <FontAwesome name="chevron-right" size={14} color={palette.accent} />
+        <FontAwesome name="chevron-right" size={14} color={palette.primary} />
       </View>
     </Pressable>
   );
@@ -40,35 +40,43 @@ const styles = StyleSheet.create({
   card: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: 'rgba(255, 255, 255, 0.96)', // Quase branco com levíssima transparência
-    borderRadius: radii.lg,
+    backgroundColor: palette.glassDark, // Vitral super escuro e translúcido
+    borderRadius: 0, // Quadrado Brutalista
     padding: spacing.lg,
     marginBottom: spacing.md,
     borderWidth: 1,
-    borderColor: 'rgba(201, 162, 39, 0.25)', // Borda macia dourada
-    shadowColor: '#000',
-    shadowOpacity: 0.12,
+    borderLeftWidth: 3, // Efeito painel arquitetônico ("feixe luminoso na lateral")
+    borderColor: palette.border, // Borda sutil escura
+    borderLeftColor: palette.primary, // Cyan Neon correndo pela esquerda
+    shadowColor: palette.primary,
+    shadowOpacity: 0.15,
     shadowRadius: 12,
-    shadowOffset: { width: 0, height: 6 },
-    elevation: 6,
+    shadowOffset: { width: 0, height: 4 },
+    elevation: 8,
   },
-  pressed: { opacity: 0.85, transform: [{ scale: 0.98 }] },
+  pressed: { 
+    opacity: 0.95, 
+    transform: [{ scale: 0.99 }], 
+    backgroundColor: 'rgba(100, 255, 218, 0.05)', // Brilho de pulse ao hover/press
+    borderColor: palette.primary,
+  },
   iconWrap: {
     width: 50,
     height: 50,
-    borderRadius: 0, // Quadrado Brutalista
-    backgroundColor: 'rgba(30, 74, 120, 0.08)', // Azul sutil translúcido
+    borderRadius: 0, 
+    backgroundColor: 'rgba(100, 255, 218, 0.08)', // Fundo cyan altamente translúcido 
     alignItems: 'center',
     justifyContent: 'center',
     marginRight: spacing.md,
     borderWidth: 1,
-    borderColor: 'rgba(30, 74, 120, 0.15)', // Contorno duro
+    borderColor: 'rgba(100, 255, 218, 0.2)', // Contorno cyan leve
   },
   textWrap: { flex: 1, paddingRight: spacing.sm },
   title: {
     fontSize: 18,
     fontWeight: '800',
-    color: palette.primary, // Azul Marinho escuro, mais legível na claridade
+    color: palette.text, // Branco brilhante
+    letterSpacing: 0.5,
   },
   sub: {
     marginTop: 4,
@@ -80,10 +88,8 @@ const styles = StyleSheet.create({
     width: 28,
     height: 28,
     borderRadius: 0, // Bloco
-    backgroundColor: 'rgba(201, 162, 39, 0.15)', // Fundo redondinho em tom dourado suave pro chevron
+    backgroundColor: 'transparent', 
     alignItems: 'center',
     justifyContent: 'center',
-    borderWidth: 1,
-    borderColor: 'rgba(201, 162, 39, 0.3)',
   }
 });
