@@ -7,7 +7,13 @@ import { useQuery, useQueryClient } from '@tanstack/react-query';
 import * as Clipboard from 'expo-clipboard';
 import { Link, router, useLocalSearchParams } from 'expo-router';
 import { useCallback, useMemo, useState } from 'react';
-import { ActivityIndicator, ScrollView, StyleSheet, Text, View } from 'react-native';
+import { ActivityIndicator, ScrollView, StyleSheet, Text, type TextStyle, View } from 'react-native';
+
+/** Rótulo legível no botão dourado (sem forçar tudo em maiúsculas). */
+const inviteButtonLabelStyle: TextStyle = {
+  textTransform: 'none',
+  letterSpacing: 0.3,
+};
 
 export const options = { title: 'Ministério' };
 
@@ -55,7 +61,7 @@ export default function PublicMinistryPage() {
     if (!ministryQuery.data?.slug) return;
     const text = buildMinistryInviteShareText(ministryQuery.data.slug);
     await Clipboard.setStringAsync(text);
-    setMsg('Link copiado. Envie por WhatsApp, e-mail etc.');
+    setMsg('Link de convite copiado. Cole no WhatsApp, e-mail ou noutra app.');
   }, [ministryQuery.data?.slug]);
 
   const requestJoin = useCallback(async () => {
@@ -111,7 +117,11 @@ export default function PublicMinistryPage() {
       </Text>
 
       {isAdmin ? (
-        <AppButton title="Enviar convite (copiar link)" onPress={copyInvite} />
+        <AppButton
+          title="Enviar Convite"
+          onPress={copyInvite}
+          textStyle={inviteButtonLabelStyle}
+        />
       ) : null}
 
       {!configured || !session ? (

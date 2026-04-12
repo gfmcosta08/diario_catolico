@@ -5,7 +5,20 @@ import { buildMinistryInviteShareText } from '@/lib/ministryInvite';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import * as Clipboard from 'expo-clipboard';
 import { useCallback, useState } from 'react';
-import { ActivityIndicator, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
+import {
+  ActivityIndicator,
+  Pressable,
+  ScrollView,
+  StyleSheet,
+  Text,
+  type TextStyle,
+  View,
+} from 'react-native';
+
+const inviteButtonLabelStyle: TextStyle = {
+  textTransform: 'none',
+  letterSpacing: 0.3,
+};
 
 type Props = {
   ministryId: string;
@@ -102,7 +115,9 @@ export function MinistryAboutTab({ ministryId, slug, name, description, myRole }
         {description || 'Sem descrição.'}
       </Text>
 
-      {isAdmin ? <AppButton title="Enviar convite" onPress={sendInvite} /> : null}
+      {isAdmin ? (
+        <AppButton title="Enviar Convite" onPress={sendInvite} textStyle={inviteButtonLabelStyle} />
+      ) : null}
 
       {msg ? (
         <Text style={styles.msg} allowFontScaling>
