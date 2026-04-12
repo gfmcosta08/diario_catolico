@@ -164,6 +164,31 @@ export default function SettingsScreen() {
       <AppButton title="Salvar perfil" onPress={saveProfile} loading={savingProfile} />
 
       <Text style={[styles.sectionTitle, styles.mt]} allowFontScaling>
+        Minhas Conquistas
+      </Text>
+      <View style={styles.badgeGrid}>
+        {/* Placeholder temporário até usar o hook do backend, mas acoplado visualmente: */}
+        <View style={styles.badgeItem}>
+          <View style={[styles.badgeIcon, {backgroundColor: 'rgba(91,44,111,0.1)'}]}>
+            <FontAwesome5 name="fire" size={24} color={palette.primary} />
+          </View>
+          <Text style={styles.badgeTitle}>Iniciante</Text>
+        </View>
+        <View style={styles.badgeItem}>
+          <View style={[styles.badgeIcon, {backgroundColor: 'rgba(212,160,23,0.1)'}]}>
+            <FontAwesome5 name="medal" size={24} color={palette.gold} />
+          </View>
+          <Text style={styles.badgeTitle}>Leitor Fiel</Text>
+        </View>
+        <View style={styles.badgeItem}>
+          <View style={[styles.badgeIcon, {backgroundColor: 'rgba(39,174,96,0.1)'}]}>
+            <FontAwesome5 name="hands-helping" size={24} color={palette.success} />
+          </View>
+          <Text style={styles.badgeTitle}>Intercessor</Text>
+        </View>
+      </View>
+
+      <Text style={[styles.sectionTitle, styles.mt]} allowFontScaling>
         Ministérios
       </Text>
       <AppButton title="Criar ministério" onPress={() => setModalOpen(true)} />
@@ -302,4 +327,27 @@ const styles = StyleSheet.create({
     gap: spacing.sm,
     marginTop: spacing.md,
   },
+  badgeGrid: {
+    flexDirection: 'row',
+    gap: spacing.md,
+    marginTop: spacing.sm,
+  },
+  badgeItem: {
+    alignItems: 'center',
+    width: 80,
+  },
+  badgeIcon: {
+    width: 60,
+    height: 60,
+    borderRadius: 30,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginBottom: spacing.xs,
+  },
+  badgeTitle: {
+    fontSize: 12,
+    fontWeight: '600',
+    color: palette.text,
+    textAlign: 'center',
+  }
 });

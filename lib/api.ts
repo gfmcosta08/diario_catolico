@@ -265,4 +265,32 @@ export const api = {
   async deleteAssignment(ministryId: string, assignmentId: string) {
     return request(`/api/ministries/${ministryId}/assignments/${assignmentId}`, { method: 'DELETE' });
   },
+
+  async likePost(ministryId: string, postId: string) {
+    return request<{ ok: boolean; likesCount: number }>(`/api/ministries/${ministryId}/posts/${postId}/like`, { method: 'POST' });
+  },
+
+  async getDashboardStats() {
+    return request<{ streakCount: number; assignmentsCount: number; bibleReadCount: number; rosaryCount: number; totalPoints: number }>('/api/dashboard/stats');
+  },
+
+  async getPrayers() {
+    return request<Array<{ id: string; authorId: string; authorName: string; content: string; prayCount: number; createdAt: string }>>('/api/prayers');
+  },
+
+  async createPrayer(content: string) {
+    return request<{ id: string; content: string; prayCount: number; createdAt: string }>('/api/prayers', {
+      method: 'POST',
+      body: JSON.stringify({ content }),
+    });
+  },
+
+  async prayForPrayer(prayerId: string) {
+    return request<{ ok: boolean; prayCount: number }>(`/api/prayers/${prayerId}/pray`, { method: 'POST' });
+  },
+
+  async getAchievements() {
+    return request<string[]>('/api/achievements');
+  },
 };
+

@@ -603,5 +603,110 @@ apiRouter.delete('/ministries/:id/assignments/:assignmentId', requireAuth, async
   return res.json({ ok: true });
 });
 
+// --- NEW SAAS SUPER APP ENDPOINTS ---
+
+apiRouter.post('/ministries/:id/posts/:postId/like', requireAuth, async (req, res) => {
+  const ministryId = routeParam(req, 'id');
+  const postId = routeParam(req, 'postId');
+  const role = await getMembershipRole(ministryId, req.auth!.userId);
+  if (!role) return res.status(403).json({ error: 'Sem acesso' });
+
+  try {
+    const post = await prisma.ministryPost.update({
+      where: { id: postId },
+      data: { likesCount: { increment: 1 } },
+      select: { likesCount: true }
+    });
+    return res.json({ ok: true, likesCount: post.likesCount });
+  } catch (error) {
+    return badRequest(res, error);
+  }
+});
+
+apiRouter.get('/dashboard/stats', requireAuth, async (req, res) => {
+  try {
+    const profile = await prisma.profile.findUnique({
+      where: { id: req.auth!.userId },
+      select: { streakCount: true }
+    });
+    
+    const assignmentsCount = await prisma.ministryEventAssignment.count({
+      where: { userId: req.auth!.userId }
+    });
+
+    const bibleReadCount = await prisma.bibleReadingProgress.count({
+      where: { userId: req.auth!.userId }
+    });
+
+    const rosaryCount = await prisma.rosaryProgress.count({
+        where: { userId: req.auth!.userId }
+    });
+
+    const totalPoints = assignmentsCount * 10 + bibleReadCount * 5 + rosaryCount * 15;
+
+    return res.json({
+      streakCount: profile?.streakCount || 0,
+      assignmentsCount,
+      bibleReadCount,
+      rosaryCount,
+      totalPoints,
+    });
+  } catch(error) {
+    return res.status(500).json({ error: 'Internal Server Error' });
+  }
+});
+
+apiRouter.get('/prayers', requireAuth, async (req, res) => {
+  const prayers = await prisma.prayerWallPost.findMany({
+    include: { author: { include: { profile: true } } },
+    orderBy: { createdAt: 'desc' },
+    take: 50
+  });
+
+  return res.json(prayers.map(p => ({
+    id: p.id,
+    authorId: p.authorId,
+    authorName: p.author.profile?.displayName || p.author.email,
+    content: p.content,
+    prayCount: p.prayCount,
+    createdAt: p.createdAt,
+  })));
+});
+
+apiRouter.post('/prayers', requireAuth, async (req, res) => {
+  try {
+    const body = z.object({ content: z.string().min(1) }).parse(req.body);
+    const post = await prisma.prayerWallPost.create({
+      data: { authorId: req.auth!.userId, content: body.content },
+      select: { id: true, content: true, prayCount: true, createdAt: true }
+    });
+    return res.status(201).json(post);
+  } catch (error) {
+    return badRequest(res, error);
+  }
+});
+
+apiRouter.post('/prayers/:id/pray', requireAuth, async (req, res) => {
+  const prayerId = routeParam(req, 'id');
+  try {
+    const prayer = await prisma.prayerWallPost.update({
+      where: { id: prayerId },
+      data: { prayCount: { increment: 1 } },
+      select: { prayCount: true }
+    });
+    return res.json({ ok: true, prayCount: prayer.prayCount });
+  } catch (error) {
+    return badRequest(res, error);
+  }
+});
+
+apiRouter.get('/achievements', requireAuth, async (req, res) => {
+  const badges = await prisma.userAchievement.findMany({
+    where: { userId: req.auth!.userId },
+    orderBy: { unlockedAt: 'desc' }
+  });
+  return res.json(badges.map(b => b.badgeType));
+});
+
 
 

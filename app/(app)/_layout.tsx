@@ -1,42 +1,50 @@
 import { useAuth } from '@/context/AuthContext';
 import { palette } from '@/constants/theme';
-import { Stack, router } from 'expo-router';
-import { Pressable, StyleSheet, Text } from 'react-native';
+import { Slot, router, Redirect } from 'expo-router';
+import { View, StyleSheet, useWindowDimensions, Platform } from 'react-native';
+import { AppSidebar } from '@/components/layout/AppSidebar';
+import { AppMobileNav } from '@/components/layout/AppMobileNav';
+import { SafeAreaView } from 'react-native-safe-area-context';
 
 export default function AppLayout() {
-  const { signOut, configured, session } = useAuth();
+  const { signOut, configured, session, isLoading } = useAuth();
+  const { width } = useWindowDimensions();
+  const isDesktop = width >= 768;
+
+  if (isLoading) return null;
+  if (configured && !session) return <Redirect href="/(auth)/login" />;
 
   return (
-    <Stack
-      screenOptions={{
-        headerShown: true,
-        headerStyle: { backgroundColor: palette.surface },
-        headerTintColor: palette.primary,
-        headerTitleStyle: { fontWeight: '700' },
-        headerShadowVisible: false,
-        contentStyle: { backgroundColor: palette.background },
-        headerRight: () =>
-          configured && session ? (
-            <Pressable
-              accessibilityRole="button"
-              accessibilityLabel="Sair da conta"
-              onPress={() => {
-                signOut();
-                router.replace('/(auth)/login');
-              }}
-              style={styles.outBtn}
-            >
-              <Text style={styles.outTxt} allowFontScaling maxFontSizeMultiplier={1.5}>
-                Sair
-              </Text>
-            </Pressable>
-          ) : null,
-      }}
-    />
+    <SafeAreaView style={styles.container} edges={['top', 'left', 'right']}>
+      <View style={styles.layout}>
+        {/* Sidebar no Desktop */}
+        {isDesktop && <AppSidebar />}
+
+        {/* Carga Principal */}
+        <View style={styles.mainContent}>
+          <Slot />
+        </View>
+      </View>
+
+      {/* Navegação Inferior no Mobile */}
+      {!isDesktop && <AppMobileNav />}
+    </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
-  outBtn: { paddingHorizontal: 12, paddingVertical: 8, minWidth: 44, justifyContent: 'center' },
-  outTxt: { color: palette.primary, fontWeight: '600', fontSize: 16 },
+  container: {
+    flex: 1,
+    backgroundColor: palette.background,
+  },
+  layout: {
+    flex: 1,
+    flexDirection: 'row',
+  },
+  mainContent: {
+    flex: 1,
+    position: 'relative',
+    // web: overflow hidden é útil para evitar barra de rolagem global fora da view principal
+    ...Platform.select({ web: { overflow: 'hidden' } })
+  }
 });

@@ -5,6 +5,7 @@ import { ScrollView, StyleSheet, Text, View, Pressable } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { FontAwesome5 } from '@expo/vector-icons';
 import { useState, useEffect } from 'react';
+import { api } from '@/lib/api';
 
 export const options = { title: 'Início', headerShown: false };
 
@@ -16,10 +17,22 @@ export default function HomeScreen() {
   const userName = session?.user?.name?.split(' ')[0] || 'Maria';
   
   const [currentDateString, setCurrentDateString] = useState('');
+  const [stats, setStats] = useState({
+    streakCount: 0,
+    assignmentsCount: 0,
+    bibleReadCount: 0,
+    rosaryCount: 0,
+    totalPoints: 0
+  });
+
   useEffect(() => {
     const now = new Date();
     setCurrentDateString(now.toLocaleDateString('pt-BR', {weekday:'long', year:'numeric', month:'long', day:'numeric'}));
-  }, []);
+
+    if (configured && session) {
+      api.getDashboardStats().then(setStats).catch(console.error);
+    }
+  }, [configured, session]);
 
   return (
     <View style={styles.root}>
@@ -49,7 +62,7 @@ export default function HomeScreen() {
         ) : null}
 
         <View style={styles.quickActions}>
-          <Link href="/(app)/rosary-player-daily" asChild>
+          <Link href="/(app)/rosary" asChild>
             <Pressable style={({pressed}) => [styles.quickActionBtn, pressed && styles.pressed]}>
               <FontAwesome5 name="pray" size={22} color={palette.primary} />
               <Text style={styles.quickActionText}>Rezar o Terço</Text>
@@ -61,24 +74,30 @@ export default function HomeScreen() {
               <Text style={styles.quickActionText}>Ler a Bíblia</Text>
             </Pressable>
           </Link>
-          <Link href="/(app)/forum" asChild>
+          <Link href="/(app)/feed" asChild>
             <Pressable style={({pressed}) => [styles.quickActionBtn, pressed && styles.pressed]}>
               <FontAwesome5 name="comments" size={22} color={palette.primary} />
               <Text style={styles.quickActionText}>Abrir o Feed</Text>
             </Pressable>
           </Link>
-          <Pressable style={({pressed}) => [styles.quickActionBtn, pressed && styles.pressed]}>
-            <FontAwesome5 name="calendar-check" size={22} color={palette.primary} />
-            <Text style={styles.quickActionText}>Ver Escalas</Text>
-          </Pressable>
-          <Pressable style={({pressed}) => [styles.quickActionBtn, pressed && styles.pressed]}>
-            <FontAwesome5 name="plus-circle" size={22} color={palette.primary} />
-            <Text style={styles.quickActionText}>Criar Ministério</Text>
-          </Pressable>
-          <Pressable style={({pressed}) => [styles.quickActionBtn, pressed && styles.pressed]}>
-            <FontAwesome5 name="hands-praying" size={22} color={palette.primary} />
-            <Text style={styles.quickActionText}>Mural de Oração</Text>
-          </Pressable>
+          <Link href="/(app)/schedule" asChild>
+            <Pressable style={({pressed}) => [styles.quickActionBtn, pressed && styles.pressed]}>
+              <FontAwesome5 name="calendar-check" size={22} color={palette.primary} />
+              <Text style={styles.quickActionText}>Ver Escalas</Text>
+            </Pressable>
+          </Link>
+          <Link href="/(app)/ministries" asChild>
+            <Pressable style={({pressed}) => [styles.quickActionBtn, pressed && styles.pressed]}>
+              <FontAwesome5 name="users" size={22} color={palette.primary} />
+              <Text style={styles.quickActionText}>Ministérios</Text>
+            </Pressable>
+          </Link>
+          <Link href="/(app)/prayers" asChild>
+            <Pressable style={({pressed}) => [styles.quickActionBtn, pressed && styles.pressed]}>
+              <FontAwesome5 name="hands-praying" size={22} color={palette.primary} />
+              <Text style={styles.quickActionText}>Mural de Oração</Text>
+            </Pressable>
+          </Link>
         </View>
 
         <View style={styles.statsGrid}>
@@ -86,7 +105,7 @@ export default function HomeScreen() {
             <View style={[styles.iconWrap, {backgroundColor: 'rgba(91,44,111,0.1)'}]}>
               <FontAwesome5 name="fire" size={18} color={palette.primary} />
             </View>
-            <Text style={styles.statValue}>0</Text>
+            <Text style={styles.statValue}>{stats.streakCount}</Text>
             <Text style={styles.statLabel}>Dias de Ofensiva</Text>
           </View>
 
@@ -95,8 +114,8 @@ export default function HomeScreen() {
               <View style={[styles.iconWrap, {backgroundColor: 'rgba(212,160,23,0.1)'}]}>
                 <FontAwesome5 name="book-open" size={18} color={palette.gold} />
               </View>
-              <Text style={styles.statValue}>1</Text>
-              <Text style={styles.statLabel}>Dia de 365 na Bíblia</Text>
+              <Text style={styles.statValue}>{stats.bibleReadCount}</Text>
+              <Text style={styles.statLabel}>Dias de 365 na Bíblia</Text>
             </Pressable>
           </Link>
 
@@ -104,16 +123,16 @@ export default function HomeScreen() {
             <View style={[styles.iconWrap, {backgroundColor: 'rgba(39,174,96,0.1)'}]}>
               <FontAwesome5 name="calendar-check" size={18} color={palette.success} />
             </View>
-            <Text style={styles.statValue}>0</Text>
+            <Text style={styles.statValue}>{stats.assignmentsCount}</Text>
             <Text style={styles.statLabel}>Escalas assumidas</Text>
           </View>
 
-          <Link href="/(app)/rosary-daily" asChild>
+          <Link href="/(app)/rosary" asChild>
             <Pressable style={styles.statCard}>
               <View style={[styles.iconWrap, {backgroundColor: 'rgba(231,76,60,0.1)'}]}>
                 <FontAwesome5 name="cross" size={18} color={palette.danger} />
               </View>
-              <Text style={styles.statValue}>0</Text>
+              <Text style={styles.statValue}>{stats.rosaryCount}</Text>
               <Text style={styles.statLabel}>Terços Rezados</Text>
             </Pressable>
           </Link>
