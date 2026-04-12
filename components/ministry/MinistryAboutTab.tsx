@@ -5,16 +5,7 @@ import { buildMinistryInviteShareText } from '@/lib/ministryInvite';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import * as Clipboard from 'expo-clipboard';
 import { useCallback, useState } from 'react';
-import {
-  ActivityIndicator,
-  Platform,
-  Pressable,
-  ScrollView,
-  Share,
-  StyleSheet,
-  Text,
-  View,
-} from 'react-native';
+import { ActivityIndicator, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 
 type Props = {
   ministryId: string;
@@ -53,32 +44,10 @@ export function MinistryAboutTab({ ministryId, slug, name, description, myRole }
     setMsg(null);
     const text = buildMinistryInviteShareText(slug);
     try {
-      if (Platform.OS === 'web') {
-        const nav = typeof navigator !== 'undefined' ? navigator : undefined;
-        if (typeof nav?.share === 'function') {
-          await nav.share({ text, title: 'Convite para o ministério' });
-          setMsg('Convite pronto para enviar pelo sistema.');
-          return;
-        }
-        await Clipboard.setStringAsync(text);
-        setMsg('Link copiado — cole na conversa ou e-mail que preferir.');
-        return;
-      }
-
-      const result = await Share.share({
-        message: text,
-        title: 'Convite para o ministério',
-      });
-      if (result.action === Share.sharedAction) {
-        setMsg('Convite partilhado.');
-      }
+      await Clipboard.setStringAsync(text);
+      setMsg('Link de convite copiado. Cole no WhatsApp, e-mail ou noutra app.');
     } catch {
-      try {
-        await Clipboard.setStringAsync(text);
-        setMsg('Link copiado — cole na conversa ou e-mail que preferir.');
-      } catch {
-        setMsg('Não foi possível abrir a partilha. Tente outra vez.');
-      }
+      setMsg('Não foi possível copiar o convite. Tente outra vez.');
     }
   }, [slug]);
 
@@ -89,6 +58,7 @@ export function MinistryAboutTab({ ministryId, slug, name, description, myRole }
         await api.approveJoinRequest(ministryId, requestId);
         queryClient.invalidateQueries({ queryKey: ['join-requests', ministryId] });
         queryClient.invalidateQueries({ queryKey: ['ministry-members', ministryId] });
+        queryClient.invalidateQueries({ queryKey: ['my-pending-join-requests'] });
       } catch (error) {
         setMsg(error instanceof Error ? error.message : 'Erro ao aprovar');
       }
@@ -102,6 +72,7 @@ export function MinistryAboutTab({ ministryId, slug, name, description, myRole }
       try {
         await api.rejectJoinRequest(ministryId, requestId);
         queryClient.invalidateQueries({ queryKey: ['join-requests', ministryId] });
+        queryClient.invalidateQueries({ queryKey: ['my-pending-join-requests'] });
       } catch (error) {
         setMsg(error instanceof Error ? error.message : 'Erro ao recusar');
       }
@@ -142,7 +113,7 @@ export function MinistryAboutTab({ ministryId, slug, name, description, myRole }
       {isAdmin ? (
         <View style={styles.section}>
           <Text style={styles.sectionTitle} allowFontScaling>
-            Pedidos de entrada
+            Pedidos pendentes
           </Text>
           {requestsQuery.isLoading ? (
             <ActivityIndicator color={palette.primary} />

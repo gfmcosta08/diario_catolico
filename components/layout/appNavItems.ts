@@ -11,7 +11,8 @@ export const APP_NAV_ITEMS: AppNavItem[] = [
   { path: '/(app)/terco-mariano', label: 'Terço Mariano', icon: 'hands-praying' },
   { path: '/(app)/bible', label: 'Bíblia', icon: 'book' },
   { path: '/(app)/liturgy', label: 'Liturgia', icon: 'cross' },
-  { path: '/(app)/ministries', label: 'Ministérios', icon: 'users' },
+  { path: '/(app)/ministries', label: 'Criar ministério', icon: 'users' },
+  { path: '/(app)/ministry-pedidos', label: 'Pedidos pendentes', icon: 'user-plus' },
   { path: '/(app)/feed', label: 'Comunidade', icon: 'comments' },
   { path: '/(app)/schedule', label: 'Escalas', icon: 'calendar-alt' },
   { path: '/(app)/prayers', label: 'Mural de Oração', icon: 'hands-helping' },
@@ -43,6 +44,9 @@ export function isAppNavItemActive(pathname: string, itemPath: string): boolean 
       pathname === '/terco-mariano' ||
       pathname.startsWith('/terco-mariano/')
     );
+  }
+  if (itemPath === '/(app)/ministry-pedidos') {
+    return pathname === '/(app)/ministry-pedidos' || pathname === '/ministry-pedidos';
   }
   return pathname === itemPath || pathname.startsWith(`${itemPath}/`);
 }

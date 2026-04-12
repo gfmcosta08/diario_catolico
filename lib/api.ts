@@ -215,6 +215,21 @@ export const api = {
     return request<Array<{ id: string; userId: string; displayName: string | null; email: string }>>(`/api/ministries/${ministryId}/join-requests`);
   },
 
+  /** Pedidos pendentes em todos os ministérios em que o utilizador é dono ou sub-admin. */
+  async getMyPendingJoinRequestsAcrossMinistries() {
+    type JoinReq = { id: string; userId: string; displayName: string | null; email: string };
+    const rows = await this.myMinistries();
+    const adminRows = rows.filter((r) => r.role === 'owner' || r.role === 'sub_admin');
+    const chunks = await Promise.all(
+      adminRows.map(async (r) => {
+        const m = r.ministry;
+        const requests = (await this.getJoinRequests(m.id)) as JoinReq[];
+        return { ministryId: m.id, ministryName: m.name, requests };
+      })
+    );
+    return chunks.filter((c) => c.requests.length > 0);
+  },
+
   async approveJoinRequest(ministryId: string, requestId: string) {
     return request(`/api/ministries/${ministryId}/join-requests/${requestId}/approve`, { method: 'POST' });
   },
