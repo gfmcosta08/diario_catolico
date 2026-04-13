@@ -554,6 +554,25 @@ apiRouter.post('/ministries/:id/events-with-roles', requireAuth, async (req, res
   }
 });
 
+apiRouter.delete('/ministries/:id/events/:eventId', requireAuth, async (req, res) => {
+  const ministryId = routeParam(req, 'id');
+  const eventId = routeParam(req, 'eventId');
+  const role = await getMembershipRole(ministryId, req.auth!.userId);
+  if (!role) return res.status(403).json({ error: 'Sem acesso' });
+  if (role !== MembershipRole.owner) return res.status(403).json({ error: 'Apenas o dono pode excluir evento' });
+
+  const event = await prisma.ministryEvent.findUnique({
+    where: { id: eventId },
+    select: { id: true, ministryId: true },
+  });
+  if (!event || event.ministryId !== ministryId) {
+    return res.status(404).json({ error: 'Evento nao encontrado' });
+  }
+
+  await prisma.ministryEvent.delete({ where: { id: eventId } });
+  return res.json({ ok: true });
+});
+
 apiRouter.get('/ministries/:id/event-roles', requireAuth, async (req, res) => {
   const ministryId = routeParam(req, 'id');
   const role = await getMembershipRole(ministryId, req.auth!.userId);

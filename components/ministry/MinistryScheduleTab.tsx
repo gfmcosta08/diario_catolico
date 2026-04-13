@@ -7,6 +7,8 @@ import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import {
   ActivityIndicator,
+  Alert,
+  Platform,
   Pressable,
   ScrollView,
   StyleSheet,
@@ -75,9 +77,10 @@ type Props = {
   ministryId: string;
   userId: string;
   isAdmin: boolean;
+  isOwner: boolean;
 };
 
-export function MinistryScheduleTab({ ministryId, userId, isAdmin }: Props) {
+export function MinistryScheduleTab({ ministryId, userId, isAdmin, isOwner }: Props) {
   const queryClient = useQueryClient();
   const [month, setMonth] = useState(() => new Date());
   const [selectedDay, setSelectedDay] = useState<number | null>(new Date().getDate());
@@ -265,6 +268,42 @@ export function MinistryScheduleTab({ ministryId, userId, isAdmin }: Props) {
     [ministryId, queryClient]
   );
 
+  const deleteEvent = useCallback(
+    async (eventId: string) => {
+      setErr(null);
+      try {
+        await api.deleteEvent(ministryId, eventId);
+        queryClient.invalidateQueries({ queryKey: ['ministry-events', ministryId] });
+        queryClient.invalidateQueries({ queryKey: ['ministry-event-roles', ministryId] });
+        queryClient.invalidateQueries({ queryKey: ['ministry-assignments', ministryId] });
+      } catch (error) {
+        setErr(error instanceof Error ? error.message : 'Erro ao excluir evento');
+      }
+    },
+    [ministryId, queryClient]
+  );
+
+  const confirmDeleteEvent = useCallback(
+    (eventId: string, title: string) => {
+      const exec = () => {
+        deleteEvent(eventId);
+      };
+
+      if (Platform.OS === 'web') {
+        if (window.confirm(`Tem certeza que deseja excluir o evento "${title}"?`)) {
+          exec();
+        }
+        return;
+      }
+
+      Alert.alert('Excluir evento', `Tem certeza que deseja excluir "${title}"?`, [
+        { text: 'Cancelar', style: 'cancel' },
+        { text: 'Excluir', style: 'destructive', onPress: exec },
+      ]);
+    },
+    [deleteEvent]
+  );
+
   const prevMonth = useCallback(() => {
     setMonth((d) => new Date(d.getFullYear(), d.getMonth() - 1, 1));
   }, []);
@@ -376,6 +415,17 @@ export function MinistryScheduleTab({ ministryId, userId, isAdmin }: Props) {
                 {formatEventDateTime(ev.startsAt)}
               </Text>
             </View>
+            {isOwner ? (
+              <Pressable
+                onPress={() => confirmDeleteEvent(ev.id, ev.title)}
+                style={styles.deleteEventBtn}
+                accessibilityRole="button"
+              >
+                <Text style={styles.deleteEventTxt} allowFontScaling>
+                  Excluir evento
+                </Text>
+              </Pressable>
+            ) : null}
             {(rolesByEvent[ev.id] ?? []).map((role) => {
               const taken = assignsByRole[role.id] ?? [];
               const mine = taken.find((a) => a.userId === userId);
@@ -469,6 +519,19 @@ const styles = StyleSheet.create({
     borderColor: palette.border,
   },
   eventTitle: { fontSize: 17, fontWeight: '700', color: palette.text },
+  deleteEventBtn: {
+    marginTop: spacing.sm,
+    alignSelf: 'flex-start',
+    paddingVertical: 6,
+    paddingHorizontal: spacing.sm,
+    borderRadius: 8,
+    backgroundColor: `${palette.error}1A`,
+  },
+  deleteEventTxt: {
+    color: palette.error,
+    fontWeight: '700',
+    fontSize: 13,
+  },
   roleRow: { marginTop: spacing.sm, paddingTop: spacing.sm, borderTopWidth: 1, borderTopColor: palette.border },
   roleTitle: { fontSize: 15, fontWeight: '600', color: palette.text },
   assignRow: { flexDirection: 'row', alignItems: 'center', gap: spacing.sm, marginTop: 4 },

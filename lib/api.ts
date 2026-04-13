@@ -266,6 +266,10 @@ export const api = {
     return request<{ id: string }>(`/api/ministries/${ministryId}/events`, { method: 'POST', body: JSON.stringify(payload) });
   },
 
+  async deleteEvent(ministryId: string, eventId: string) {
+    return request<{ ok: boolean }>(`/api/ministries/${ministryId}/events/${eventId}`, { method: 'DELETE' });
+  },
+
   async createEventWithRoles(
     ministryId: string,
     payload: {

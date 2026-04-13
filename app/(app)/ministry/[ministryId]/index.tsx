@@ -88,6 +88,7 @@ export default function MinistryDetailScreen() {
   const m = ministryQuery.data;
   const myRole = memberQuery.data.role;
   const isAdmin = myRole === 'owner' || myRole === 'sub_admin';
+  const isOwner = myRole === 'owner';
 
   return (
     <View style={styles.flex}>
@@ -122,7 +123,7 @@ export default function MinistryDetailScreen() {
           />
         ) : null}
         {tab === 'schedule' ? (
-          <MinistryScheduleTab ministryId={m.id} userId={uid} isAdmin={isAdmin} />
+          <MinistryScheduleTab ministryId={m.id} userId={uid} isAdmin={isAdmin} isOwner={isOwner} />
         ) : null}
       </View>
     </View>

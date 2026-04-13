@@ -4,9 +4,12 @@ import { api } from '@/lib/api';
 import { buildMinistryInviteShareText } from '@/lib/ministryInvite';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import * as Clipboard from 'expo-clipboard';
+import { router } from 'expo-router';
 import { useCallback, useState } from 'react';
 import {
   ActivityIndicator,
+  Alert,
+  Platform,
   Pressable,
   ScrollView,
   StyleSheet,
@@ -106,6 +109,31 @@ export function MinistryAboutTab({ ministryId, slug, name, description, myRole }
     [ministryId, queryClient]
   );
 
+  const confirmDeleteMinistry = useCallback(() => {
+    const exec = async () => {
+      setMsg(null);
+      try {
+        await api.deleteMinistry(ministryId);
+        queryClient.invalidateQueries({ queryKey: ['my-ministries'] });
+        router.replace('/(app)/ministries');
+      } catch (error) {
+        setMsg(error instanceof Error ? error.message : 'Erro ao excluir ministério');
+      }
+    };
+
+    if (Platform.OS === 'web') {
+      if (window.confirm(`Tem certeza que deseja excluir o ministério "${name}" permanentemente?`)) {
+        exec();
+      }
+      return;
+    }
+
+    Alert.alert('Excluir Ministério', `Tem certeza que deseja excluir "${name}"?`, [
+      { text: 'Cancelar', style: 'cancel' },
+      { text: 'Excluir', style: 'destructive', onPress: exec },
+    ]);
+  }, [ministryId, name, queryClient]);
+
   return (
     <ScrollView style={styles.scroll} contentContainerStyle={styles.container}>
       <Text style={styles.title} allowFontScaling>
@@ -192,6 +220,20 @@ export function MinistryAboutTab({ ministryId, slug, name, description, myRole }
           ))
         )}
       </View>
+
+      {isOwner ? (
+        <View style={[styles.section, styles.dangerBox]}>
+          <Text style={styles.dangerTitle} allowFontScaling>
+            Perigo
+          </Text>
+          <Text style={styles.muted} allowFontScaling>
+            Excluir ministério remove permanentemente eventos, cargos, escalas e membros.
+          </Text>
+          <View style={styles.dangerBtnWrap}>
+            <AppButton title="Excluir ministério" variant="ghost" onPress={confirmDeleteMinistry} />
+          </View>
+        </View>
+      ) : null}
     </ScrollView>
   );
 }
@@ -230,4 +272,18 @@ const styles = StyleSheet.create({
     borderRadius: 8,
   },
   smallBtnOutlineTxt: { color: palette.primary, fontWeight: '600', fontSize: 13 },
+  dangerBox: {
+    borderWidth: 1,
+    borderColor: `${palette.error}55`,
+    borderRadius: 12,
+    padding: spacing.md,
+    backgroundColor: `${palette.error}0D`,
+  },
+  dangerTitle: {
+    fontSize: 16,
+    fontWeight: '800',
+    color: palette.error,
+    marginBottom: spacing.xs,
+  },
+  dangerBtnWrap: { marginTop: spacing.sm },
 });

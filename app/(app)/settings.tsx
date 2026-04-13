@@ -11,8 +11,6 @@ import { Link, router } from 'expo-router';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import {
   ActivityIndicator,
-  Alert,
-  Platform,
   Pressable,
   ScrollView,
   StyleSheet,
@@ -81,31 +79,6 @@ export default function SettingsScreen() {
       setSavingProfile(false);
     }
   }, [displayName, queryClient, uid]);
-
-  const confirmDeleteMinistry = useCallback(
-    async (id: string, mName: string) => {
-      const exec = async () => {
-        try {
-          await api.deleteMinistry(id);
-          queryClient.invalidateQueries({ queryKey: ['my-ministries', uid] });
-        } catch (e) {
-          setError(e instanceof Error ? e.message : 'Erro ao excluir ministério');
-        }
-      };
-
-      if (Platform.OS === 'web') {
-        if (window.confirm(`Tem certeza que deseja excluir o ministério "${mName}" permanentemente?`)) {
-          exec();
-        }
-      } else {
-        Alert.alert('Excluir Ministério', `Tem certeza que deseja excluir "${mName}"?`, [
-          { text: 'Cancelar', style: 'cancel' },
-          { text: 'Excluir', style: 'destructive', onPress: exec },
-        ]);
-      }
-    },
-    [queryClient, uid]
-  );
 
   if (!configured || !session) {
     return (
@@ -197,11 +170,6 @@ export default function SettingsScreen() {
                     </Text>
                   </View>
                 </Pressable>
-                {row.role === 'owner' && (
-                  <Pressable onPress={() => confirmDeleteMinistry(m.id, m.name)} style={styles.deleteBtn}>
-                    <Text style={styles.deleteBtnTxt}>Excluir</Text>
-                  </Pressable>
-                )}
               </View>
             );
           })}
@@ -267,12 +235,6 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     gap: spacing.sm,
   },
-  deleteBtn: {
-    padding: spacing.md,
-    backgroundColor: palette.error + '1A',
-    borderRadius: 8,
-  },
-  deleteBtnTxt: { color: palette.error, fontWeight: '600' },
   err: { color: palette.error, marginTop: spacing.md },
   badgeGrid: {
     flexDirection: 'row',
