@@ -8,6 +8,10 @@ import { prisma } from '../lib/prisma.js';
 import { requireAuth } from '../middleware/auth.js';
 
 export const apiRouter = Router();
+const USERNAME_COOLDOWN_DAYS = 30;
+const USERNAME_MIN = 3;
+const USERNAME_MAX = 30;
+const USERNAME_REGEX = /^[a-z0-9._]{3,30}$/;
 
 function routeParam(req: any, key: string): string {
   const value = req.params?.[key];
@@ -22,6 +26,16 @@ function hashResetToken(token: string) {
 function buildResetLink(token: string) {
   const appUrl = process.env.APP_URL || process.env.CLIENT_ORIGIN?.split(',')[0] || 'http://localhost:8081';
   return `${appUrl.replace(/\/$/, '')}/(auth)/reset-password?token=${token}`;
+}
+
+function normalizeOptionalText(value: unknown) {
+  if (typeof value !== 'string') return null;
+  const trimmed = value.trim();
+  return trimmed.length ? trimmed : null;
+}
+
+function resolvePublicName(user: { email: string; profile?: { displayName?: string | null; username?: string | null } | null }) {
+  return user.profile?.displayName || user.profile?.username || user.email;
 }
 function badRequest(res: any, error: unknown) {
   if (error instanceof z.ZodError) {
@@ -92,9 +106,13 @@ apiRouter.post('/auth/login', async (req, res) => {
 apiRouter.get('/auth/me', requireAuth, async (req, res) => {
   const user = await prisma.user.findUnique({
     where: { id: req.auth!.userId },
-    select: { id: true, email: true, profile: { select: { displayName: true } } },
+    select: {
+      id: true,
+      email: true,
+      profile: { select: { displayName: true, username: true } },
+    },
   });
-  if (!user) return res.status(404).json({ error: 'Usuário não encontrado' });
+  if (!user) return res.status(404).json({ error: 'Usuario nao encontrado' });
   return res.json(user);
 });
 
@@ -160,22 +178,164 @@ apiRouter.post('/auth/password/reset', async (req, res) => {
 });
 
 apiRouter.get('/profile', requireAuth, async (req, res) => {
-  const profile = await prisma.profile.findUnique({ where: { id: req.auth!.userId } });
-  return res.json(profile ?? { id: req.auth!.userId, displayName: null });
+  const user = await prisma.user.findUnique({
+    where: { id: req.auth!.userId },
+    select: {
+      id: true,
+      email: true,
+      profile: {
+        include: {
+          parishes: { orderBy: { createdAt: 'asc' } },
+        },
+      },
+    },
+  });
+
+  if (!user) return res.status(404).json({ error: 'Usuario nao encontrado' });
+
+  return res.json({
+    id: user.id,
+    email: user.email,
+    displayName: user.profile?.displayName ?? null,
+    username: user.profile?.username ?? null,
+    usernameChangedAt: user.profile?.usernameChangedAt ?? null,
+    phone: user.profile?.phone ?? null,
+    address: user.profile?.address ?? null,
+    parishes:
+      user.profile?.parishes.map((p) => ({
+        id: p.id,
+        name: p.name,
+        city: p.city,
+        state: p.state,
+      })) ?? [],
+  });
 });
 
 apiRouter.put('/profile', requireAuth, async (req, res) => {
   try {
-    const body = z.object({ displayName: z.string().trim().max(80).nullable() }).parse(req.body);
-    const profile = await prisma.profile.upsert({
-      where: { id: req.auth!.userId },
-      create: { id: req.auth!.userId, displayName: body.displayName },
-      update: { displayName: body.displayName },
+    const body = z
+      .object({
+        displayName: z.string().trim().max(80).nullable().optional(),
+        username: z
+          .string()
+          .trim()
+          .toLowerCase()
+          .min(USERNAME_MIN)
+          .max(USERNAME_MAX)
+          .regex(USERNAME_REGEX)
+          .nullable()
+          .optional(),
+        phone: z.string().trim().max(30).nullable().optional(),
+        address: z.string().trim().max(200).nullable().optional(),
+        parishes: z
+          .array(
+            z.object({
+              name: z.string().trim().min(1).max(120),
+              city: z.string().trim().min(1).max(120),
+              state: z.string().trim().min(2).max(2),
+            })
+          )
+          .max(10)
+          .optional(),
+      })
+      .parse(req.body);
+
+    const current = await prisma.profile.findUnique({ where: { id: req.auth!.userId } });
+    const nextUsername = body.username === undefined ? current?.username ?? null : normalizeOptionalText(body.username);
+    const currentUsername = current?.username ?? null;
+    const usernameChanged = nextUsername !== currentUsername;
+
+    if (usernameChanged && currentUsername && current?.usernameChangedAt) {
+      const nextAllowed = new Date(current.usernameChangedAt);
+      nextAllowed.setDate(nextAllowed.getDate() + USERNAME_COOLDOWN_DAYS);
+      if (nextAllowed.getTime() > Date.now()) {
+        return res.status(409).json({
+          error: `Username so pode ser alterado a cada ${USERNAME_COOLDOWN_DAYS} dias`,
+          nextAllowedAt: nextAllowed.toISOString(),
+        });
+      }
+    }
+
+    const profile = await prisma.$transaction(async (tx) => {
+      const upserted = await tx.profile.upsert({
+        where: { id: req.auth!.userId },
+        create: {
+          id: req.auth!.userId,
+          displayName: body.displayName === undefined ? null : normalizeOptionalText(body.displayName),
+          username: nextUsername,
+          usernameChangedAt: usernameChanged ? new Date() : current?.usernameChangedAt ?? null,
+          phone: body.phone === undefined ? null : normalizeOptionalText(body.phone),
+          address: body.address === undefined ? null : normalizeOptionalText(body.address),
+        },
+        update: {
+          ...(body.displayName !== undefined ? { displayName: normalizeOptionalText(body.displayName) } : {}),
+          ...(body.username !== undefined
+            ? {
+                username: nextUsername,
+                usernameChangedAt: usernameChanged ? new Date() : current?.usernameChangedAt ?? null,
+              }
+            : {}),
+          ...(body.phone !== undefined ? { phone: normalizeOptionalText(body.phone) } : {}),
+          ...(body.address !== undefined ? { address: normalizeOptionalText(body.address) } : {}),
+        },
+      });
+
+      if (body.parishes !== undefined) {
+        await tx.profileParish.deleteMany({ where: { profileId: req.auth!.userId } });
+        if (body.parishes.length > 0) {
+          const unique = Array.from(
+            new Map(
+              body.parishes.map((p) => [
+                `${p.name.toLowerCase()}|${p.city.toLowerCase()}|${p.state.toUpperCase()}`,
+                {
+                  profileId: req.auth!.userId,
+                  name: p.name,
+                  city: p.city,
+                  state: p.state.toUpperCase(),
+                },
+              ])
+            ).values()
+          );
+          await tx.profileParish.createMany({ data: unique });
+        }
+      }
+
+      const withParishes = await tx.profile.findUnique({
+        where: { id: req.auth!.userId },
+        include: { parishes: { orderBy: { createdAt: 'asc' } } },
+      });
+      return withParishes ?? upserted;
     });
-    return res.json(profile);
+
+    return res.json({
+      id: profile.id,
+      displayName: profile.displayName,
+      username: profile.username,
+      usernameChangedAt: profile.usernameChangedAt,
+      phone: profile.phone,
+      address: profile.address,
+      parishes: 'parishes' in profile ? profile.parishes : [],
+    });
   } catch (error) {
+    if (String((error as any)?.code) === 'P2002') {
+      return res.status(409).json({ error: 'Username ja esta em uso' });
+    }
     return badRequest(res, error);
   }
+});
+
+apiRouter.get('/profile/username-availability', requireAuth, async (req, res) => {
+  const parsed = z
+    .object({
+      username: z.string().trim().toLowerCase().min(USERNAME_MIN).max(USERNAME_MAX).regex(USERNAME_REGEX),
+    })
+    .safeParse(req.query);
+  if (!parsed.success) return res.status(400).json({ error: 'Username invalido' });
+
+  const username = parsed.data.username;
+  const existing = await prisma.profile.findFirst({ where: { username }, select: { id: true } });
+  const available = !existing || existing.id === req.auth!.userId;
+  return res.json({ available, username });
 });
 
 apiRouter.get('/progress/bible', requireAuth, async (req, res) => {
@@ -331,7 +491,7 @@ apiRouter.get('/ministries/:id/join-requests', requireAuth, async (req, res) => 
     include: { user: { include: { profile: true } } },
     orderBy: { createdAt: 'asc' },
   });
-  return res.json(rows.map((r) => ({ id: r.id, userId: r.userId, displayName: r.user.profile?.displayName ?? null, email: r.user.email })));
+  return res.json(rows.map((r) => ({ id: r.id, userId: r.userId, displayName: resolvePublicName(r.user), email: r.user.email })));
 });
 
 apiRouter.post('/ministries/:id/join-requests/:requestId/approve', requireAuth, async (req, res) => {
@@ -375,7 +535,7 @@ apiRouter.get('/ministries/:id/members', requireAuth, async (req, res) => {
     include: { user: { include: { profile: true } } },
     orderBy: { createdAt: 'asc' },
   });
-  return res.json(rows.map((r) => ({ userId: r.userId, role: r.role, displayName: r.user.profile?.displayName ?? null, email: r.user.email })));
+  return res.json(rows.map((r) => ({ userId: r.userId, role: r.role, displayName: resolvePublicName(r.user), email: r.user.email })));
 });
 
 apiRouter.post('/ministries/:id/members/:userId/promote-sub-admin', requireAuth, async (req, res) => {
@@ -439,7 +599,7 @@ apiRouter.get('/ministries/:id/posts', requireAuth, async (req, res) => {
     id: p.id,
     ministryId: p.ministryId,
     authorId: p.authorId,
-    authorName: p.author.profile?.displayName || p.author.email,
+    authorName: resolvePublicName(p.author),
     content: p.content,
     likesCount: p.likesCount,
     parentId: p.parentId,
@@ -658,7 +818,7 @@ apiRouter.get('/ministries/:id/assignments', requireAuth, async (req, res) => {
     id: r.id,
     roleId: r.roleId,
     userId: r.userId,
-    userName: r.user.profile?.displayName || r.user.email,
+    userName: resolvePublicName(r.user),
   })));
 });
 
@@ -780,7 +940,7 @@ apiRouter.get('/prayers', requireAuth, async (req, res) => {
   return res.json(prayers.map(p => ({
     id: p.id,
     authorId: p.authorId,
-    authorName: p.author.profile?.displayName || p.author.email,
+    authorName: resolvePublicName(p.author),
     content: p.content,
     prayCount: p.prayCount,
     createdAt: p.createdAt,
@@ -821,6 +981,8 @@ apiRouter.get('/achievements', requireAuth, async (req, res) => {
   });
   return res.json(badges.map(b => b.badgeType));
 });
+
+
 
 
 

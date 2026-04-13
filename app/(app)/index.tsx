@@ -6,6 +6,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { FontAwesome5 } from '@expo/vector-icons';
 import { useState, useEffect } from 'react';
 import { api } from '@/lib/api';
+import { useQuery } from '@tanstack/react-query';
 
 export const options = { title: 'Início', headerShown: false };
 
@@ -15,10 +16,12 @@ export default function HomeScreen() {
   const { width } = useWindowDimensions();
   const isDesktop = width >= 768;
   
-  // Real data state
-  const userName =
-    session?.user?.email?.split('@')[0]?.split('.')[0]?.replace(/^\w/, (c) => c.toUpperCase()) ||
-    'Maria';
+  const profileQuery = useQuery({
+    queryKey: ['profile', session?.user.id],
+    enabled: !!configured && !!session,
+    queryFn: async () => api.getProfile(),
+  });
+  const userName = profileQuery.data?.displayName || profileQuery.data?.username || session?.user?.email?.split('@')[0] || 'Maria';
   
   const [currentDateString, setCurrentDateString] = useState('');
   const [stats, setStats] = useState({

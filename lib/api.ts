@@ -15,6 +15,18 @@ const TOKEN_KEY = 'auth_token';
 const FETCH_TIMEOUT_MS = 12000;
 
 export type AuthUser = { id: string; email: string };
+export type ProfileParishInput = { name: string; city: string; state: string };
+export type ProfileParish = ProfileParishInput & { id: string };
+export type ProfilePayload = {
+  id: string;
+  email: string;
+  displayName: string | null;
+  username: string | null;
+  usernameChangedAt: string | null;
+  phone: string | null;
+  address: string | null;
+  parishes: ProfileParish[];
+};
 
 export async function getToken() {
   return AsyncStorage.getItem(TOKEN_KEY);
@@ -146,12 +158,23 @@ export const api = {
     return request<{ id: string; email: string; profile?: { displayName: string | null } | null }>('/api/auth/me');
   },
 
-  async updateProfile(displayName: string | null) {
-    return request('/api/profile', { method: 'PUT', body: JSON.stringify({ displayName }) });
+  async updateProfile(payload: {
+    displayName?: string | null;
+    username?: string | null;
+    phone?: string | null;
+    address?: string | null;
+    parishes?: ProfileParishInput[];
+  }) {
+    return request<ProfilePayload>('/api/profile', { method: 'PUT', body: JSON.stringify(payload) });
   },
 
   async getProfile() {
-    return request<{ id: string; displayName: string | null }>('/api/profile');
+    return request<ProfilePayload>('/api/profile');
+  },
+
+  async checkUsernameAvailability(username: string) {
+    const qs = new URLSearchParams({ username: username.trim().toLowerCase() });
+    return request<{ available: boolean; username: string }>(`/api/profile/username-availability?${qs.toString()}`);
   },
 
   async getBibleProgress() {
