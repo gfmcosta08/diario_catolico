@@ -7,7 +7,7 @@ import { FontAwesome5 } from '@expo/vector-icons';
 import { useInfiniteQuery, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useLocalSearchParams, useNavigation, useRouter } from 'expo-router';
 import { useCallback, useLayoutEffect, useMemo, useState } from 'react';
-import { ActivityIndicator, Pressable, ScrollView, StyleSheet, Text, TextInput, View } from 'react-native';
+import { ActivityIndicator, Platform, Pressable, ScrollView, StyleSheet, Text, TextInput, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 type MinistryRow = {
@@ -59,6 +59,7 @@ export default function CommunityTimelineScreen() {
   const [replyBody, setReplyBody] = useState('');
   const [expanded, setExpanded] = useState<Record<string, boolean>>({});
   const [sending, setSending] = useState(false);
+  const noTranslateProps = Platform.OS === 'web' ? ({ translate: 'no' } as any) : {};
 
   const ministriesQuery = useQuery({
     queryKey: ['my-ministries', session?.user.id],
@@ -222,6 +223,7 @@ export default function CommunityTimelineScreen() {
             multiline
             value={newPostContent}
             onChangeText={setNewPostContent}
+            {...noTranslateProps}
           />
           <View style={styles.composeFooter}>
             <View style={styles.composeActions}>
@@ -258,7 +260,7 @@ export default function CommunityTimelineScreen() {
                   </View>
                 </View>
 
-                <Text style={styles.postContent} allowFontScaling>
+                <Text style={styles.postContent} allowFontScaling {...noTranslateProps}>
                   {post.content}
                 </Text>
 
@@ -314,7 +316,7 @@ export default function CommunityTimelineScreen() {
                         <Text style={styles.replyMeta} allowFontScaling>
                           {reply.authorName} · {formatPostTime(reply.createdAt)}
                         </Text>
-                        <Text style={styles.replyContent} allowFontScaling>
+                        <Text style={styles.replyContent} allowFontScaling {...noTranslateProps}>
                           {reply.content}
                         </Text>
                       </View>
@@ -430,3 +432,5 @@ const styles = StyleSheet.create({
   replyContent: { marginTop: 2, fontSize: 14, color: palette.text },
   emptyText: { marginTop: spacing.lg, fontSize: 14, color: palette.textSecondary, textAlign: 'center' },
 });
+
+

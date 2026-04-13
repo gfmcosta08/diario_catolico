@@ -131,8 +131,8 @@ function RosaryBeadCircle({
           const activeSize = isLarge ? BEAD_SIZE_ACTIVE * 1.4 : BEAD_SIZE_ACTIVE;
           const size = isActive ? activeSize : baseSize;
           
-          let backgroundColor = palette.surface;
-          let borderColor = palette.border;
+          let backgroundColor: string = palette.surface;
+          let borderColor: string = palette.border;
           
           if (isPast) {
             backgroundColor = palette.primaryMuted;

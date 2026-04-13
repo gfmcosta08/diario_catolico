@@ -16,7 +16,9 @@ export default function HomeScreen() {
   const isDesktop = width >= 768;
   
   // Real data state
-  const userName = session?.user?.name?.split(' ')[0] || 'Maria';
+  const userName =
+    session?.user?.email?.split('@')[0]?.split('.')[0]?.replace(/^\w/, (c) => c.toUpperCase()) ||
+    'Maria';
   
   const [currentDateString, setCurrentDateString] = useState('');
   const [stats, setStats] = useState({

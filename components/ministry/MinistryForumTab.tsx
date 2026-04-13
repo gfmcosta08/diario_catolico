@@ -38,6 +38,7 @@ export function MinistryForumTab({ ministryId, userId, isAdmin }: Props) {
   const [replyBody, setReplyBody] = useState('');
   const [expanded, setExpanded] = useState<Record<string, boolean>>({});
   const [sending, setSending] = useState(false);
+  const noTranslateProps = Platform.OS === 'web' ? ({ translate: 'no' } as any) : {};
 
   const postsQuery = useQuery({
     queryKey: ['ministry-posts', ministryId],
@@ -147,7 +148,7 @@ export function MinistryForumTab({ ministryId, userId, isAdmin }: Props) {
                   timeStyle: 'short',
                 })}
               </Text>
-              <Text style={styles.body} allowFontScaling>
+              <Text style={styles.body} allowFontScaling {...noTranslateProps}>
                 {item.content}
               </Text>
               <View style={styles.cardActions}>
@@ -189,7 +190,7 @@ export function MinistryForumTab({ ministryId, userId, isAdmin }: Props) {
                           timeStyle: 'short',
                         })}
                       </Text>
-                      <Text style={styles.bodySmall} allowFontScaling>
+                      <Text style={styles.bodySmall} allowFontScaling {...noTranslateProps}>
                         {r.content}
                       </Text>
                       {isAdmin || r.authorId === userId ? (

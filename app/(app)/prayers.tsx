@@ -36,7 +36,7 @@ export default function PrayersScreen() {
     try {
       const newPrayer = await api.createPrayer(content);
       // O mock rápido previne outro fetch até que deem push
-      setPrayers([{...newPrayer, authorName: session?.user?.name || 'Eu'}, ...prayers]);
+      setPrayers([{ ...newPrayer, authorName: session?.user?.email?.split('@')[0] || 'Eu' }, ...prayers]);
       setContent('');
     } catch (err) {
       alert("Erro ao enviar pedido de oração.");
