@@ -246,8 +246,24 @@ export const api = {
     return request(`/api/ministries/${ministryId}/members/${userId}/promote-sub-admin`, { method: 'POST' });
   },
 
-  async getPosts(ministryId: string) {
-    return request<Array<{ id: string; ministryId: string; authorId: string; authorName: string; content: string; parentId: string | null; createdAt: string }>>(`/api/ministries/${ministryId}/posts`);
+  async getPosts(ministryId: string, params?: { cursor?: string; limit?: number }) {
+    const qs = new URLSearchParams();
+    if (params?.cursor) qs.set('cursor', params.cursor);
+    if (params?.limit) qs.set('limit', String(params.limit));
+    const suffix = qs.toString() ? `?${qs.toString()}` : '';
+    return request<{
+      items: Array<{
+        id: string;
+        ministryId: string;
+        authorId: string;
+        authorName: string;
+        content: string;
+        likesCount: number;
+        parentId: string | null;
+        createdAt: string;
+      }>;
+      nextCursor: string | null;
+    }>(`/api/ministries/${ministryId}/posts${suffix}`);
   },
 
   async createPost(ministryId: string, payload: { content: string; parentId?: string | null }) {

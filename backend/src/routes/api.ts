@@ -397,21 +397,57 @@ apiRouter.get('/ministries/:id/posts', requireAuth, async (req, res) => {
   const role = await getMembershipRole(ministryId, req.auth!.userId);
   if (!role) return res.status(403).json({ error: 'Sem acesso' });
 
+  const query = z
+    .object({
+      cursor: z.string().uuid().optional(),
+      limit: z.coerce.number().int().min(1).max(50).optional(),
+    })
+    .safeParse(req.query);
+  if (!query.success) return res.status(400).json({ error: 'Query inválida' });
+
+  const limit = query.data.limit ?? 20;
+  let cursorFilter: Record<string, unknown> = {};
+  if (query.data.cursor) {
+    const cursorPost = await prisma.ministryPost.findUnique({
+      where: { id: query.data.cursor },
+      select: { id: true, ministryId: true, createdAt: true },
+    });
+    if (!cursorPost || cursorPost.ministryId !== ministryId) {
+      return res.status(404).json({ error: 'Cursor inválido' });
+    }
+
+    cursorFilter = {
+      OR: [
+        { createdAt: { lt: cursorPost.createdAt } },
+        {
+          AND: [{ createdAt: cursorPost.createdAt }, { id: { lt: cursorPost.id } }],
+        },
+      ],
+    };
+  }
+
   const posts = await prisma.ministryPost.findMany({
-    where: { ministryId },
+    where: { ministryId, ...cursorFilter },
     include: { author: { include: { profile: true } } },
-    orderBy: { createdAt: 'desc' },
+    orderBy: [{ createdAt: 'desc' }, { id: 'desc' }],
+    take: limit + 1,
   });
 
-  return res.json(posts.map((p) => ({
+  const hasMore = posts.length > limit;
+  const pageItems = hasMore ? posts.slice(0, limit) : posts;
+  const items = pageItems.map((p) => ({
     id: p.id,
     ministryId: p.ministryId,
     authorId: p.authorId,
     authorName: p.author.profile?.displayName || p.author.email,
     content: p.content,
+    likesCount: p.likesCount,
     parentId: p.parentId,
     createdAt: p.createdAt,
-  })));
+  }));
+  const nextCursor = hasMore ? pageItems[pageItems.length - 1]?.id ?? null : null;
+
+  return res.json({ items, nextCursor });
 });
 
 apiRouter.post('/ministries/:id/posts', requireAuth, async (req, res) => {

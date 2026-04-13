@@ -41,7 +41,7 @@ export function MinistryForumTab({ ministryId, userId, isAdmin }: Props) {
 
   const postsQuery = useQuery({
     queryKey: ['ministry-posts', ministryId],
-    queryFn: async () => (await api.getPosts(ministryId)) as Post[],
+    queryFn: async () => (await api.getPosts(ministryId, { limit: 50 })).items as Post[],
   });
 
   const roots = useMemo(
