@@ -266,6 +266,21 @@ export const api = {
     return request<{ id: string }>(`/api/ministries/${ministryId}/events`, { method: 'POST', body: JSON.stringify(payload) });
   },
 
+  async createEventWithRoles(
+    ministryId: string,
+    payload: {
+      title: string;
+      startsAt: string;
+      notes?: string;
+      roles?: Array<{ title: string; capacity: number }>;
+    }
+  ) {
+    return request<{ id: string; rolesCreated: number }>(
+      `/api/ministries/${ministryId}/events-with-roles`,
+      { method: 'POST', body: JSON.stringify(payload) }
+    );
+  },
+
   async getEventRoles(ministryId: string) {
     return request<Array<{ id: string; eventId: string; title: string; capacity: number }>>(`/api/ministries/${ministryId}/event-roles`);
   },

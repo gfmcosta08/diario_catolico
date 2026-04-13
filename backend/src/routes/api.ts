@@ -495,6 +495,65 @@ apiRouter.post('/ministries/:id/events', requireAuth, async (req, res) => {
   }
 });
 
+apiRouter.post('/ministries/:id/events-with-roles', requireAuth, async (req, res) => {
+  const ministryId = routeParam(req, 'id');
+  const isAdmin = await requireAdmin(ministryId, req.auth!.userId);
+  if (!isAdmin) return res.status(403).json({ error: 'Sem permissao' });
+
+  try {
+    const body = z
+      .object({
+        title: z.string().trim().min(2),
+        startsAt: z.string(),
+        notes: z.string().optional(),
+        roles: z
+          .array(
+            z.object({
+              title: z.string().trim().min(1),
+              capacity: z.number().int().min(1).max(50),
+            })
+          )
+          .optional(),
+      })
+      .parse(req.body);
+
+    const startsAt = new Date(body.startsAt);
+    if (Number.isNaN(startsAt.getTime())) {
+      return res.status(400).json({ error: 'Data/hora invalida' });
+    }
+
+    const created = await prisma.$transaction(async (tx) => {
+      const event = await tx.ministryEvent.create({
+        data: {
+          ministryId,
+          title: body.title,
+          startsAt,
+          notes: body.notes ?? '',
+          createdBy: req.auth!.userId,
+        },
+        select: { id: true },
+      });
+
+      const roles = body.roles ?? [];
+      if (roles.length > 0) {
+        await tx.ministryEventRole.createMany({
+          data: roles.map((role) => ({
+            eventId: event.id,
+            title: role.title,
+            capacity: role.capacity,
+          })),
+        });
+      }
+
+      return { id: event.id, rolesCreated: roles.length };
+    });
+
+    return res.status(201).json(created);
+  } catch (error) {
+    return badRequest(res, error);
+  }
+});
+
 apiRouter.get('/ministries/:id/event-roles', requireAuth, async (req, res) => {
   const ministryId = routeParam(req, 'id');
   const role = await getMembershipRole(ministryId, req.auth!.userId);

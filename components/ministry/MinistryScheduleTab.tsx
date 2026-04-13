@@ -23,6 +23,7 @@ type EventRow = {
 
 type RoleRow = { id: string; eventId: string; title: string; capacity: number };
 type AssignRow = { id: string; roleId: string; userId: string; userName: string };
+type DraftRole = { id: string; title: string; capacity: string };
 
 function pad(n: number) {
   return n < 10 ? `0${n}` : String(n);
@@ -82,9 +83,7 @@ export function MinistryScheduleTab({ ministryId, userId, isAdmin }: Props) {
   const [selectedDay, setSelectedDay] = useState<number | null>(new Date().getDate());
   const [eventTitle, setEventTitle] = useState('');
   const [eventTime, setEventTime] = useState('09:00');
-  const [roleTitle, setRoleTitle] = useState('');
-  const [roleSlots, setRoleSlots] = useState('1');
-  const [forEventId, setForEventId] = useState<string | null>(null);
+  const [draftRoles, setDraftRoles] = useState<DraftRole[]>([]);
   const [busy, setBusy] = useState(false);
   const [err, setErr] = useState<string | null>(null);
 
@@ -162,6 +161,21 @@ export function MinistryScheduleTab({ ministryId, userId, isAdmin }: Props) {
     setSelectedDay(day);
   }, []);
 
+  const addDraftRole = useCallback(() => {
+    setDraftRoles((prev) => [
+      ...prev,
+      { id: `${Date.now()}-${Math.random().toString(36).slice(2, 8)}`, title: '', capacity: '1' },
+    ]);
+  }, []);
+
+  const updateDraftRole = useCallback((id: string, patch: Partial<Omit<DraftRole, 'id'>>) => {
+    setDraftRoles((prev) => prev.map((role) => (role.id === id ? { ...role, ...patch } : role)));
+  }, []);
+
+  const removeDraftRole = useCallback((id: string) => {
+    setDraftRoles((prev) => prev.filter((role) => role.id !== id));
+  }, []);
+
   const createEvent = useCallback(async () => {
     if (selectedDay == null) {
       setErr('Selecione um dia no calendário.');
@@ -189,50 +203,41 @@ export function MinistryScheduleTab({ ministryId, userId, isAdmin }: Props) {
       setErr('Data ou hora inválida.');
       return;
     }
+
+    const parsedRoles: Array<{ title: string; capacity: number }> = [];
+    for (const role of draftRoles) {
+      const title = role.title.trim();
+      const capacity = parseInt(role.capacity, 10);
+      if (!title) {
+        setErr('Preencha o título de todos os cargos adicionados ou remova o cargo vazio.');
+        return;
+      }
+      if (!Number.isFinite(capacity) || capacity < 1) {
+        setErr('A quantidade de vagas deve ser um número maior ou igual a 1.');
+        return;
+      }
+      parsedRoles.push({ title, capacity });
+    }
+
     setBusy(true);
     setErr(null);
     try {
-      const created = await api.createEvent(ministryId, {
+      await api.createEventWithRoles(ministryId, {
         title: eventTitle.trim(),
         startsAt: startsAt.toISOString(),
+        roles: parsedRoles.length > 0 ? parsedRoles : undefined,
       });
       setEventTitle('');
-      setForEventId(created.id);
+      setEventTime('09:00');
+      setDraftRoles([]);
       queryClient.invalidateQueries({ queryKey: ['ministry-events', ministryId] });
+      queryClient.invalidateQueries({ queryKey: ['ministry-event-roles', ministryId] });
     } catch (error) {
       setErr(error instanceof Error ? error.message : 'Erro ao criar evento');
     } finally {
       setBusy(false);
     }
-  }, [eventTitle, eventTime, ministryId, month, queryClient, selectedDay]);
-
-  const addRole = useCallback(async () => {
-    if (!forEventId || !roleTitle.trim()) {
-      setErr('Selecione um evento e informe o cargo.');
-      return;
-    }
-    const n = parseInt(roleSlots, 10);
-    if (!Number.isFinite(n) || n < 1) {
-      setErr('Vagas deve ser um número >= 1.');
-      return;
-    }
-    setBusy(true);
-    setErr(null);
-    try {
-      await api.createEventRole(ministryId, {
-        eventId: forEventId,
-        title: roleTitle.trim(),
-        capacity: n,
-      });
-      setRoleTitle('');
-      setRoleSlots('1');
-      queryClient.invalidateQueries({ queryKey: ['ministry-event-roles', ministryId] });
-    } catch (error) {
-      setErr(error instanceof Error ? error.message : 'Erro ao adicionar cargo');
-    } finally {
-      setBusy(false);
-    }
-  }, [forEventId, ministryId, queryClient, roleSlots, roleTitle]);
+  }, [draftRoles, eventTitle, eventTime, ministryId, month, queryClient, selectedDay]);
 
   const takeSlot = useCallback(
     async (roleId: string) => {
@@ -310,16 +315,46 @@ export function MinistryScheduleTab({ ministryId, userId, isAdmin }: Props) {
             onChangeText={setEventTime}
             placeholder="08:00"
           />
-          <AppButton title="Criar evento" onPress={createEvent} loading={busy} />
+
           <Text style={[styles.subTitle, styles.mt]} allowFontScaling>
-            Cargo no evento
+            Cargos e vagas (opcional)
           </Text>
           <Text style={styles.hint} allowFontScaling>
-            O último evento criado fica selecionado para adicionar cargos. Toque num evento abaixo para mudar o alvo.
+            Adicione quantos cargos quiser. Você pode criar evento sem cargos.
           </Text>
-          <AppTextField label="Título do cargo" value={roleTitle} onChangeText={setRoleTitle} />
-          <AppTextField label="Vagas" value={roleSlots} onChangeText={setRoleSlots} keyboardType="number-pad" />
-          <AppButton title="Adicionar cargo" onPress={addRole} loading={busy} variant="outline" />
+          {draftRoles.length === 0 ? (
+            <Text style={styles.muted} allowFontScaling>
+              Nenhum cargo adicionado.
+            </Text>
+          ) : (
+            draftRoles.map((role, index) => (
+              <View key={role.id} style={styles.roleDraftCard}>
+                <Text style={styles.roleDraftTitle} allowFontScaling>
+                  Cargo {index + 1}
+                </Text>
+                <AppTextField
+                  label="Título do cargo"
+                  value={role.title}
+                  onChangeText={(value) => updateDraftRole(role.id, { title: value })}
+                />
+                <AppTextField
+                  label="Vagas"
+                  value={role.capacity}
+                  onChangeText={(value) => updateDraftRole(role.id, { capacity: value })}
+                  keyboardType="number-pad"
+                />
+                <AppButton
+                  title="Remover cargo"
+                  variant="ghost"
+                  onPress={() => removeDraftRole(role.id)}
+                />
+              </View>
+            ))
+          )}
+          <AppButton title="+ Adicionar cargo" onPress={addDraftRole} variant="outline" />
+          <View style={styles.createEventBtn}>
+            <AppButton title="Criar evento" onPress={createEvent} loading={busy} />
+          </View>
         </View>
       ) : null}
 
@@ -333,17 +368,14 @@ export function MinistryScheduleTab({ ministryId, userId, isAdmin }: Props) {
       ) : (
         eventsOnSelectedDay.map((ev) => (
           <View key={ev.id} style={styles.eventCard}>
-            <Pressable
-              onPress={() => setForEventId(ev.id)}
-              style={forEventId === ev.id ? styles.eventSelected : undefined}
-            >
+            <View>
               <Text style={styles.eventTitle} allowFontScaling>
                 {ev.title}
               </Text>
               <Text style={styles.muted} allowFontScaling>
                 {formatEventDateTime(ev.startsAt)}
               </Text>
-            </Pressable>
+            </View>
             {(rolesByEvent[ev.id] ?? []).map((role) => {
               const taken = assignsByRole[role.id] ?? [];
               const mine = taken.find((a) => a.userId === userId);
@@ -412,6 +444,21 @@ const styles = StyleSheet.create({
   },
   hint: { fontSize: 13, color: palette.textSecondary, marginBottom: spacing.sm },
   mt: { marginTop: spacing.md },
+  roleDraftCard: {
+    marginTop: spacing.sm,
+    padding: spacing.sm,
+    borderWidth: 1,
+    borderColor: palette.border,
+    borderRadius: 10,
+    backgroundColor: palette.background,
+  },
+  roleDraftTitle: {
+    fontSize: 14,
+    fontWeight: '700',
+    color: palette.text,
+    marginBottom: spacing.xs,
+  },
+  createEventBtn: { marginTop: spacing.sm },
   muted: { fontSize: 14, color: palette.textSecondary },
   eventCard: {
     marginTop: spacing.sm,
@@ -420,12 +467,6 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     borderWidth: 1,
     borderColor: palette.border,
-  },
-  eventSelected: {
-    backgroundColor: palette.accentSoft,
-    borderRadius: 8,
-    padding: spacing.sm,
-    marginBottom: spacing.sm,
   },
   eventTitle: { fontSize: 17, fontWeight: '700', color: palette.text },
   roleRow: { marginTop: spacing.sm, paddingTop: spacing.sm, borderTopWidth: 1, borderTopColor: palette.border },
