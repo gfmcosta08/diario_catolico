@@ -9,7 +9,7 @@ services:
     rootDir: .
     plan: free
     buildCommand: npm install && cd backend && npm install && npm run prisma:generate && npx tsc && cd .. && npm run build:web
-    startCommand: node server-entry.mjs
+    startCommand: node index.ts
     
     envVars:
       - key: DATABASE_URL
