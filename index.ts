@@ -20,6 +20,15 @@ function runStep(cmd: string, args: string[]) {
   });
 }
 
+async function runOptionalStep(label: string, cmd: string, args: string[]) {
+  try {
+    await runStep(cmd, args);
+  } catch (error) {
+    console.warn(`[WARN] ${label} falhou; seguindo startup.`);
+    console.warn(String(error));
+  }
+}
+
 async function main() {
   if (!runningOnRender) {
     // Local Expo workflow (native/web) keeps platform-specific registerPlayer.
@@ -38,14 +47,25 @@ async function main() {
   }
 
   try {
-    try {
-      await runStep('npm', ['--prefix', 'backend', 'run', 'prisma:migrate']);
-    } catch (error) {
-      console.warn('[WARN] prisma:migrate falhou; continuando com prisma:push');
-      console.warn(String(error));
-    }
+    await runOptionalStep('prisma:migrate', 'npm', [
+      '--prefix',
+      'backend',
+      'run',
+      'prisma:migrate',
+    ]);
 
-    await runStep('npm', ['--prefix', 'backend', 'run', 'prisma:push']);
+    const shouldRunPrismaPush = process.env.AUTO_PRISMA_PUSH === 'true';
+    if (shouldRunPrismaPush) {
+      const pushArgs = ['--prefix', 'backend', 'run', 'prisma:push'];
+      if (process.env.PRISMA_PUSH_ACCEPT_DATA_LOSS === 'true') {
+        pushArgs.push('--', '--accept-data-loss');
+      }
+      await runOptionalStep('prisma:push', 'npm', pushArgs);
+    } else {
+      console.log(
+        '[INFO] AUTO_PRISMA_PUSH!=true: pulando prisma:push no startup para evitar bloqueio do deploy.'
+      );
+    }
 
     const child = spawn('npm', ['--prefix', 'backend', 'run', 'start'], {
       stdio: 'inherit',
