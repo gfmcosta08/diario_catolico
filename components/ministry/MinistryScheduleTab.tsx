@@ -52,6 +52,24 @@ function parseHm(raw: string): { h: number; m: number } | null {
   return { h, m };
 }
 
+function formatEventDateTime(raw: string) {
+  const d = new Date(raw);
+  if (Number.isNaN(d.getTime())) return raw;
+
+  try {
+    return d.toLocaleString('pt-BR', {
+      weekday: 'short',
+      day: '2-digit',
+      month: 'short',
+      year: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit',
+    });
+  } catch {
+    return d.toLocaleString('pt-BR');
+  }
+}
+
 type Props = {
   ministryId: string;
   userId: string;
@@ -323,11 +341,7 @@ export function MinistryScheduleTab({ ministryId, userId, isAdmin }: Props) {
                 {ev.title}
               </Text>
               <Text style={styles.muted} allowFontScaling>
-                {new Date(ev.startsAt).toLocaleString('pt-BR', {
-                  weekday: 'short',
-                  dateStyle: 'medium',
-                  timeStyle: 'short',
-                })}
+                {formatEventDateTime(ev.startsAt)}
               </Text>
             </Pressable>
             {(rolesByEvent[ev.id] ?? []).map((role) => {
