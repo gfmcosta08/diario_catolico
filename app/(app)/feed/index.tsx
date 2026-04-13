@@ -35,7 +35,7 @@ export default function CommunitySelectionScreen() {
     return (
       <View style={styles.center}>
         <Text style={styles.subtitle} allowFontScaling>
-          Faça login para acessar as comunidades.
+          Faca login para acessar as comunidades.
         </Text>
       </View>
     );
@@ -55,7 +55,7 @@ export default function CommunitySelectionScreen() {
           Comunidade
         </Text>
         <Text style={styles.subtitle} allowFontScaling>
-          Escolha qual comunidade (ministério) você quer entrar.
+          Escolha qual comunidade (ministerio) voce quer entrar.
         </Text>
 
         {ministriesQuery.isLoading ? (
@@ -63,9 +63,9 @@ export default function CommunitySelectionScreen() {
         ) : (ministriesQuery.data?.length ?? 0) === 0 ? (
           <View style={styles.emptyCard}>
             <Text style={styles.emptyText} allowFontScaling>
-              Você ainda não participa de nenhum ministério.
+              Voce ainda nao participa de nenhum ministerio.
             </Text>
-            <AppButton title="Ver ministérios" onPress={() => router.push('/(app)/ministries')} />
+            <AppButton title="Ver ministerios" onPress={() => router.push('/(app)/ministries')} />
           </View>
         ) : (
           <View style={styles.list}>
@@ -84,7 +84,7 @@ export default function CommunitySelectionScreen() {
                     {row.ministry.name}
                   </Text>
                   <Text style={styles.cardSub} allowFontScaling>
-                    Comunidade do ministério · {roleLabel(row.role)}
+                    Comunidade do ministerio - {roleLabel(row.role)}
                   </Text>
                 </View>
               </Pressable>

@@ -150,7 +150,7 @@ export default function CommunityTimelineScreen() {
     return (
       <View style={styles.center}>
         <Text style={styles.emptyText} allowFontScaling>
-          Faça login para acessar as comunidades.
+          Faca login para acessar as comunidades.
         </Text>
       </View>
     );
@@ -168,7 +168,7 @@ export default function CommunityTimelineScreen() {
     return (
       <View style={styles.center}>
         <Text style={styles.emptyText} allowFontScaling>
-          Você não tem acesso a essa comunidade.
+          Voce nao tem acesso a essa comunidade.
         </Text>
         <View style={{ marginTop: spacing.md }}>
           <AppButton title="Voltar para comunidades" onPress={() => router.replace('/(app)/feed')} />
@@ -191,7 +191,7 @@ export default function CommunityTimelineScreen() {
           {selectedCommunity.ministry.name}
         </Text>
         <Text style={styles.subtitle} allowFontScaling>
-          Comunidade do ministério · {roleLabel(selectedCommunity.role)}
+          Comunidade do ministerio - {roleLabel(selectedCommunity.role)}
         </Text>
 
         <ScrollView
@@ -218,7 +218,7 @@ export default function CommunityTimelineScreen() {
         <View style={styles.composeCard}>
           <TextInput
             style={styles.textInput}
-            placeholder="O que está acontecendo na comunidade?"
+            placeholder="O que esta acontecendo na comunidade?"
             placeholderTextColor={palette.textSecondary}
             multiline
             value={newPostContent}
@@ -238,7 +238,7 @@ export default function CommunityTimelineScreen() {
           <ActivityIndicator size="large" color={palette.primary} style={{ marginTop: spacing.lg }} />
         ) : rootPosts.length === 0 ? (
           <Text style={styles.emptyText} allowFontScaling>
-            Ainda não há postagens nesta comunidade.
+            Ainda nao ha postagens nesta comunidade.
           </Text>
         ) : (
           rootPosts.map((post) => {
@@ -314,7 +314,7 @@ export default function CommunityTimelineScreen() {
                   ? replies.map((reply) => (
                       <View key={reply.id} style={styles.replyItem}>
                         <Text style={styles.replyMeta} allowFontScaling>
-                          {reply.authorName} · {formatPostTime(reply.createdAt)}
+                          {reply.authorName} - {formatPostTime(reply.createdAt)}
                         </Text>
                         <Text style={styles.replyContent} allowFontScaling {...noTranslateProps}>
                           {reply.content}
